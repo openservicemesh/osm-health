@@ -3,6 +3,7 @@ package kubernetes
 import (
 	"context"
 	"errors"
+	"os"
 	"strings"
 
 	v1 "k8s.io/api/core/v1"
@@ -20,14 +21,20 @@ func PodFromString(namespacedPod string) (*v1.Pod, error) {
 		return nil, errors.New("invalid Pod name")
 	}
 
+	if len(os.Getenv("KUBECONFIG")) <= 0 {
+		log.Fatal().Msgf("Point us to the Kubernetes Config via the KUBECONFIG. export KUBECONFIG=~/.kube/config maybe?")
+	}
+
 	// Initialize kube config and client
-	kubeConfig, err := clientcmd.BuildConfigFromFlags("", "")
+	kubeConfig, err := clientcmd.BuildConfigFromFlags("", os.Getenv("KUBECONFIG"))
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error creating kube configs using in-cluster config")
 	}
 
 	namespace := podChunks[0]
 	podName := podChunks[1]
+
+	log.Trace().Msgf("Looking for Pod with Name=%s in Namespace=%s", podName, namespace)
 
 	kubeClient := kubernetes.NewForConfigOrDie(kubeConfig)
 
@@ -37,8 +44,11 @@ func PodFromString(namespacedPod string) (*v1.Pod, error) {
 		return nil, errors.New("error getting pods")
 	}
 
+	log.Trace().Msgf("Looking for pod %s", namespacedPod)
 	for _, pod := range podList.Items {
+		log.Trace().Msgf("Could this be it: %s/%s", pod.Namespace, pod.Name)
 		if pod.Namespace == namespace && pod.Name == podName {
+			log.Trace().Msgf("Found Pod %s: %+v", namespacedPod, pod)
 			return &pod, nil
 		}
 	}
