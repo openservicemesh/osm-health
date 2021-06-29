@@ -22,7 +22,11 @@ func (h CallerHook) Run(e *zerolog.Event, _ zerolog.Level, _ string) {
 }
 
 // New creates a new zerolog.Logger
-func New(module string) zerolog.Logger {
+func New(component string) zerolog.Logger {
 	zerolog.SetGlobalLevel(zerolog.TraceLevel)
-	return log.With().Str("module", module).Logger().Hook(CallerHook{}).Output(zerolog.ConsoleWriter{Out: os.Stdout})
+	return newLogger(component).Output(zerolog.ConsoleWriter{Out: os.Stdout})
+}
+
+func newLogger(module string) zerolog.Logger {
+	return log.With().Str("module", module).Logger().Hook(CallerHook{})
 }
