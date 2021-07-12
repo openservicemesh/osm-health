@@ -30,27 +30,38 @@ func main() {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			fromPodString := c.String("from-pod")
-			if fromPodString == "" {
-				log.Fatal().Msg("--from-pod is required")
+			verb := c.Args().First()
+
+			if verb == "connectivity" {
+				fromPodString := c.String("from-pod")
+				if fromPodString == "" {
+					log.Fatal().Msg("--from-pod is required")
+				}
+
+				toPodString := c.String("to-pod")
+				if toPodString == "" {
+					log.Fatal().Msg("--to-pod is required")
+				}
+
+				fromPod, err := kubernetes.PodFromString(fromPodString)
+				if err != nil {
+					log.Fatal().Msg("Err fetching Pod ")
+				}
+
+				toPod, err := kubernetes.PodFromString(toPodString)
+				if err != nil {
+					log.Fatal().Msg("Err fetching Pod ")
+				}
+
+				connectivity.PodToPod(fromPod, toPod)
+				return nil
 			}
 
-			toPodString := c.String("to-pod")
-			if toPodString == "" {
-				log.Fatal().Msg("--to-pod is required")
+			if verb == "collect" {
+				return nil
 			}
 
-			fromPod, err := kubernetes.PodFromString(fromPodString)
-			if err != nil {
-				log.Fatal().Msg("Err fetching Pod ")
-			}
-
-			toPod, err := kubernetes.PodFromString(toPodString)
-			if err != nil {
-				log.Fatal().Msg("Err fetching Pod ")
-			}
-
-			connectivity.PodToPod(fromPod, toPod)
+			log.Fatal().Msgf("What's the verb? I don't recognize %q", verb)
 
 			return nil
 		},

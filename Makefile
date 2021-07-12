@@ -69,3 +69,7 @@ shellcheck:
 .PHONY: install-git-pre-push-hook
 install-git-pre-push-hook:
 	./scripts/install-git-pre-push-hook.sh
+
+.PHONY: run-collection
+run-collection: build-osm-trouble
+	./bin/osm-trouble collect
