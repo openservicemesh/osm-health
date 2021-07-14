@@ -1,7 +1,7 @@
 #!make
 
 TARGETS         := darwin/amd64 linux/amd64 windows/amd64
-BINNAME         ?= osm-trouble
+BINNAME         ?= osm-health
 DIST_DIRS       := find * -type d -exec
 
 GOPATH = $(shell go env GOPATH)
@@ -31,9 +31,9 @@ ifeq ($(GO_VERSION_PATCH),)
 GO_VERSION_PATCH := 0
 endif
 
-.PHONY: build-osm-trouble
-build-osm-trouble:
-	CGO_ENABLED=0  go build -v -o ./bin/osm-trouble -ldflags ${LDFLAGS} ./cmd
+.PHONY: build-osm-health
+build-osm-health:
+	CGO_ENABLED=0  go build -v -o ./bin/osm-health -ldflags ${LDFLAGS} ./cmd
 
 .PHONY: go-checks
 go-checks: go-lint go-fmt go-mod-tidy check-mocks
@@ -71,5 +71,5 @@ install-git-pre-push-hook:
 	./scripts/install-git-pre-push-hook.sh
 
 .PHONY: run-collection
-run-collection: build-osm-trouble
-	./bin/osm-trouble collect
+run-collection: build-osm-health
+	./bin/osm-health collect

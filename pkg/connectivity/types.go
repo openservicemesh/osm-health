@@ -1,9 +1,9 @@
 package connectivity
 
 import (
-	"github.com/openservicemesh/osm-trouble/pkg/logger"
+	"github.com/draychev/osm-health/pkg/logger"
 )
 
 var (
-	log = logger.New("osm-trouble/connectivity")
+	log = logger.New("osm-health/connectivity")
 )
