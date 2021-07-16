@@ -1,4 +1,4 @@
-module github.com/draychev/osm-health
+module github.com/openservicemesh/osm-health
 
 go 1.16
 

@@ -1,7 +1,7 @@
 package connectivity
 
 import (
-	"github.com/draychev/osm-health/pkg/logger"
+	"github.com/openservicemesh/osm-health/pkg/logger"
 )
 
 var (

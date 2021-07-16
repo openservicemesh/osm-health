@@ -1,9 +1,10 @@
 package connectivity
 
 import (
+	"fmt"
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/draychev/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common"
 )
 
 // PodToPod tests the connectivity between a source and destination pods.
