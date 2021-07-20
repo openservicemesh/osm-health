@@ -27,8 +27,8 @@ Example:
 
 type connectivityPodToPodCmd struct {
 	out             io.Writer
-	fromPod         string
-	toPod           string
+	srcPod          string
+	destPod         string
 	clientSet       kubernetes.Interface
 	smiAccessClient smiAccessClient.Interface
 	// meshConfigClient osmConfigClient.Interface
@@ -46,8 +46,8 @@ func newConnectivityPodToPodCmd(config *action.Configuration, in io.Reader, out 
 		Long:  connectivityPodToPodDesc,
 		Args:  cobra.ExactArgs(2),
 		RunE: func(_ *cobra.Command, args []string) error {
-			podToPodCmd.fromPod = args[0]
-			podToPodCmd.toPod = args[1]
+			podToPodCmd.srcPod = args[0]
+			podToPodCmd.destPod = args[1]
 
 			config, err := settings.RESTClientGetter().ToRESTConfig()
 			if err != nil {
@@ -56,11 +56,11 @@ func newConnectivityPodToPodCmd(config *action.Configuration, in io.Reader, out 
 
 			podToPodCmd.restConfig = config
 
-			clientset, err := kubernetes.NewForConfig(config)
+			clientSet, err := kubernetes.NewForConfig(config)
 			if err != nil {
 				return errors.Errorf("Could not access Kubernetes cluster, check kubeconfig: %s", err)
 			}
-			podToPodCmd.clientSet = clientset
+			podToPodCmd.clientSet = clientSet
 
 			accessClient, err := smiAccessClient.NewForConfig(config)
 			if err != nil {
@@ -82,16 +82,16 @@ func newConnectivityPodToPodCmd(config *action.Configuration, in io.Reader, out 
 }
 
 func (podToPodCmd *connectivityPodToPodCmd) run() error {
-	fromPod, err := kubernetesHelper.PodFromString(podToPodCmd.fromPod)
+	srcPod, err := kubernetesHelper.PodFromString(podToPodCmd.srcPod)
 	if err != nil {
 		return errors.New("invalid SOURCE_POD")
 	}
 
-	toPod, err := kubernetesHelper.PodFromString(podToPodCmd.toPod)
+	destPod, err := kubernetesHelper.PodFromString(podToPodCmd.destPod)
 	if err != nil {
 		return errors.New("invalid DESTINATION_POD")
 	}
 
-	connectivity.PodToPod(fromPod, toPod)
+	connectivity.PodToPod(srcPod, destPod, podToPodCmd.clientSet)
 	return nil
 }
