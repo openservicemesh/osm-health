@@ -8,8 +8,8 @@ import (
 
 	"helm.sh/helm/v3/pkg/action"
 
-	"github.com/draychev/osm-health/pkg/cli"
-	"github.com/draychev/osm-health/pkg/logger"
+	"github.com/openservicemesh/osm-health/pkg/cli"
+	"github.com/openservicemesh/osm-health/pkg/logger"
 	"github.com/spf13/cobra"
 )
 

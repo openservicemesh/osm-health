@@ -10,8 +10,8 @@ import (
 	"k8s.io/client-go/rest"
 
 	// osmConfigClient "github.com/openservicemesh/osm/pkg/gen/client/config/clientset/versioned"
-	"github.com/draychev/osm-health/pkg/connectivity"
-	"github.com/draychev/osm-health/pkg/kubernetesHelper"
+	"github.com/openservicemesh/osm-health/pkg/connectivity"
+	"github.com/openservicemesh/osm-health/pkg/kubernetesHelper"
 	smiAccessClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/access/clientset/versioned"
 )
 
@@ -84,12 +84,12 @@ func newConnectivityPodToPodCmd(config *action.Configuration, in io.Reader, out 
 func (podToPodCmd *connectivityPodToPodCmd) run() error {
 	fromPod, err := kubernetesHelper.PodFromString(podToPodCmd.fromPod)
 	if err != nil {
-		return errors.New("invaliid SOURCE_POD")
+		return errors.New("invalid SOURCE_POD")
 	}
 
 	toPod, err := kubernetesHelper.PodFromString(podToPodCmd.toPod)
 	if err != nil {
-		return errors.New("invaliid DESTINATION_POD")
+		return errors.New("invalid DESTINATION_POD")
 	}
 
 	connectivity.PodToPod(fromPod, toPod)
