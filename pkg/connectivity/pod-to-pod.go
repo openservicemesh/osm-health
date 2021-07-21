@@ -17,8 +17,12 @@ func PodToPod(srcPod *v1.Pod, destPod *v1.Pod, clientSet kubernetes.Interface) c
 
 	// TODO: actually test connectivity
 	srcPodLabels := srcPod.ObjectMeta.GetLabels()
-	for key,val := range srcPodLabels {
-		fmt.Printf("key: %s, val: %s\n", key,val)
+	for label,val := range srcPodLabels {
+		fmt.Printf("label: %s, val: %s\n", label,val)
+	}
+	srcPodAnnotations := srcPod.ObjectMeta.GetAnnotations()
+	for annotation,val := range srcPodAnnotations {
+		fmt.Printf("annotation: %s, val: %s\n", annotation,val)
 	}
 	inSameMesh, err := arePodsInSameMesh(srcPod, destPod, clientSet)
 	if err != nil {
