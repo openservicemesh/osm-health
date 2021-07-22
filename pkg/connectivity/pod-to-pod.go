@@ -3,7 +3,6 @@ package connectivity
 import (
 	"fmt"
 	v1 "k8s.io/api/core/v1"
-	"strings"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
 )
@@ -14,7 +13,7 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 
 	// TODO: actually test connectivity
 	fmt.Printf("Pod %s has an envoy sidecar: %t\n", fromPod.Name, hasEnvoySideCar(fromPod))
-	fmt.Printf("Pod %s has an envoy sidecar: %t\n", fromPod.Name, hasEnvoySideCar(toPod))
+	fmt.Printf("Pod %s has an envoy sidecar: %t\n", toPod.Name, hasEnvoySideCar(toPod))
 
 	return common.Result{
 		SMIPolicy: common.SMIPolicy{
@@ -27,8 +26,24 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 }
 
 func hasEnvoySideCar(pod *v1.Pod) bool {
-	for _, container := range pod.Spec.Containers {
-		if strings.Contains(container.Image, "envoy") {
+	foundEnvoyContainer := checkForContainer(pod.Spec.Containers, "envoy")
+	foundOsmInitContainer := checkForContainer(pod.Spec.InitContainers, "osm-init")
+	return foundEnvoyContainer && foundOsmInitContainer && isPodMeshed(pod) && (countNumContainers(pod) >= 3)
+}
+
+func isPodMeshed(pod *v1.Pod) bool {
+	_, labels := pod.Labels["osm-proxy-uuid"] // TODO: change this to constants.EnvoyUniqueIDLabelName?
+	return labels
+}
+
+func countNumContainers(pod *v1.Pod) int {
+	return len(pod.Spec.Containers) + len(pod.Spec.InitContainers)
+}
+
+// TODO: more specific check?
+func checkForContainer(containerList []v1.Container, name string) bool {
+	for _, container := range containerList {
+		if container.Name == name {
 			return true
 		}
 	}
