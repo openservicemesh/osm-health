@@ -4,15 +4,14 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
+	smiAccessClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/access/clientset/versioned"
 	"github.com/spf13/cobra"
 	"helm.sh/helm/v3/pkg/action"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	// osmConfigClient "github.com/openservicemesh/osm/pkg/gen/client/config/clientset/versioned"
 	"github.com/openservicemesh/osm-health/pkg/connectivity"
-	"github.com/openservicemesh/osm-health/pkg/kubernetesHelper"
-	smiAccessClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/access/clientset/versioned"
+	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 )
 
 const connectivityPodToPodDesc = `
@@ -82,12 +81,12 @@ func newConnectivityPodToPodCmd(config *action.Configuration, in io.Reader, out 
 }
 
 func (podToPodCmd *connectivityPodToPodCmd) run() error {
-	fromPod, err := kubernetesHelper.PodFromString(podToPodCmd.fromPod)
+	fromPod, err := kuberneteshelper.PodFromString(podToPodCmd.fromPod)
 	if err != nil {
 		return errors.New("invalid SOURCE_POD")
 	}
 
-	toPod, err := kubernetesHelper.PodFromString(podToPodCmd.toPod)
+	toPod, err := kuberneteshelper.PodFromString(podToPodCmd.toPod)
 	if err != nil {
 		return errors.New("invalid DESTINATION_POD")
 	}
