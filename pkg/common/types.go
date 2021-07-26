@@ -4,9 +4,9 @@ import "fmt"
 
 // Pod is an identifier of a pod within a cluster that is being tested.
 type Pod struct {
-	Cluster string
+	Cluster   string
 	Namespace string
-	Name string
+	Name      string
 }
 
 func (p Pod) String() string {
@@ -22,8 +22,8 @@ type Result struct {
 
 // SMIPolicy contains context around how SMI affects a result of a test.
 type SMIPolicy struct {
-	HasPolicy bool
-	ValidPolicy bool
+	HasPolicy                  bool
+	ValidPolicy                bool
 	SourceToDestinationAllowed bool
 	// TODO: include actual SMI policy
 }

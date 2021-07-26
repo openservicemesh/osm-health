@@ -1,16 +1,15 @@
 package main
 
 import (
-	// "github.com/urfave/cli/v2"
 	goflag "flag"
 	"io"
 	"os"
 
+	"github.com/spf13/cobra"
 	"helm.sh/helm/v3/pkg/action"
 
 	"github.com/openservicemesh/osm-health/pkg/cli"
 	"github.com/openservicemesh/osm-health/pkg/logger"
-	"github.com/spf13/cobra"
 )
 
 var globalUsage = `The osm-health cli enables you to
@@ -62,6 +61,7 @@ func initCommands() *cobra.Command {
 }
 
 func main() {
+	log.Info().Msg(`👋🏻`)
 	cmd := initCommands()
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)

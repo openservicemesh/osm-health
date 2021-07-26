@@ -31,6 +31,9 @@ ifeq ($(GO_VERSION_PATCH),)
 GO_VERSION_PATCH := 0
 endif
 
+.PHONY: build-ci
+build-ci: build-osm-health
+
 .PHONY: build-osm-health
 build-osm-health:
 	CGO_ENABLED=0  go build -v -o ./bin/osm-health -ldflags ${LDFLAGS} ./cmd
@@ -59,7 +62,7 @@ go-test:
 	./scripts/go-test.sh
 
 .PHONY: go-test-coverage
-go-test-coverage: embed-files
+go-test-coverage:
 	./scripts/test-w-coverage.sh
 
 .PHONY: shellcheck
@@ -73,3 +76,7 @@ install-git-pre-push-hook:
 .PHONY: run-collection
 run-collection: build-osm-health
 	./bin/osm-health collect
+
+.PHONY: kind-up
+kind-up:
+	./scripts/kind-with-registry.sh

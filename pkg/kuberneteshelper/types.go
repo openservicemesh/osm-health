@@ -1,4 +1,4 @@
-package kubernetesHelper
+package kuberneteshelper
 
 import "github.com/openservicemesh/osm-health/pkg/logger"
 
