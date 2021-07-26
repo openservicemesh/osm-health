@@ -33,19 +33,19 @@ func isMonitoredBy(client kubernetes.Interface, namespace kubernetes2.Namespace,
 }
 
 // Info implements common.Runnable
-func (mc MonitoredCheck) Info() string {
-	return fmt.Sprintf("Checking whether namespace %s is monitored by OSM %s", mc.namespace, mc.meshName)
+func (check MonitoredCheck) Info() string {
+	return fmt.Sprintf("Checking whether namespace %s is monitored by OSM %s", check.namespace, check.meshName)
 }
 
 // Run implements common.Runnable
-func (mc MonitoredCheck) Run() error {
-	labels, err := getLabels(mc.client, mc.namespace)
+func (check MonitoredCheck) Run() error {
+	labels, err := getLabels(check.client, check.namespace)
 	if err != nil {
 		return err
 	}
 
 	labelValue, ok := labels[constants.OSMKubeResourceMonitorAnnotation]
-	isMonitoredByController := ok && labelValue == mc.meshName.String()
+	isMonitoredByController := ok && labelValue == check.meshName.String()
 
 	if !isMonitoredByController {
 		return ErrNotMonitoredByOSMController

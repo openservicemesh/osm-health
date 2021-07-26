@@ -32,13 +32,13 @@ func isInjectEnabled(client kubernetes.Interface, namespace kubernetes2.Namespac
 }
 
 // Info implements common.Runnable
-func (ii SidecarInjectionCheck) Info() string {
-	return fmt.Sprintf("Checking whether namespace %s is annotated for automatic sidecar injection", ii.namespace)
+func (check SidecarInjectionCheck) Info() string {
+	return fmt.Sprintf("Checking whether namespace %s is annotated for automatic sidecar injection", check.namespace)
 }
 
 // Run implements common.Runnable
-func (ii SidecarInjectionCheck) Run() error {
-	annotations, err := getAnnotations(ii.client, ii.namespace)
+func (check SidecarInjectionCheck) Run() error {
+	annotations, err := getAnnotations(check.client, check.namespace)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 		return err
