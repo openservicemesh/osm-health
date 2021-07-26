@@ -91,6 +91,6 @@ func (podToPodCmd *connectivityPodToPodCmd) run() error {
 		return errors.New("invalid DESTINATION_POD")
 	}
 
-	connectivity.PodToPod(fromPod, toPod)
+	connectivity.PodToPod(podToPodCmd.clientSet, fromPod, toPod)
 	return nil
 }

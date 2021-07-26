@@ -48,7 +48,7 @@ func PodFromString(namespacedPod string) (*v1.Pod, error) {
 	namespace := podChunks[0]
 	podName := podChunks[1]
 
-	log.Trace().Msgf("Looking for Pod with Name=%s in Namespace=%s", podName, namespace)
+	log.Trace().Msgf("Looking for Pod with Name=%s in namespace=%s", podName, namespace)
 
 	kubeClient := kubernetes.NewForConfigOrDie(kubeConfig)
 
