@@ -1,23 +1,16 @@
 package main
 
-import (
-	"io"
+import "github.com/spf13/cobra"
 
-	"github.com/spf13/cobra"
-	"helm.sh/helm/v3/pkg/action"
-)
-
-const validateDesc = `
-Validates YAML files including SMI policies
-	(add more descriptive description)
-`
-
-func newValidateCmd(config *action.Configuration, in io.Reader, out io.Writer) *cobra.Command {
+func newValidateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "validate",
 		Short: "Validates YAML files including SMI policies",
-		Long:  validateDesc,
-		Args:  cobra.NoArgs,
+		Long: `
+Validates YAML files including SMI policies
+	(add more descriptive description)
+`,
+		Args: cobra.NoArgs,
 	}
 	return cmd
 }
