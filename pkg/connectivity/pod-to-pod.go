@@ -26,14 +26,15 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 }
 
 func hasEnvoySideCar(pod *v1.Pod) bool {
+
 	foundEnvoyContainer := checkForContainer(pod.Spec.Containers, "envoy")
 	foundOsmInitContainer := checkForContainer(pod.Spec.InitContainers, "osm-init")
 	return foundEnvoyContainer && foundOsmInitContainer && isPodMeshed(pod) && (countNumContainers(pod) >= 3)
 }
 
 func isPodMeshed(pod *v1.Pod) bool {
-	_, labels := pod.Labels["osm-proxy-uuid"] // TODO: change this to constants.EnvoyUniqueIDLabelName?
-	return labels
+	_, containsLabel := pod.Labels["osm-proxy-uuid"] // TODO: use constants.EnvoyUniqueIDLabelName?
+	return containsLabel
 }
 
 func countNumContainers(pod *v1.Pod) int {

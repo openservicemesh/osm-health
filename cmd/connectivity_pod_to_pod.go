@@ -91,7 +91,7 @@ func (podToPodCmd *connectivityPodToPodCmd) run() error {
 	if err != nil {
 		return errors.New("invalid DESTINATION_POD")
 	}
-
+	kubernetesHelper.GetMeshConfig("arc-osm-system", "osm-mesh-config")
 	connectivity.PodToPod(fromPod, toPod)
 	return nil
 }
