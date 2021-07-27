@@ -37,7 +37,7 @@ func newRootCmd(config *action.Configuration, in io.Reader, out io.Writer, args 
 	cmd.AddCommand(
 		newCollectCmd(config, in, out),
 		newConnectivityCmd(config, in, out),
-		newValidateCmd(config, in, out),
+		newValidateCmd(),
 	)
 
 	_ = flags.Parse(args)
