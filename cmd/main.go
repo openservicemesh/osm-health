@@ -35,7 +35,7 @@ func newRootCmd(config *action.Configuration, in io.Reader, out io.Writer, args 
 
 	// Add subcommands here
 	cmd.AddCommand(
-		newCollectCmd(config, in, out),
+		newCollectCmd(),
 		newConnectivityCmd(config, in, out),
 		newValidateCmd(config, in, out),
 	)
