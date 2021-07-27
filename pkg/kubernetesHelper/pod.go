@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"os"
 	"strings"
 
@@ -13,7 +14,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
-	configClientset "github.com/openservicemesh/osm/pkg/gen/client/config/clientset/versioned"
+	"github.com/openservicemesh/osm/pkg/signals"
+	"github.com/openservicemesh/osm/pkg/configurator"
+	"github.com/openservicemesh/osm/pkg/gen/client/config/clientset/versioned"
+	//configClientset "github.com/openservicemesh/osm/pkg/gen/client/config/clientset/versioned"
 	//v1alpha1 "github.com/openservicemesh/osm/pkg/apis/config/v1alpha1"
 )
 
@@ -61,7 +65,7 @@ func PodFromString(namespacedPod string) (*v1.Pod, error) {
 	return nil, errors.New("no pod found")
 }
 
-func GetMeshConfig(namespace, name string) (error) {
+func GetMeshConfig(namespace, name string) (string, error) {
 	if len(os.Getenv("KUBECONFIG")) <= 0 {
 		log.Fatal().Msgf("Point us to the Kubernetes Config via the KUBECONFIG. export KUBECONFIG=~/.kube/config maybe?")
 	}
@@ -72,19 +76,25 @@ func GetMeshConfig(namespace, name string) (error) {
 		log.Fatal().Err(err).Msg("Error creating kube configs using in-cluster config")
 	}
 
-	configClient, err := configClientset.NewForConfig(kubeConfig)
-	if err != nil {
-		return err
-	}
+	//configClient, err := configClientset.NewForConfig(kubeConfig)
+	//if err != nil {
+	//	return err
+	//}
+	stop := signals.RegisterExitHandlers()
 
-	meshConfigList, err := configClient.ConfigV1alpha1().MeshConfigs(namespace).List(context.TODO(), v12.ListOptions{})
-	if err != nil {
-		return err
-	}
-	for _, mc := range meshConfigList.Items {
-		fmt.Println("Found a meshconfig: %s", mc.Name)
-	}
-	return nil
+	cfg := configurator.NewConfigurator(versioned.NewForConfigOrDie(kubeConfig), stop, namespace, name)
+	fmt.Println(cfg.GetEnvoyImage())
+	cfg.GetMeshConfigJSON()
+	return cfg.GetEnvoyImage(), nil
+
+	//meshConfigList, err := configClient.ConfigV1alpha1().MeshConfigs(namespace).List(context.TODO(), v12.ListOptions{})
+	//if err != nil {
+	//	return err
+	//}
+	//for _, mc := range meshConfigList.Items {
+	//	fmt.Println("Found a meshconfig: %s", mc.Name)
+	//}
+	//return nil
 	//return nil, nil
 	//	meshConfig, err := td.ConfigClient.ConfigV1alpha1().MeshConfigs(namespace).Get(context.TODO(), td.OsmMeshConfigName, v1.GetOptions{})
 }
