@@ -23,7 +23,7 @@ func PodToPod(client kubernetes.Interface, fromPod *v1.Pod, toPod *v1.Pod) commo
 
 	destinationPod := k8s.Pod{
 		Namespace: k8s.Namespace(toPod.Namespace),
-		Name:      fromPod.Name,
+		Name:      toPod.Name,
 	}
 
 	outcomes := common.Run(

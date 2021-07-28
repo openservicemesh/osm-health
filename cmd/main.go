@@ -38,6 +38,7 @@ func newRootCmd(config *action.Configuration, in io.Reader, out io.Writer, args 
 		newCollectCmd(),
 		newConnectivityCmd(config, in, out),
 		newValidateCmd(),
+		newIngressCmd(),
 	)
 
 	_ = flags.Parse(args)
