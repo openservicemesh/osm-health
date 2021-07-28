@@ -55,7 +55,7 @@ func PodFromString(namespacedPod string) (*v1.Pod, error) {
 }
 
 // GetKubeClient returns a Kubernetes clientset.
-func GetKubeClient() (*kubernetes.Clientset, error) {
+func GetKubeClient() (kubernetes.Interface, error) {
 	var err error
 	kubeConfLocation := os.Getenv("KUBECONFIG")
 
