@@ -39,6 +39,7 @@ func newRootCmd(config *action.Configuration, in io.Reader, out io.Writer, args 
 		newConnectivityCmd(),
 		newValidateCmd(),
 		newIngressCmd(),
+		newProxyGetCmd(config, out),
 	)
 
 	_ = flags.Parse(args)
