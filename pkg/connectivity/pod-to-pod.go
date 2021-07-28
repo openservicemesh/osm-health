@@ -4,7 +4,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
-	k8s "github.com/openservicemesh/osm-health/pkg/kubernetes"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/namespace"
 	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 )
@@ -16,16 +15,6 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 	// TODO
 	meshName := common.MeshName("osm")
 
-	sourcePod := k8s.Pod{
-		Namespace: k8s.Namespace(fromPod.Namespace),
-		Name:      fromPod.Name,
-	}
-
-	destinationPod := k8s.Pod{
-		Namespace: k8s.Namespace(toPod.Namespace),
-		Name:      toPod.Name,
-	}
-
 	client, err := kuberneteshelper.GetKubeClient()
 	if err != nil {
 		log.Err(err).Msg("Error creating Kubernetes client")
@@ -33,12 +22,12 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 
 	outcomes := common.Run(
 		// Check source Pod's namespace
-		namespace.IsInjectEnabled(client, sourcePod.Namespace),
-		namespace.IsMonitoredBy(client, sourcePod.Namespace, meshName),
+		namespace.IsInjectEnabled(client, fromPod.Namespace),
+		namespace.IsMonitoredBy(client, fromPod.Namespace, meshName),
 
 		// Check destination Pod's namespace
-		namespace.IsInjectEnabled(client, destinationPod.Namespace),
-		namespace.IsMonitoredBy(client, destinationPod.Namespace, meshName),
+		namespace.IsInjectEnabled(client, toPod.Namespace),
+		namespace.IsMonitoredBy(client, toPod.Namespace, meshName),
 	)
 
 	common.Print(outcomes...)
