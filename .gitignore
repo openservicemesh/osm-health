@@ -77,4 +77,4 @@ node_modules/
 vendor/
 rootfs/
 linux-amd64
-osm
+./osm
