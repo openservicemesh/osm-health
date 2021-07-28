@@ -1,14 +1,9 @@
 package main
 
 import (
-	"io"
-
 	"github.com/pkg/errors"
-	smiAccessClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/access/clientset/versioned"
 	"github.com/spf13/cobra"
-	"helm.sh/helm/v3/pkg/action"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 
 	"github.com/openservicemesh/osm-health/pkg/connectivity"
 	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
@@ -24,73 +19,42 @@ Example:
 	(add example)
 `
 
-type connectivityPodToPodCmd struct {
-	out             io.Writer
-	fromPod         string
-	toPod           string
-	clientSet       kubernetes.Interface
-	smiAccessClient smiAccessClient.Interface
-	// meshConfigClient osmConfigClient.Interface
-	restConfig *rest.Config
-}
-
-func newConnectivityPodToPodCmd(config *action.Configuration, in io.Reader, out io.Writer) *cobra.Command {
-	podToPodCmd := &connectivityPodToPodCmd{
-		out: out,
-	}
-
+func newConnectivityPodToPodCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "pod-to-pod SOURCE_POD DESTINATION_POD",
 		Short: "Checks connectivity between Kubernetes pods",
 		Long:  connectivityPodToPodDesc,
 		Args:  cobra.ExactArgs(2),
 		RunE: func(_ *cobra.Command, args []string) error {
-			podToPodCmd.fromPod = args[0]
-			podToPodCmd.toPod = args[1]
+			if len(args) < 2 {
+				return errors.Errorf("provide both SOURCE_POD and DESTINATION_POD")
+			}
 
 			config, err := settings.RESTClientGetter().ToRESTConfig()
 			if err != nil {
 				return errors.Errorf("Error fetching kubeconfig: %s", err)
 			}
 
-			podToPodCmd.restConfig = config
-
 			clientset, err := kubernetes.NewForConfig(config)
 			if err != nil {
 				return errors.Errorf("Could not access Kubernetes cluster, check kubeconfig: %s", err)
 			}
-			podToPodCmd.clientSet = clientset
+			clientSet := clientset
 
-			accessClient, err := smiAccessClient.NewForConfig(config)
+			fromPod, err := kuberneteshelper.PodFromString(args[0])
 			if err != nil {
-				return errors.Errorf("Could not initialize SMI Access client: %s", err)
+				return errors.New("invalid SOURCE_POD")
 			}
-			podToPodCmd.smiAccessClient = accessClient
 
-			// configClient, err := osmConfigClient.NewForConfig(config)
-			// if err != nil {
-			// 	return errors.Errorf("Could not initialize OSM Config client: %s", err)
-			// }
-			// podToPodCmd.meshConfigClient = configClient
+			toPod, err := kuberneteshelper.PodFromString(args[1])
+			if err != nil {
+				return errors.New("invalid DESTINATION_POD")
+			}
 
-			return podToPodCmd.run()
+			connectivity.PodToPod(clientSet, fromPod, toPod)
+			return nil
 		},
 		Example: connectivityPodToPodExample,
 	}
 	return cmd
-}
-
-func (podToPodCmd *connectivityPodToPodCmd) run() error {
-	fromPod, err := kuberneteshelper.PodFromString(podToPodCmd.fromPod)
-	if err != nil {
-		return errors.New("invalid SOURCE_POD")
-	}
-
-	toPod, err := kuberneteshelper.PodFromString(podToPodCmd.toPod)
-	if err != nil {
-		return errors.New("invalid DESTINATION_POD")
-	}
-
-	connectivity.PodToPod(podToPodCmd.clientSet, fromPod, toPod)
-	return nil
 }
