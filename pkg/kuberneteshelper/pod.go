@@ -25,32 +25,16 @@ func PodFromString(namespacedPod string) (*v1.Pod, error) {
 		return nil, errors.New("invalid Pod name")
 	}
 
-	var err error
-	kubeConfLocation := os.Getenv("KUBECONFIG")
-
-	if kubeConfLocation == "" {
-		kubeConfLocation, err = homedir.Expand(defaultKubeConfigFile)
-		if err != nil {
-			log.Fatal()
-		}
-
-		if _, err := os.Stat(kubeConfLocation); err != nil && os.IsNotExist(err) {
-			log.Fatal().Msgf("Set KUBECONFIG and try again. (Are there k8s credentials in ~/.kube/config?)")
-		}
-	}
-
-	// Initialize kube config and client
-	kubeConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfLocation)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Error creating kube configs using in-cluster config")
-	}
-
 	namespace := podChunks[0]
 	podName := podChunks[1]
 
 	log.Trace().Msgf("Looking for Pod with Name=%s in namespace=%s", podName, namespace)
 
-	kubeClient := kubernetes.NewForConfigOrDie(kubeConfig)
+	kubeClient, err := GetKubeClient()
+	if err != nil {
+		log.Err(err).Msgf("Error getting Kubernetes client")
+		return nil, err
+	}
 
 	podList, err := kubeClient.CoreV1().Pods(namespace).List(context.Background(), v12.ListOptions{})
 	if err != nil {
@@ -68,4 +52,29 @@ func PodFromString(namespacedPod string) (*v1.Pod, error) {
 
 	log.Error().Msgf("Did not find Pod %s", namespacedPod)
 	return nil, errors.New("no pod found")
+}
+
+// GetKubeClient returns a Kubernetes clientset.
+func GetKubeClient() (*kubernetes.Clientset, error) {
+	var err error
+	kubeConfLocation := os.Getenv("KUBECONFIG")
+
+	if kubeConfLocation == "" {
+		kubeConfLocation, err = homedir.Expand(defaultKubeConfigFile)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := os.Stat(kubeConfLocation); err != nil && os.IsNotExist(err) {
+			return nil, err
+		}
+	}
+
+	// Initialize kube config and client
+	kubeConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfLocation)
+	if err != nil {
+		return nil, err
+	}
+
+	return kubernetes.NewForConfigOrDie(kubeConfig), nil
 }
