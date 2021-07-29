@@ -3,8 +3,6 @@ package namespace
 import (
 	"fmt"
 
-	kubernetes2 "github.com/openservicemesh/osm-health/pkg/kubernetes"
-
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
@@ -16,15 +14,15 @@ const enabled = "enabled"
 // SidecarInjectionCheck implements common.Runnable
 type SidecarInjectionCheck struct {
 	client    kubernetes.Interface
-	namespace kubernetes2.Namespace
+	namespace string
 }
 
 // IsInjectEnabled checks whether a namespace is enabled for sidecar injection.
-func IsInjectEnabled(client kubernetes.Interface, namespace kubernetes2.Namespace) common.Runnable {
+func IsInjectEnabled(client kubernetes.Interface, namespace string) common.Runnable {
 	return isInjectEnabled(client, namespace)
 }
 
-func isInjectEnabled(client kubernetes.Interface, namespace kubernetes2.Namespace) SidecarInjectionCheck {
+func isInjectEnabled(client kubernetes.Interface, namespace string) SidecarInjectionCheck {
 	return SidecarInjectionCheck{
 		client:    client,
 		namespace: namespace,

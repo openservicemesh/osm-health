@@ -5,7 +5,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
-	k8s "github.com/openservicemesh/osm-health/pkg/kubernetes"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/namespace"
 )
 
@@ -16,15 +15,10 @@ func ToPod(client kubernetes.Interface, toPod *v1.Pod) {
 	// TODO
 	meshName := common.MeshName("osm")
 
-	destinationPod := k8s.Pod{
-		Namespace: k8s.Namespace(toPod.Namespace),
-		Name:      toPod.Name,
-	}
-
 	outcomes := common.Run(
 		// Check destination Pod's namespace
-		namespace.IsInjectEnabled(client, destinationPod.Namespace),
-		namespace.IsMonitoredBy(client, destinationPod.Namespace, meshName),
+		namespace.IsInjectEnabled(client, toPod.Namespace),
+		namespace.IsMonitoredBy(client, toPod.Namespace, meshName),
 	)
 
 	common.Print(outcomes...)
