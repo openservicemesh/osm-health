@@ -12,6 +12,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+
+	"github.com/openservicemesh/osm/pkg/configurator"
+	"github.com/openservicemesh/osm/pkg/gen/client/config/clientset/versioned"
+	"github.com/openservicemesh/osm/pkg/signals"
 )
 
 const (
@@ -87,4 +91,15 @@ func GetKubeClient() (kubernetes.Interface, error) {
 	}
 
 	return kubernetes.NewForConfigOrDie(kubeConfig), nil
+}
+
+// GetOsmConfigurator returns a new OSM configurator
+func GetOsmConfigurator(pod *v1.Pod) configurator.Configurator {
+	stop := signals.RegisterExitHandlers()
+	kubeConfig, err := GetKubeConfig()
+	if err != nil {
+		log.Err(err).Msg("Error getting kubeconfig")
+	}
+	cfg := configurator.NewConfigurator(versioned.NewForConfigOrDie(kubeConfig), stop, pod.Namespace, pod.Name)
+	return cfg
 }

@@ -40,12 +40,16 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 		// Check source Pod's namespace
 		namespace.IsInjectEnabled(client, fromPod.Namespace),
 		namespace.IsMonitoredBy(client, fromPod.Namespace, meshName),
-		pod.HasEnvoySidecar(fromPod),
+		pod.HasMinExpectedContainers(fromPod, 3),
+		pod.HasExpectedEnvoyImage(fromPod),
+		pod.HasProxyUUIDLabel(fromPod),
 
 		// Check destination Pod's namespace
 		namespace.IsInjectEnabled(client, toPod.Namespace),
 		namespace.IsMonitoredBy(client, toPod.Namespace, meshName),
-		pod.HasEnvoySidecar(toPod),
+		pod.HasMinExpectedContainers(toPod, 3),
+		pod.HasExpectedEnvoyImage(toPod),
+		pod.HasProxyUUIDLabel(toPod),
 
 		// Source Envoy must have Outbound listener
 		envoy.HasOutboundListener(srcConfigGetter, osmVersion),
