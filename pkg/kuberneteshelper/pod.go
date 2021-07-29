@@ -10,6 +10,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -54,8 +55,8 @@ func PodFromString(namespacedPod string) (*v1.Pod, error) {
 	return nil, errors.New("no pod found")
 }
 
-// GetKubeClient returns a Kubernetes clientset.
-func GetKubeClient() (kubernetes.Interface, error) {
+// GetKubeConfig returns the kubeconfig
+func GetKubeConfig() (*restclient.Config, error) {
 	var err error
 	kubeConfLocation := os.Getenv("KUBECONFIG")
 
@@ -72,6 +73,15 @@ func GetKubeClient() (kubernetes.Interface, error) {
 
 	// Initialize kube config and client
 	kubeConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfLocation)
+	if err != nil {
+		return nil, err
+	}
+	return kubeConfig, nil
+}
+
+// GetKubeClient returns a Kubernetes clientset.
+func GetKubeClient() (kubernetes.Interface, error) {
+	kubeConfig, err := GetKubeConfig()
 	if err != nil {
 		return nil, err
 	}
