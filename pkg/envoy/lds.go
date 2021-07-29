@@ -3,13 +3,17 @@ package envoy
 import (
 	"errors"
 
+	v1 "k8s.io/api/core/v1"
+
 	"github.com/openservicemesh/osm-health/pkg/common"
-	k8s "github.com/openservicemesh/osm-health/pkg/kubernetes"
 )
+
+// Verify interface compliance
+var _ common.Runnable = (*HasListener)(nil)
 
 // HasListener implements common.Runnable
 type HasListener struct {
-	k8s.Pod
+	*v1.Pod
 }
 
 // Run implements common.Runnable
@@ -30,7 +34,7 @@ func (l HasListener) Info() string {
 }
 
 // NewHasListener creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener.
-func NewHasListener(pod k8s.Pod) common.Runnable {
+func NewHasListener(pod *v1.Pod) HasListener {
 	return HasListener{
 		Pod: pod,
 	}

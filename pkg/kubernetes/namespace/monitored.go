@@ -9,6 +9,9 @@ import (
 	"github.com/openservicemesh/osm/pkg/constants"
 )
 
+// Verify interface compliance
+var _ common.Runnable = (*MonitoredCheck)(nil)
+
 // MonitoredCheck implements common.Runnable
 type MonitoredCheck struct {
 	client    kubernetes.Interface
@@ -17,11 +20,7 @@ type MonitoredCheck struct {
 }
 
 // IsMonitoredBy checks whether a namespace is monitored by certain OSM Controller.
-func IsMonitoredBy(client kubernetes.Interface, namespace string, meshName common.MeshName) common.Runnable {
-	return isMonitoredBy(client, namespace, meshName)
-}
-
-func isMonitoredBy(client kubernetes.Interface, namespace string, meshName common.MeshName) MonitoredCheck {
+func IsMonitoredBy(client kubernetes.Interface, namespace string, meshName common.MeshName) MonitoredCheck {
 	return MonitoredCheck{
 		client:    client,
 		namespace: namespace,
