@@ -8,6 +8,9 @@ import (
 	"github.com/openservicemesh/osm-health/pkg/common"
 )
 
+// Verify interface compliance
+var _ common.Runnable = (*HasListener)(nil)
+
 // HasListener implements common.Runnable
 type HasListener struct {
 	*v1.Pod
@@ -31,7 +34,7 @@ func (l HasListener) Info() string {
 }
 
 // NewHasListener creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener.
-func NewHasListener(pod *v1.Pod) common.Runnable {
+func NewHasListener(pod *v1.Pod) HasListener {
 	return HasListener{
 		Pod: pod,
 	}

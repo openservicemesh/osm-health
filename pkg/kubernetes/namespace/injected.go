@@ -11,6 +11,9 @@ import (
 
 const enabled = "enabled"
 
+// Verify interface compliance
+var _ common.Runnable = (*SidecarInjectionCheck)(nil)
+
 // SidecarInjectionCheck implements common.Runnable
 type SidecarInjectionCheck struct {
 	client    kubernetes.Interface
@@ -18,11 +21,7 @@ type SidecarInjectionCheck struct {
 }
 
 // IsInjectEnabled checks whether a namespace is enabled for sidecar injection.
-func IsInjectEnabled(client kubernetes.Interface, namespace string) common.Runnable {
-	return isInjectEnabled(client, namespace)
-}
-
-func isInjectEnabled(client kubernetes.Interface, namespace string) SidecarInjectionCheck {
+func IsInjectEnabled(client kubernetes.Interface, namespace string) SidecarInjectionCheck {
 	return SidecarInjectionCheck{
 		client:    client,
 		namespace: namespace,
