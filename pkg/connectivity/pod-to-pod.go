@@ -5,6 +5,7 @@ import (
 
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/namespace"
+	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
 	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 )
 
@@ -24,10 +25,12 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 		// Check source Pod's namespace
 		namespace.IsInjectEnabled(client, fromPod.Namespace),
 		namespace.IsMonitoredBy(client, fromPod.Namespace, meshName),
+		pod.HasEnvoySidecar(fromPod),
 
 		// Check destination Pod's namespace
 		namespace.IsInjectEnabled(client, toPod.Namespace),
 		namespace.IsMonitoredBy(client, toPod.Namespace, meshName),
+		pod.HasEnvoySidecar(toPod),
 	)
 
 	common.Print(outcomes...)

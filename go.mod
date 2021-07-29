@@ -6,8 +6,8 @@ require (
 	github.com/axw/gocov v1.0.0 // indirect
 	github.com/envoyproxy/go-control-plane v0.9.9
 	github.com/fatih/color v1.12.0 // indirect
+	github.com/golang/mock v1.4.4 // indirect
 	github.com/golang/protobuf v1.4.3
-	github.com/golangci/golangci-lint v1.41.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
