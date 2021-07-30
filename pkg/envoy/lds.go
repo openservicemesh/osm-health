@@ -14,6 +14,12 @@ var _ common.Runnable = (*HasListenerCheck)(nil)
 type HasListenerCheck struct {
 	ConfigGetter
 	osm.ControllerVersion
+
+	// This is used for Info() function from Runnable. Helps the logs identify what kind of a listener we are looking for.
+	listenerType string
+
+	// This map will be used to get the expected NAME of the Envoy listener depending on the OSM version in use.
+	expectedListenersPerVersion map[osm.ControllerVersion]string
 }
 
 // Run implements common.Runnable
@@ -31,7 +37,7 @@ func (l HasListenerCheck) Run() error {
 		return ErrEnvoyConfigEmpty
 	}
 
-	expectedListenerName, exists := osm.ListenerNames[l.ControllerVersion]
+	expectedListenerName, exists := l.expectedListenersPerVersion[l.ControllerVersion]
 	if !exists {
 		return ErrOSMControllerVersionUnrecognized
 	}
@@ -52,13 +58,25 @@ func (l HasListenerCheck) Run() error {
 
 // Info implements common.Runnable
 func (l HasListenerCheck) Info() string {
-	return fmt.Sprintf("Checking whether %s is configured with correct Envoy listener", l.ConfigGetter.GetObjectName())
+	return fmt.Sprintf("Checking whether %s is configured with correct %s Envoy listener", l.ConfigGetter.GetObjectName(), l.listenerType)
 }
 
-// HasListener creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener.
-func HasListener(configGetter ConfigGetter, osmVersion osm.ControllerVersion) common.Runnable {
+// HasOutboundListener creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener.
+func HasOutboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVersion) common.Runnable {
 	return HasListenerCheck{
 		ConfigGetter:      configGetter,
 		ControllerVersion: osmVersion,
+
+		expectedListenersPerVersion: osm.OutboundListenerNames,
+	}
+}
+
+// HasInboundListener creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener.
+func HasInboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVersion) common.Runnable {
+	return HasListenerCheck{
+		ConfigGetter:      configGetter,
+		ControllerVersion: osmVersion,
+
+		expectedListenersPerVersion: osm.InboundListenerNames,
 	}
 }
