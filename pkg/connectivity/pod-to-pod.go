@@ -51,6 +51,12 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 		pod.HasExpectedEnvoyImage(toPod),
 		pod.HasProxyUUIDLabel(toPod),
 
+		// The source Envoy must have at least one endpoint for the destination Envoy.
+		envoy.HasDestinationEndpoints(srcConfigGetter),
+
+		// Check whether the source Pod has on endpoint, which matches the destination Pod.
+		envoy.HasSpecificEndpoint(srcConfigGetter, toPod),
+
 		// Source Envoy must have Outbound listener
 		envoy.HasOutboundListener(srcConfigGetter, osmVersion),
 
