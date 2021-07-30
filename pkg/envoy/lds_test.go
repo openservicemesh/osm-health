@@ -33,7 +33,7 @@ func TestEnvoyListenerChecker(t *testing.T) {
 			return ParseEnvoyConfig(sampleConfig)
 		},
 	}
-	listenerChecker := HasListener(configGetter, osmVersion)
+	listenerChecker := HasOutboundListener(configGetter, osmVersion)
 	checkError := listenerChecker.Run()
 	assert.Nil(checkError)
 }
@@ -46,7 +46,7 @@ func TestEnvoyListenerCheckerEmptyConfig(t *testing.T) {
 			return nil, nil
 		},
 	}
-	listenerChecker := HasListener(configGetter, osmVersion)
+	listenerChecker := HasOutboundListener(configGetter, osmVersion)
 	checkError := listenerChecker.Run()
 	assert.NotNil(checkError)
 	assert.Equal("envoy config is empty", checkError.Error())
@@ -64,7 +64,7 @@ func TestEnvoyListenerCheckerInvalidOSMVersion(t *testing.T) {
 			return ParseEnvoyConfig(sampleConfig)
 		},
 	}
-	listenerChecker := HasListener(configGetter, osmVersion)
+	listenerChecker := HasOutboundListener(configGetter, osmVersion)
 	checkError := listenerChecker.Run()
 	assert.NotNil(checkError)
 	assert.Equal("osm controller version not recognized", checkError.Error())

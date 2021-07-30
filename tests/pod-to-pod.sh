@@ -1,9 +1,21 @@
 #!/bin/bash
 
 
+if [[ -f "./osm" ]]
+then
+    echo "Found OSM version $(./osm version)"
+else
+    OSM_RELEASE="v0.9.1"
+    curl -L https://github.com/openservicemesh/osm/releases/download/${OSM_RELEASE}/osm-${OSM_RELEASE}-linux-amd64.tar.gz | tar -vxzf -
+
+    mkdir -p ./bin
+    mv ./linux-amd64/osm ./bin
+    rm -rf ./linux-amd64
+fi
+
 
 kubectl create namespace bookstore
-./osm namespace add bookstore
+./bin/osm namespace add bookstore
 
 for x in bookbuyer bookstore; do
     while [[ $(kubectl get pods -n "$x" -l "app=${x}" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do

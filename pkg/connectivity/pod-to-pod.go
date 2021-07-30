@@ -26,12 +26,12 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 
 	var srcConfigGetter, dstConfigGetter envoy.ConfigGetter
 
-	srcConfigGetter, err = envoy.GetEnvoyConfigGetterForPod(fromPod)
+	srcConfigGetter, err = envoy.GetEnvoyConfigGetterForPod(fromPod, osmVersion)
 	if err != nil {
 		log.Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", fromPod.Namespace, fromPod.Name)
 	}
 
-	dstConfigGetter, err = envoy.GetEnvoyConfigGetterForPod(toPod)
+	dstConfigGetter, err = envoy.GetEnvoyConfigGetterForPod(toPod, osmVersion)
 	if err != nil {
 		log.Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", toPod.Namespace, toPod.Name)
 	}
@@ -47,8 +47,11 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 		namespace.IsMonitoredBy(client, toPod.Namespace, meshName),
 		pod.HasEnvoySidecar(toPod),
 
-		envoy.HasListener(srcConfigGetter, osmVersion),
-		envoy.HasListener(dstConfigGetter, osmVersion),
+		// Source Envoy must have Outbound listener
+		envoy.HasOutboundListener(srcConfigGetter, osmVersion),
+
+		// Destination Envoy must have Inbound listener
+		envoy.HasInboundListener(dstConfigGetter, osmVersion),
 	)
 
 	common.Print(outcomes...)
