@@ -5,11 +5,10 @@ import (
 	"os"
 	"testing"
 
-	envoy_config_route_v3 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
+	tassert "github.com/stretchr/testify/assert"
 
 	envoy_config_cluster_v3 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
-
-	tassert "github.com/stretchr/testify/assert"
+	envoy_config_route_v3 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 )
 
 func TestEnvoyConfigParser(t *testing.T) {
