@@ -31,6 +31,12 @@ type Config struct {
 	// Listeners is an Envoy xDS proto.
 	Listeners v3.ListenersConfigDump
 
+	// SecretsConfigDump is an Envoy xDS proto.
+	SecretsConfigDump v3.SecretsConfigDump
+
+	// ScopedRoutesConfigDump is an Envoy xDS proto.
+	ScopedRoutesConfigDump v3.ScopedRoutesConfigDump
+
 	// Routes is an Envoy xDS proto.
 	Routes v3.RoutesConfigDump
 }
