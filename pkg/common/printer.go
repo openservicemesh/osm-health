@@ -10,7 +10,7 @@ func Print(outcomes ...Outcome) {
 		foundIssues = foundIssues && issue.Error != nil
 		errString := "OK"
 		if issue.Error != nil {
-			errString = "FAIL"
+			errString = fmt.Sprintf("FAIL: %s", issue.Error.Error())
 			issuesCount = issuesCount + 1
 		}
 		fmt.Printf("%d  %s  -- %s\n", idx+1, issue.RunnableInfo, errString)
