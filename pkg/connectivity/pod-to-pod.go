@@ -57,6 +57,10 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 		// Check whether the source Pod has an endpoint that matches the destination Pod.
 		envoy.HasSpecificEndpoint(srcConfigGetter, toPod),
 
+		// Check envoy logs
+		envoy.HasNoBadEnvoyLogsCheck(client, fromPod),
+		envoy.HasNoBadEnvoyLogsCheck(client, toPod),
+
 		// Source Envoy must have Outbound listener
 		envoy.HasOutboundListener(srcConfigGetter, osmVersion),
 
