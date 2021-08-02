@@ -41,6 +41,9 @@ func (check EnvoySidecarImageCheck) Run() error {
 	return ErrExpectedEnvoyImageMissing
 }
 
+// Verify interface compliance
+var _ common.Runnable = (*MinNumContainersCheck)(nil)
+
 // Suggestion implements common.Runnable
 func (check EnvoySidecarImageCheck) Suggestion() string {
 	panic("implement me")
