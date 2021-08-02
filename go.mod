@@ -9,6 +9,8 @@ require (
 	github.com/fatih/color v1.12.0 // indirect
 	github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e // indirect
 	github.com/golang/mock v1.4.4 // indirect
+	github.com/golang/protobuf v1.4.3
+	github.com/google/uuid v1.1.2 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
