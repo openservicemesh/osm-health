@@ -15,5 +15,5 @@ type TrafficSplitVersion string
 // HTTPRouteVersion is a string type alias for the SMI HTTPRoute version supported.
 type HTTPRouteVersion string
 
-// Annotation is a string type alias for the an osm annotation.
+// Annotation is a string type alias for the osm annotation.
 type Annotation string

@@ -39,6 +39,11 @@ func TestEnvoyConfigParser(t *testing.T) {
 			_, exists := SupportedHTTPRouteVersion[controllerVersion]
 			assert.Truef(exists, "SupportedHTTPRouteVersion does not contain info on OSM release %s", release)
 		}
+
+		{
+			_, exists := SupportedAnnotations[controllerVersion]
+			assert.Truef(exists, "SupportedAnnotations does not contain info on OSM release %s", release)
+		}
 	}
 }
 
