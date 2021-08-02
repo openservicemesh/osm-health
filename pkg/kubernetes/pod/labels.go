@@ -10,13 +10,16 @@ import (
 	"github.com/openservicemesh/osm/pkg/constants"
 )
 
+// Verify interface compliance
+var _ common.Runnable = (*ProxyUUIDLabelCheck)(nil)
+
 // ProxyUUIDLabelCheck implements common.Runnable
 type ProxyUUIDLabelCheck struct {
 	pod *v1.Pod
 }
 
 // HasProxyUUIDLabel checks whether a pod has a valid proxy UUID label which is added when a pod is added to a mesh
-func HasProxyUUIDLabel(pod *v1.Pod) common.Runnable {
+func HasProxyUUIDLabel(pod *v1.Pod) ProxyUUIDLabelCheck {
 	return ProxyUUIDLabelCheck{
 		pod: pod,
 	}
@@ -33,6 +36,16 @@ func (check ProxyUUIDLabelCheck) Run() error {
 		return ErrProxyUUIDLabelMissing
 	}
 	return nil
+}
+
+// Suggestion implements common.Runnable
+func (check ProxyUUIDLabelCheck) Suggestion() string {
+	panic("implement me")
+}
+
+// FixIt implements common.Runnable
+func (check ProxyUUIDLabelCheck) FixIt() error {
+	panic("implement me")
 }
 
 // TODO: replace with function from osm pkg once it's made public

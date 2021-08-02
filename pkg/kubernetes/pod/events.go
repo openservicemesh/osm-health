@@ -52,3 +52,13 @@ func (check NoBadEventsCheck) Run() error {
 
 	return fmt.Errorf("pod '%s' has events that are of 'type!=Normal' - run 'kubectl get events --field-selector %s' to inspect events", check.pod.Name, selectorString)
 }
+
+// Suggestion implements common.Runnable.
+func (check NoBadEventsCheck) Suggestion() string {
+	panic("implement me")
+}
+
+// FixIt implements common.Runnable.
+func (check NoBadEventsCheck) FixIt() error {
+	panic("implement me")
+}
