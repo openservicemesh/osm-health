@@ -30,10 +30,6 @@ func (l DestinationEndpointChecker) Run() error {
 		return err
 	}
 
-	if envoyConfig == nil {
-		return ErrEnvoyConfigEmpty
-	}
-
 	if envoyConfig == nil || envoyConfig.Listeners.DynamicListeners == nil {
 		return ErrEnvoyConfigEmpty
 	}
