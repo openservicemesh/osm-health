@@ -11,16 +11,16 @@ import (
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*HasDestinationEndpointsCheck)(nil)
+var _ common.Runnable = (*DestinationEndpointChecker)(nil)
 
-// HasDestinationEndpointsCheck implements common.Runnable
-type HasDestinationEndpointsCheck struct {
+// DestinationEndpointChecker implements common.Runnable
+type DestinationEndpointChecker struct {
 	*v1.Pod
 	ConfigGetter
 }
 
 // Run implements common.Runnable
-func (l HasDestinationEndpointsCheck) Run() error {
+func (l DestinationEndpointChecker) Run() error {
 	if l.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
 		return ErrIncorrectlyInitializedConfigGetter
@@ -72,7 +72,7 @@ func (l HasDestinationEndpointsCheck) Run() error {
 }
 
 // Info implements common.Runnable
-func (l HasDestinationEndpointsCheck) Info() string {
+func (l DestinationEndpointChecker) Info() string {
 	txt := "at least one destination"
 	if l.Pod != nil {
 		txt = fmt.Sprintf("%s as a destination", l.Status.PodIP)
@@ -83,14 +83,14 @@ func (l HasDestinationEndpointsCheck) Info() string {
 
 // HasDestinationEndpoints creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener for the local payload.
 func HasDestinationEndpoints(configGetter ConfigGetter) common.Runnable {
-	return HasDestinationEndpointsCheck{
+	return DestinationEndpointChecker{
 		ConfigGetter: configGetter,
 	}
 }
 
 // HasSpecificEndpoint creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener for the local payload.
 func HasSpecificEndpoint(configGetter ConfigGetter, pod *v1.Pod) common.Runnable {
-	return HasDestinationEndpointsCheck{
+	return DestinationEndpointChecker{
 		ConfigGetter: configGetter,
 		Pod:          pod,
 	}
