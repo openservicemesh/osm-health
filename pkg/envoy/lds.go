@@ -66,6 +66,7 @@ func HasOutboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVer
 	return HasListenerCheck{
 		ConfigGetter:      configGetter,
 		ControllerVersion: osmVersion,
+		listenerType:      "outbound",
 
 		expectedListenersPerVersion: osm.OutboundListenerNames,
 	}
@@ -76,6 +77,7 @@ func HasInboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVers
 	return HasListenerCheck{
 		ConfigGetter:      configGetter,
 		ControllerVersion: osmVersion,
+		listenerType:      "inbound",
 
 		expectedListenersPerVersion: osm.InboundListenerNames,
 	}
