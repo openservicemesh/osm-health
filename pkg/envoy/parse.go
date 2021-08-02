@@ -8,6 +8,7 @@ import (
 	_ "github.com/envoyproxy/go-control-plane/envoy/extensions/access_loggers/stream/v3"
 	_ "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/ext_authz/v3"
 	_ "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/lua/v3"
+	_ "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/rbac/v3"
 	_ "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/wasm/v3"
 	_ "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
 	_ "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/rbac/v3"
