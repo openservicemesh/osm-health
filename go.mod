@@ -9,15 +9,14 @@ require (
 	github.com/fatih/color v1.12.0 // indirect
 	github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e // indirect
 	github.com/golang/mock v1.4.4 // indirect
-	github.com/golang/protobuf v1.4.3
-	github.com/google/uuid v1.1.2 // indirect
 	github.com/golang/protobuf v1.5.2
+	github.com/google/uuid v1.1.2 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/opencontainers/runtime-tools v0.0.0-20181011054405-1d69bd0f9c39 // indirect
-	github.com/openservicemesh/osm v0.8.2-0.20210730182412-e003a65c2cb5
+	github.com/openservicemesh/osm v0.8.2-0.20210802225558-b607bba099c1
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.23.0
 	github.com/spf13/cobra v1.1.3
