@@ -67,6 +67,16 @@ func (l DestinationEndpointChecker) Run() error {
 	return nil
 }
 
+// Suggestion implements common.Runnable
+func (l DestinationEndpointChecker) Suggestion() string {
+	panic("implement me")
+}
+
+// FixIt implements common.Runnable
+func (l DestinationEndpointChecker) FixIt() error {
+	panic("implement me")
+}
+
 // Info implements common.Runnable
 func (l DestinationEndpointChecker) Info() string {
 	txt := "at least one destination"
@@ -78,14 +88,14 @@ func (l DestinationEndpointChecker) Info() string {
 }
 
 // HasDestinationEndpoints creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener for the local payload.
-func HasDestinationEndpoints(configGetter ConfigGetter) common.Runnable {
+func HasDestinationEndpoints(configGetter ConfigGetter) DestinationEndpointChecker {
 	return DestinationEndpointChecker{
 		ConfigGetter: configGetter,
 	}
 }
 
 // HasSpecificEndpoint creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener for the local payload.
-func HasSpecificEndpoint(configGetter ConfigGetter, pod *v1.Pod) common.Runnable {
+func HasSpecificEndpoint(configGetter ConfigGetter, pod *v1.Pod) DestinationEndpointChecker {
 	return DestinationEndpointChecker{
 		ConfigGetter: configGetter,
 		Pod:          pod,

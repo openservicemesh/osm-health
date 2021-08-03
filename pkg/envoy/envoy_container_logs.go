@@ -75,3 +75,13 @@ func (check NoBadEnvoyLogsCheck) Run() error {
 
 	return nil
 }
+
+// Suggestion implements common.Runnable.
+func (check NoBadEnvoyLogsCheck) Suggestion() string {
+	panic("implement me")
+}
+
+// FixIt implements common.Runnable.
+func (check NoBadEnvoyLogsCheck) FixIt() error {
+	panic("implement me")
+}
