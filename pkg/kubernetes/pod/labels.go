@@ -39,7 +39,7 @@ func (check ProxyUUIDLabelCheck) Run() error {
 
 // Suggestion implements common.Runnable
 func (check ProxyUUIDLabelCheck) Suggestion() string {
-	panic("implement me")
+	return "Verify that the pod is in a meshed namespace. Try: \"osm namespace list\""
 }
 
 // FixIt implements common.Runnable

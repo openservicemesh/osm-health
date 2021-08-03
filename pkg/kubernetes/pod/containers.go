@@ -46,7 +46,7 @@ var _ common.Runnable = (*MinNumContainersCheck)(nil)
 
 // Suggestion implements common.Runnable
 func (check EnvoySidecarImageCheck) Suggestion() string {
-	panic("implement me")
+	return fmt.Sprintf("Envoy image may not match image in mesh config. To verify that the pod has an envoy container, try: \"kubectl describe pod %s -n %s\"", check.pod.Name, check.pod.Namespace)
 }
 
 // FixIt implements common.Runnable
@@ -87,7 +87,8 @@ func (check MinNumContainersCheck) Run() error {
 
 // Suggestion implements common.Runnable
 func (check MinNumContainersCheck) Suggestion() string {
-	panic("implement me")
+	//TODO: remove osm init once init check is added
+	return fmt.Sprintf("Verify that the pod has at least %d containers (app container, envoy sidecar container and OSM init container). Try: \"kubectl describe pod %s -n %s\"", check.minNum, check.pod.Name, check.pod.Namespace)
 }
 
 // FixIt implements common.Runnable
