@@ -18,14 +18,13 @@ kubectl create namespace bookstore
 ./bin/osm namespace add bookstore
 
 for x in bookbuyer bookstore; do
-    while [[ $(kubectl get pods -n "$x" -l "app=${x}" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
-        echo "waiting for pod ${x}" && sleep 1
-    done
+  while [[ $(kubectl get pods -n "$x" -l "app=${x}" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+    echo "waiting for pod ${x}" && sleep 1
+  done
 done
 
 POD1=$(kubectl get pod -n bookbuyer --selector app=bookbuyer --no-headers | awk '{print $1}')
-POD2=$(kubectl get pod -n bookstore --selector app=bookstore --no-headers | awk '{print $1}')
 
-./bin/osm-health connectivity pod-to-pod \
+./bin/osm-health connectivity pod-to-url \
                  "bookbuyer/${POD1}" \
-                 "bookstore/${POD2}"
+                 "http://bookstore.bookstore/"

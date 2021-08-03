@@ -17,5 +17,6 @@ func newConnectivityCmd() *cobra.Command {
 		Args:  cobra.NoArgs,
 	}
 	cmd.AddCommand(newConnectivityPodToPodCmd())
+	cmd.AddCommand(newConnectivityPodToURLCmd())
 	return cmd
 }
