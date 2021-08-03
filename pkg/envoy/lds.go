@@ -56,13 +56,23 @@ func (l HasListenerCheck) Run() error {
 	return nil
 }
 
+// Suggestion implements common.Runnable
+func (l HasListenerCheck) Suggestion() string {
+	panic("implement me")
+}
+
+// FixIt implements common.Runnable
+func (l HasListenerCheck) FixIt() error {
+	panic("implement me")
+}
+
 // Info implements common.Runnable
 func (l HasListenerCheck) Info() string {
 	return fmt.Sprintf("Checking whether %s is configured with correct %s Envoy listener", l.ConfigGetter.GetObjectName(), l.listenerType)
 }
 
 // HasOutboundListener creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener.
-func HasOutboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVersion) common.Runnable {
+func HasOutboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVersion) HasListenerCheck {
 	return HasListenerCheck{
 		ConfigGetter:      configGetter,
 		ControllerVersion: osmVersion,
@@ -73,7 +83,7 @@ func HasOutboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVer
 }
 
 // HasInboundListener creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener.
-func HasInboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVersion) common.Runnable {
+func HasInboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVersion) HasListenerCheck {
 	return HasListenerCheck{
 		ConfigGetter:      configGetter,
 		ControllerVersion: osmVersion,

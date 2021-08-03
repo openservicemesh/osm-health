@@ -9,13 +9,16 @@ import (
 	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 )
 
+// Verify interface compliance
+var _ common.Runnable = (*EnvoySidecarImageCheck)(nil)
+
 // EnvoySidecarImageCheck implements common.Runnable
 type EnvoySidecarImageCheck struct {
 	pod *v1.Pod
 }
 
 // HasExpectedEnvoyImage checks whether a pod has a sidecar with the envoy image specified in the meshconfig
-func HasExpectedEnvoyImage(pod *v1.Pod) common.Runnable {
+func HasExpectedEnvoyImage(pod *v1.Pod) EnvoySidecarImageCheck {
 	return EnvoySidecarImageCheck{
 		pod: pod,
 	}
@@ -38,6 +41,19 @@ func (check EnvoySidecarImageCheck) Run() error {
 	return ErrExpectedEnvoyImageMissing
 }
 
+// Suggestion implements common.Runnable
+func (check EnvoySidecarImageCheck) Suggestion() string {
+	panic("implement me")
+}
+
+// FixIt implements common.Runnable
+func (check EnvoySidecarImageCheck) FixIt() error {
+	panic("implement me")
+}
+
+// Verify interface compliance
+var _ common.Runnable = (*MinNumContainersCheck)(nil)
+
 // MinNumContainersCheck implements common.Runnable
 type MinNumContainersCheck struct {
 	pod    *v1.Pod
@@ -46,7 +62,7 @@ type MinNumContainersCheck struct {
 
 // HasMinExpectedContainers checks whether a pod has at least the min number of containers expected
 // This currently corresponds to an app container, osm init container and envoy proxy sidecar
-func HasMinExpectedContainers(pod *v1.Pod, num int) common.Runnable {
+func HasMinExpectedContainers(pod *v1.Pod, num int) MinNumContainersCheck {
 	return MinNumContainersCheck{
 		pod:    pod,
 		minNum: num,
@@ -64,4 +80,14 @@ func (check MinNumContainersCheck) Run() error {
 		return ErrExpectedMinNumContainers
 	}
 	return nil
+}
+
+// Suggestion implements common.Runnable
+func (check MinNumContainersCheck) Suggestion() string {
+	panic("implement me")
+}
+
+// FixIt implements common.Runnable
+func (check MinNumContainersCheck) FixIt() error {
+	panic("implement me")
 }
