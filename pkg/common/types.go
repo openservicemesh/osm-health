@@ -15,10 +15,19 @@ type SMIPolicy struct {
 	// TODO: include actual SMI policy
 }
 
-// Runnable is a type of generic function that can be executed and it will return pass/fail on a given check.
+// Runnable is a type of generic function that can be executed; it returns pass/fail on a given check.
 type Runnable interface {
+	// Run executes a check.
 	Run() error
+
+	// Info returns human-readable information on what check is being executed.
 	Info() string
+
+	// Suggestion returns a human-readable suggestion on how to fix the issue.
+	Suggestion() string
+
+	// FixIt attempts to fix the issue at hand.
+	FixIt() error
 }
 
 // MeshName is the type for the name of a mesh.

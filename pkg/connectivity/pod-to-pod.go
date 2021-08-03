@@ -43,6 +43,7 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 		pod.HasMinExpectedContainers(fromPod, 3),
 		pod.HasExpectedEnvoyImage(fromPod),
 		pod.HasProxyUUIDLabel(fromPod),
+		pod.DoesNotHaveBadEvents(client, fromPod),
 
 		// Check destination Pod's namespace
 		namespace.IsInjectEnabled(client, toPod.Namespace),
@@ -50,12 +51,17 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 		pod.HasMinExpectedContainers(toPod, 3),
 		pod.HasExpectedEnvoyImage(toPod),
 		pod.HasProxyUUIDLabel(toPod),
+		pod.DoesNotHaveBadEvents(client, toPod),
 
 		// The source Envoy must have at least one endpoint for the destination Envoy.
 		envoy.HasDestinationEndpoints(srcConfigGetter),
 
 		// Check whether the source Pod has an endpoint that matches the destination Pod.
 		envoy.HasSpecificEndpoint(srcConfigGetter, toPod),
+
+		// Check envoy logs
+		envoy.HasNoBadEnvoyLogsCheck(client, fromPod),
+		envoy.HasNoBadEnvoyLogsCheck(client, toPod),
 
 		// Source Envoy must have Outbound listener
 		envoy.HasOutboundListener(srcConfigGetter, osmVersion),

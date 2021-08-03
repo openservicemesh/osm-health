@@ -20,6 +20,16 @@ type SidecarInjectionCheck struct {
 	namespace string
 }
 
+// Suggestion implements common.Runnable
+func (check SidecarInjectionCheck) Suggestion() string {
+	panic("implement me")
+}
+
+// FixIt implements common.Runnable
+func (check SidecarInjectionCheck) FixIt() error {
+	panic("implement me")
+}
+
 // IsInjectEnabled checks whether a namespace is enabled for sidecar injection.
 func IsInjectEnabled(client kubernetes.Interface, namespace string) SidecarInjectionCheck {
 	return SidecarInjectionCheck{

@@ -49,3 +49,13 @@ func (check MonitoredCheck) Run() error {
 
 	return nil
 }
+
+// Suggestion implements common.Runnable
+func (check MonitoredCheck) Suggestion() string {
+	panic("implement me")
+}
+
+// FixIt implements common.Runnable
+func (check MonitoredCheck) FixIt() error {
+	panic("implement me")
+}
