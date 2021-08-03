@@ -49,19 +49,26 @@ func (l DestinationEndpointChecker) Run() error {
 		return ErrNoDestinationEndpoints
 	}
 
+	if l.Pod == nil {
+		return nil
+	}
+
 	// If Pod was defined -- check if this pod IP is in the list of endpoints.
-	if l.Pod != nil {
-		foundIt := false
-		// Check for a specific Pod.
-		for _, ept := range cla.Endpoints[0].LbEndpoints {
-			if ept.GetEndpoint().Address.GetSocketAddress().Address == l.Status.PodIP {
+	foundIt := false
+	// Check for a specific Pod.
+	for _, ept := range cla.GetEndpoints() {
+		for _, lbEpt := range ept.GetLbEndpoints() {
+			if lbEpt.GetEndpoint().GetAddress().GetSocketAddress().GetAddress() == l.Status.PodIP {
 				foundIt = true
 				break
 			}
 		}
-		if !foundIt {
-			return ErrEndpointNotFound
+		if foundIt {
+			break
 		}
+	}
+	if !foundIt {
+		return ErrEndpointNotFound
 	}
 
 	return nil
