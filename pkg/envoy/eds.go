@@ -30,44 +30,43 @@ func (l DestinationEndpointChecker) Run() error {
 		return err
 	}
 
-	if envoyConfig == nil || envoyConfig.Listeners.DynamicListeners == nil {
+	if envoyConfig == nil {
 		return ErrEnvoyConfigEmpty
 	}
 
-	if len(envoyConfig.Endpoints.GetDynamicEndpointConfigs()) <= 0 {
+	foundAnyEndpoints := false
+	// If Pod was defined -- check if this pod IP is in the list of endpoints.
+	foundIt := false
+
+	for _, dynEpt := range envoyConfig.Endpoints.GetDynamicEndpointConfigs() {
+		var cla envoy_config_endpoint_v3.ClusterLoadAssignment
+		if err = dynEpt.GetEndpointConfig().UnmarshalTo(&cla); err != nil {
+			return ErrUnmarshalingClusterLoadAssigment
+		}
+
+		for _, ept := range cla.GetEndpoints() {
+			for _, lbEpt := range ept.GetLbEndpoints() {
+				foundAnyEndpoints = true
+				if l.Pod == nil {
+					break
+				}
+				if lbEpt.GetEndpoint().GetAddress().GetSocketAddress().GetAddress() == l.Status.PodIP {
+					foundIt = true
+					break
+				}
+			}
+			if (l.Pod == nil && foundAnyEndpoints) || foundIt {
+				break
+			}
+		}
+	}
+
+	if !foundAnyEndpoints {
 		log.Error().Msgf("must have at least one destination endpoint: %+v", envoyConfig.Endpoints.GetDynamicEndpointConfigs())
 		return ErrNoDestinationEndpoints
 	}
 
-	var cla envoy_config_endpoint_v3.ClusterLoadAssignment
-	if err = envoyConfig.Endpoints.GetDynamicEndpointConfigs()[0].GetEndpointConfig().UnmarshalTo(&cla); err != nil {
-		return ErrUnmarshalingClusterLoadAssigment
-	}
-
-	if len(cla.Endpoints) <= 0 || len(cla.Endpoints[0].LbEndpoints) <= 0 {
-		log.Error().Msg("must have at least one destination endpoint")
-		return ErrNoDestinationEndpoints
-	}
-
-	if l.Pod == nil {
-		return nil
-	}
-
-	// If Pod was defined -- check if this pod IP is in the list of endpoints.
-	foundIt := false
-	// Check for a specific Pod.
-	for _, ept := range cla.GetEndpoints() {
-		for _, lbEpt := range ept.GetLbEndpoints() {
-			if lbEpt.GetEndpoint().GetAddress().GetSocketAddress().GetAddress() == l.Status.PodIP {
-				foundIt = true
-				break
-			}
-		}
-		if foundIt {
-			break
-		}
-	}
-	if !foundIt {
+	if l.Pod != nil && !foundIt {
 		return ErrEndpointNotFound
 	}
 
@@ -94,14 +93,17 @@ func (l DestinationEndpointChecker) Info() string {
 	return fmt.Sprintf("Checking whether %s is configured with %s endpoint", l.ConfigGetter.GetObjectName(), txt)
 }
 
-// HasDestinationEndpoints creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener for the local payload.
+// HasDestinationEndpoints creates a new common.Runnable, which checks whether
+// the given Pod has an Envoy with any endpoints configured.
 func HasDestinationEndpoints(configGetter ConfigGetter) DestinationEndpointChecker {
 	return DestinationEndpointChecker{
 		ConfigGetter: configGetter,
 	}
 }
 
-// HasSpecificEndpoint creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener for the local payload.
+// HasSpecificEndpoint creates a new common.Runnable, which checks whether the
+// given Pod has an Envoy with an endpoint configured mapping to a specific
+// destination Pod.
 func HasSpecificEndpoint(configGetter ConfigGetter, pod *v1.Pod) DestinationEndpointChecker {
 	return DestinationEndpointChecker{
 		ConfigGetter: configGetter,
