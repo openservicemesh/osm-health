@@ -46,10 +46,18 @@ func (l HasListenerCheck) Run() error {
 		return ErrEnvoyConfigEmpty
 	}
 
-	actualListener := envoyConfig.Listeners.DynamicListeners[0]
+	found := false
+	var actualListeners []string
+	for _, actualListener := range envoyConfig.Listeners.GetDynamicListeners() {
+		actualListeners = append(actualListeners, actualListener.Name)
+		if expectedListenerName == actualListener.Name {
+			found = true
+			break
+		}
+	}
 
-	if expectedListenerName != actualListener.Name {
-		log.Error().Msgf("must have listener with name %s but it is instead %s", expectedListenerName, actualListener.Name)
+	if !found {
+		log.Error().Msgf("must have listener with name %s but only found %s", expectedListenerName, actualListeners)
 		return ErrEnvoyListenerMissing
 	}
 
