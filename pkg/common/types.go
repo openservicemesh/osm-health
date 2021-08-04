@@ -1,20 +1,5 @@
 package common
 
-// Result is the output of a test.
-type Result struct {
-	SMIPolicy
-
-	Successful bool
-}
-
-// SMIPolicy contains context around how SMI affects a result of a test.
-type SMIPolicy struct {
-	HasPolicy                  bool
-	ValidPolicy                bool
-	SourceToDestinationAllowed bool
-	// TODO: include actual SMI policy
-}
-
 // Runnable is a type of generic function that can be executed; it returns pass/fail on a given check.
 type Runnable interface {
 	// Run executes a check.
