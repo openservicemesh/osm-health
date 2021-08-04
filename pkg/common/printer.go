@@ -1,6 +1,10 @@
 package common
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/fatih/color"
+)
 
 // Print prints the outcomes of the evaluation of a list of Runnables.
 func Print(outcomes ...Outcome) {
@@ -8,9 +12,9 @@ func Print(outcomes ...Outcome) {
 	foundIssues := false
 	for idx, issue := range outcomes {
 		foundIssues = foundIssues && issue.Error != nil
-		errString := "OK"
+		errString := color.GreenString("OK")
 		if issue.Error != nil {
-			errString = fmt.Sprintf("FAIL: %s", issue.Error.Error())
+			errString = fmt.Sprintf("%s %s", color.RedString("FAIL:"), color.RedString(issue.Error.Error()))
 			issuesCount = issuesCount + 1
 		}
 		fmt.Printf("%d  %s  -- %s\n", idx+1, issue.RunnableInfo, errString)
