@@ -68,6 +68,9 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) common.Result {
 
 		// Destination Envoy must have Inbound listener
 		envoy.HasInboundListener(dstConfigGetter, osmVersion),
+
+		// Source Envoy must define a cluster for the destination
+		envoy.HasCluster(client, srcConfigGetter, toPod),
 	)
 
 	common.Print(outcomes...)
