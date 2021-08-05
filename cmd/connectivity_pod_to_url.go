@@ -3,7 +3,6 @@ package main
 import (
 	"net/url"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/openservicemesh/osm-health/pkg/connectivity"
@@ -29,17 +28,17 @@ func newConnectivityPodToURLCmd() *cobra.Command {
 		Args:    cobra.ExactArgs(2),
 		RunE: func(_ *cobra.Command, args []string) error {
 			if len(args) < 2 {
-				return errors.Errorf("provide both SOURCE_POD and DESTINATION_URL")
+				return ErrNoSourcePodOrNoDestinationURL
 			}
 
 			fromPod, err := kuberneteshelper.PodFromString(args[0])
 			if err != nil {
-				return errors.New("invalid SOURCE_POD")
+				return ErrInvalidSourcePod
 			}
 
 			toURL, err := url.Parse(args[1])
 			if err != nil {
-				return errors.New("invalid DESTINATION_URL")
+				return ErrInvalidDestinationURL
 			}
 
 			connectivity.PodToURL(fromPod, toURL)

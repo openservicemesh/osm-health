@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/openservicemesh/osm-health/pkg/ingress"
@@ -16,7 +15,7 @@ func newIngressToPodCmd() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
-				return errors.Errorf("missing DESTINATION_POD parameter")
+				return ErrNoDestinationPod
 			}
 			log.Info().Msgf("Checking Ingress to Pod %s", args[0])
 
@@ -27,7 +26,7 @@ func newIngressToPodCmd() *cobra.Command {
 
 			toPod, err := kuberneteshelper.PodFromString(args[0])
 			if err != nil {
-				return errors.New("invalid DESTINATION_POD")
+				return ErrInvalidDestinationPod
 			}
 
 			ingress.ToPod(client, toPod)

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/openservicemesh/osm-health/pkg/connectivity"
@@ -27,17 +26,17 @@ func newConnectivityPodToPodCmd() *cobra.Command {
 		Args:    cobra.ExactArgs(2),
 		RunE: func(_ *cobra.Command, args []string) error {
 			if len(args) < 2 {
-				return errors.Errorf("provide both SOURCE_POD and DESTINATION_POD")
+				return ErrNoSourcePodOrNoDestinationPod
 			}
 
 			fromPod, err := kuberneteshelper.PodFromString(args[0])
 			if err != nil {
-				return errors.New("invalid SOURCE_POD")
+				return ErrInvalidSourcePod
 			}
 
 			toPod, err := kuberneteshelper.PodFromString(args[1])
 			if err != nil {
-				return errors.New("invalid DESTINATION_POD")
+				return ErrInvalidDestinationPod
 			}
 
 			connectivity.PodToPod(fromPod, toPod)
