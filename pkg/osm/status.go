@@ -9,13 +9,12 @@ import (
 func ControlPlaneStatus(osmControlPlaneNamespace string) error {
 	log.Info().Msgf("Determining the status of the OSM control plane in namespace %s", osmControlPlaneNamespace)
 
-	_, err := kuberneteshelper.GetKubeClient()
+	client, err := kuberneteshelper.GetKubeClient()
 	if err != nil {
 		log.Err(err).Msg("Error creating Kubernetes client")
 	}
 
-	// TODO add checks like osm controller log checks
-	outcomes := common.Run()
+	outcomes := common.Run(HasNoBadOsmControllerLogsCheck(client, osmControlPlaneNamespace))
 
 	common.Print(outcomes...)
 
