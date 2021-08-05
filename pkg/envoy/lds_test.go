@@ -26,14 +26,14 @@ func TestEnvoyListenerChecker(t *testing.T) {
 	osmVersion := osm.ControllerVersion("v0.9")
 	configGetter := mockConfigGetter{
 		getter: func() (*Config, error) {
-			sampleConfig, err := os.ReadFile("../../tests/sample-enovy-config-dump-bookbuyer.json")
+			sampleConfig, err := os.ReadFile("../../tests/sample-enovy-config-dump-bookstore.json")
 			if err != nil {
 				return nil, err
 			}
 			return ParseEnvoyConfig(sampleConfig)
 		},
 	}
-	listenerChecker := HasOutboundListener(configGetter, osmVersion)
+	listenerChecker := HasInboundListener(configGetter, osmVersion)
 	checkError := listenerChecker.Run()
 	assert.Nil(checkError)
 }
