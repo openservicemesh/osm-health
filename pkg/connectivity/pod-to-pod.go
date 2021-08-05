@@ -37,6 +37,9 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) {
 	}
 
 	outcomes := common.Run(
+		// Check that pod namespaces are in the same mesh
+		namespace.AreNamespacesInSameMesh(client, fromPod.Namespace, toPod.Namespace),
+
 		// Check source Pod's namespace
 		namespace.IsInjectEnabled(client, fromPod.Namespace),
 		namespace.IsMonitoredBy(client, fromPod.Namespace, meshName),
