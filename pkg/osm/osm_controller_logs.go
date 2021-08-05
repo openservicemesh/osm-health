@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pkg/errors"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
@@ -44,13 +45,19 @@ func (check NoBadOsmControllerLogsCheck) Run() error {
 	}
 	pods, err := check.client.CoreV1().Pods(check.osmControlPlaneNamespace).List(context.TODO(), listOptions)
 	if err != nil {
-		return fmt.Errorf("unable to list osm controller pods in namespace %s", check.osmControlPlaneNamespace)
+		return fmt.Errorf("unable to list %s pods in namespace %s", constants.OSMControllerName, check.osmControlPlaneNamespace)
 	}
 
+	osmControllerErrCount := 0
 	for i := range pods.Items {
 		if err := podhelper.HasNoBadLogs(check.client, &pods.Items[i], "osm-controller"); err != nil {
-			return err // TODO since we can have multiple osm-controller pods, should we return err on the first controller with bad logs?
+			osmControllerErrCount++
+			log.Error().Err(err)
 		}
+	}
+
+	if osmControllerErrCount != 0 {
+		return errors.Errorf("%s pods in namespace %s have %d errors", constants.OSMControllerName, check.osmControlPlaneNamespace, osmControllerErrCount)
 	}
 
 	return nil

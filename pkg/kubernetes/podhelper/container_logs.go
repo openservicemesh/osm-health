@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/pkg/errors"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 )
@@ -44,8 +46,7 @@ func HasNoBadLogs(client kubernetes.Interface, pod *v1.Pod, containerName string
 	}
 
 	if len(badLogLines) != 0 {
-		log.Error().Msgf("%s container of pod %s contains bad logs", containerName, pod.Name)
-		log.Error().Msg(badLogLines)
+		return errors.Errorf("%s container of pod %s contains bad log lines: %s", containerName, pod.Name, badLogLines)
 	}
 
 	return nil
