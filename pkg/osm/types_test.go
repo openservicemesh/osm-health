@@ -3,7 +3,6 @@ package osm
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"sort"
 	"strings"
@@ -55,12 +54,12 @@ func getReleases() []string {
 	req.Header.Set("Accept", "application/vnd.github.v3+json")
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err)
 	}
 	defer func() {
 		err := resp.Body.Close()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal().Err(err)
 		}
 	}()
 
@@ -68,7 +67,7 @@ func getReleases() []string {
 
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err)
 	}
 
 	ignore := map[string]interface{}{

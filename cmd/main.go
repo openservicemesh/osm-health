@@ -37,6 +37,7 @@ func newRootCmd(config *action.Configuration, in io.Reader, out io.Writer, args 
 	cmd.AddCommand(
 		newCollectCmd(),
 		newConnectivityCmd(),
+		newControlPlaneCmd(),
 		newValidateCmd(),
 		newIngressCmd(),
 	)
