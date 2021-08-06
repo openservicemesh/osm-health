@@ -12,11 +12,12 @@ import (
 )
 
 // PodToPod tests the connectivity between a source and destination pods.
-func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) {
+func PodToPod(fromPod *v1.Pod, toPod *v1.Pod, osmControlPlaneNamespace string) {
 	log.Info().Msgf("Testing connectivity from %s/%s to %s/%s", fromPod.Namespace, fromPod.Name, toPod.Namespace, toPod.Name)
 
 	// TODO
 	meshName := common.MeshName("osm")
+	osmNamespace := common.MeshNamespace(osmControlPlaneNamespace)
 	osmVersion := osm.ControllerVersion("v0.9")
 
 	client, err := kuberneteshelper.GetKubeClient()
@@ -36,6 +37,8 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) {
 		log.Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", toPod.Namespace, toPod.Name)
 	}
 
+	configurator := kuberneteshelper.GetOsmConfigurator(osmNamespace)
+
 	outcomes := common.Run(
 		// Check that pod namespaces are in the same mesh
 		namespace.AreNamespacesInSameMesh(client, fromPod.Namespace, toPod.Namespace),
@@ -43,16 +46,18 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) {
 		// Check source Pod's namespace
 		namespace.IsInjectEnabled(client, fromPod.Namespace),
 		namespace.IsMonitoredBy(client, fromPod.Namespace, meshName),
-		podhelper.HasMinExpectedContainers(fromPod, 3),
-		podhelper.HasExpectedEnvoyImage(fromPod),
+		podhelper.HasMinExpectedContainers(fromPod, 2),
+		podhelper.HasExpectedOsmInitImage(configurator, fromPod),
+		podhelper.HasExpectedEnvoyImage(configurator, fromPod),
 		podhelper.HasProxyUUIDLabel(fromPod),
 		podhelper.DoesNotHaveBadEvents(client, fromPod),
 
 		// Check destination Pod's namespace
 		namespace.IsInjectEnabled(client, toPod.Namespace),
 		namespace.IsMonitoredBy(client, toPod.Namespace, meshName),
-		podhelper.HasMinExpectedContainers(toPod, 3),
-		podhelper.HasExpectedEnvoyImage(toPod),
+		podhelper.HasMinExpectedContainers(toPod, 2),
+		podhelper.HasExpectedOsmInitImage(configurator, toPod),
+		podhelper.HasExpectedEnvoyImage(configurator, toPod),
 		podhelper.HasProxyUUIDLabel(toPod),
 		podhelper.DoesNotHaveBadEvents(client, toPod),
 

@@ -40,7 +40,9 @@ func newConnectivityPodToPodCmd() *cobra.Command {
 				return errors.New("invalid DESTINATION_POD")
 			}
 
-			connectivity.PodToPod(fromPod, toPod)
+			osmControlPlaneNamespace := settings.Namespace()
+
+			connectivity.PodToPod(fromPod, toPod, osmControlPlaneNamespace)
 			return nil
 		},
 	}
