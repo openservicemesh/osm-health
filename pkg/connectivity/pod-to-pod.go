@@ -6,7 +6,7 @@ import (
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/envoy"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/namespace"
-	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
+	"github.com/openservicemesh/osm-health/pkg/kubernetes/podhelper"
 	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 	"github.com/openservicemesh/osm-health/pkg/osm"
 )
@@ -43,18 +43,18 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod) {
 		// Check source Pod's namespace
 		namespace.IsInjectEnabled(client, fromPod.Namespace),
 		namespace.IsMonitoredBy(client, fromPod.Namespace, meshName),
-		pod.HasMinExpectedContainers(fromPod, 3),
-		pod.HasExpectedEnvoyImage(fromPod),
-		pod.HasProxyUUIDLabel(fromPod),
-		pod.DoesNotHaveBadEvents(client, fromPod),
+		podhelper.HasMinExpectedContainers(fromPod, 3),
+		podhelper.HasExpectedEnvoyImage(fromPod),
+		podhelper.HasProxyUUIDLabel(fromPod),
+		podhelper.DoesNotHaveBadEvents(client, fromPod),
 
 		// Check destination Pod's namespace
 		namespace.IsInjectEnabled(client, toPod.Namespace),
 		namespace.IsMonitoredBy(client, toPod.Namespace, meshName),
-		pod.HasMinExpectedContainers(toPod, 3),
-		pod.HasExpectedEnvoyImage(toPod),
-		pod.HasProxyUUIDLabel(toPod),
-		pod.DoesNotHaveBadEvents(client, toPod),
+		podhelper.HasMinExpectedContainers(toPod, 3),
+		podhelper.HasExpectedEnvoyImage(toPod),
+		podhelper.HasProxyUUIDLabel(toPod),
+		podhelper.DoesNotHaveBadEvents(client, toPod),
 
 		// The source Envoy must have at least one endpoint for the destination Envoy.
 		envoy.HasDestinationEndpoints(srcConfigGetter),
