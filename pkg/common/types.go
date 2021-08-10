@@ -22,6 +22,13 @@ func (mn MeshName) String() string {
 	return string(mn)
 }
 
+// MeshNamespace is the type for the namespace of a mesh.
+type MeshNamespace string
+
+func (mns MeshNamespace) String() string {
+	return string(mns)
+}
+
 // Outcome is the context around a check (common.Runnable), which failed.
 type Outcome struct {
 	// RunnableInfo will hold context on the executed runnable - common.Runnable{}.Info()

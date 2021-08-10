@@ -33,12 +33,6 @@ func TestHasExpectedNumContainers(t *testing.T) {
 							Image: "random/app:v0.0.0",
 						},
 					},
-					InitContainers: []corev1.Container{
-						{
-							Name:  "OsmInit",
-							Image: "openservicemesh/init:v0.0.0",
-						},
-					},
 				},
 			},
 			expectedError: nil,
@@ -76,10 +70,6 @@ func TestHasExpectedNumContainers(t *testing.T) {
 							Name:  "EnvoyContainer",
 							Image: "envoyproxy/envoy-alpine:v1.18.555",
 						},
-						{
-							Name:  "AppContainer",
-							Image: "random/app:v0.0.0",
-						},
 					},
 				},
 			},
@@ -88,8 +78,7 @@ func TestHasExpectedNumContainers(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		// TODO: change to 2 once HasOsmInitCheck is added
-		numContainersChecker := HasMinExpectedContainers(&tc.pod, 3)
+		numContainersChecker := HasMinExpectedContainers(&tc.pod, 2)
 
 		assert.Equal(tc.expectedError, numContainersChecker.Run())
 	}
