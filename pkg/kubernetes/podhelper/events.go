@@ -50,12 +50,12 @@ func (check NoBadEventsCheck) Run() error {
 		return nil
 	}
 
-	return fmt.Errorf("pod '%s' has events that are of 'type!=Normal' - run 'kubectl get events --field-selector %s' to inspect events", check.pod.Name, selectorString)
+	return fmt.Errorf("pod '%s' has events that are of 'type!=Normal' - run 'kubectl get events --namespace %s --field-selector %s' to inspect events", check.pod.Name, check.pod.Namespace, selectorString)
 }
 
 // Suggestion implements common.Runnable.
 func (check NoBadEventsCheck) Suggestion() string {
-	panic("implement me")
+	return fmt.Sprintf("To inspect for unexpected events, try \"kubectl get events --namespace %s --field-selector type!=Normal\"", check.pod.Namespace)
 }
 
 // FixIt implements common.Runnable.
