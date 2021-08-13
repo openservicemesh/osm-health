@@ -19,6 +19,7 @@ require (
 	github.com/openservicemesh/osm v0.8.2-0.20210802225558-b607bba099c1
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.23.0
+	github.com/servicemeshinterface/smi-sdk-go v0.5.0 // indirect
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0 // indirect

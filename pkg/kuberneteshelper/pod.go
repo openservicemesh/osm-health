@@ -17,6 +17,7 @@ import (
 	"github.com/openservicemesh/osm/pkg/configurator"
 	"github.com/openservicemesh/osm/pkg/constants"
 	"github.com/openservicemesh/osm/pkg/gen/client/config/clientset/versioned"
+	"github.com/openservicemesh/osm/pkg/service"
 	"github.com/openservicemesh/osm/pkg/signals"
 )
 
@@ -104,4 +105,30 @@ func GetOsmConfigurator(osmNamespace common.MeshNamespace) configurator.Configur
 	}
 	cfg := configurator.NewConfigurator(versioned.NewForConfigOrDie(kubeConfig), stop, osmNamespace.String(), constants.OSMMeshConfig)
 	return cfg
+}
+
+// GetMatchingServices returns a list of Kuberentes services in the namespace that match the pod's label
+func GetMatchingServices(kubeClient kubernetes.Interface, pod *v1.Pod) ([]service.MeshService, error) {
+	serviceList, err := kubeClient.CoreV1().Services(pod.Namespace).List(context.Background(), v12.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	servicesSet := make(map[service.MeshService]struct{}) // Set, avoid duplicates
+	for labelKey, labelVal := range pod.ObjectMeta.GetLabels() {
+		for _, svc := range serviceList.Items {
+			selectorVal, keyFound := svc.Spec.Selector[labelKey]
+			if keyFound && selectorVal == labelVal {
+				meshSvc := service.MeshService{
+					Namespace: pod.Namespace,
+					Name:      svc.Name,
+				}
+				servicesSet[meshSvc] = struct{}{}
+			}
+		}
+	}
+	servicesList := make([]service.MeshService, 0, len(servicesSet))
+	for svc := range servicesSet {
+		servicesList = append(servicesList, svc)
+	}
+	return servicesList, nil
 }

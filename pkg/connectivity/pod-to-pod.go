@@ -1,12 +1,14 @@
 package connectivity
 
 import (
+	smiAccessClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/split/clientset/versioned"
 	v1 "k8s.io/api/core/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/envoy"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/namespace"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/podhelper"
+	"github.com/openservicemesh/osm-health/pkg/kubernetes/smihelper"
 	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 	"github.com/openservicemesh/osm-health/pkg/osm"
 )
@@ -17,12 +19,21 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod, osmControlPlaneNamespace string) {
 
 	// TODO
 	meshName := common.MeshName("osm")
-	osmNamespace := common.MeshNamespace(osmControlPlaneNamespace)
 	osmVersion := osm.ControllerVersion("v0.9")
 
+	osmNamespace := common.MeshNamespace(osmControlPlaneNamespace)
 	client, err := kuberneteshelper.GetKubeClient()
 	if err != nil {
 		log.Err(err).Msg("Error creating Kubernetes client")
+	}
+
+	kubeConfig, err := kuberneteshelper.GetKubeConfig()
+	if err != nil {
+		log.Err(err).Msg("Error getting Kubernetes config")
+	}
+	accessClient, err := smiAccessClient.NewForConfig(kubeConfig)
+	if err != nil {
+		log.Err(err).Msg("Error initializing SMI Access client")
 	}
 
 	var srcConfigGetter, dstConfigGetter envoy.ConfigGetter
@@ -79,6 +90,9 @@ func PodToPod(fromPod *v1.Pod, toPod *v1.Pod, osmControlPlaneNamespace string) {
 
 		// Source Envoy must define a cluster for the destination
 		envoy.HasCluster(client, srcConfigGetter, toPod),
+
+		// Run SMI checks
+		smihelper.IsInTrafficSplit(client, toPod, accessClient),
 	)
 
 	common.Print(outcomes...)
