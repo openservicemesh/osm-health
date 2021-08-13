@@ -3,10 +3,8 @@ package kuberneteshelper
 import (
 	"context"
 	"errors"
-	"os"
 	"strings"
 
-	"github.com/mitchellh/go-homedir"
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -18,10 +16,6 @@ import (
 	"github.com/openservicemesh/osm/pkg/constants"
 	"github.com/openservicemesh/osm/pkg/gen/client/config/clientset/versioned"
 	"github.com/openservicemesh/osm/pkg/signals"
-)
-
-const (
-	defaultKubeConfigFile = "~/.kube/config"
 )
 
 // PodFromString validates the name of the Pod
@@ -63,26 +57,7 @@ func PodFromString(namespacedPod string) (*v1.Pod, error) {
 
 // GetKubeConfig returns the kubeconfig
 func GetKubeConfig() (*restclient.Config, error) {
-	var err error
-	kubeConfLocation := os.Getenv("KUBECONFIG")
-
-	if kubeConfLocation == "" {
-		kubeConfLocation, err = homedir.Expand(defaultKubeConfigFile)
-		if err != nil {
-			return nil, err
-		}
-
-		if _, err := os.Stat(kubeConfLocation); err != nil && os.IsNotExist(err) {
-			return nil, err
-		}
-	}
-
-	// Initialize kube config and client
-	kubeConfig, err := clientcmd.BuildConfigFromFlags("", kubeConfLocation)
-	if err != nil {
-		return nil, err
-	}
-	return kubeConfig, nil
+	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(clientcmd.NewDefaultClientConfigLoadingRules(), &clientcmd.ConfigOverrides{}).ClientConfig()
 }
 
 // GetKubeClient returns a Kubernetes clientset.
