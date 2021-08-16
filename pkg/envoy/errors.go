@@ -23,4 +23,13 @@ var (
 
 	// ErrEndpointNotFound is an error returned when a specific endpoint is not found in Envoy EDS config.
 	ErrEndpointNotFound = errors.New("endpoint not found")
+
+	// ErrUnmarshalingDynamicRouteConfig is an error returned when the unmarshaling of the dynamic RouteConfiguration struct fails.
+	ErrUnmarshalingDynamicRouteConfig = errors.New("error unmarshaling dynamic route configuration")
+
+	// ErrNoDynamicRouteConfigDomains is an error returned when an Envoy has no dynamic route config domains.
+	ErrNoDynamicRouteConfigDomains = errors.New("no dynamic route config domains")
+
+	// ErrDynamicRouteConfigDomainNotFound is an error returned when a specific dynamic route config domain is not found.
+	ErrDynamicRouteConfigDomainNotFound = errors.New("dynamic route config domain not found")
 )

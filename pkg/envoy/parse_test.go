@@ -27,7 +27,7 @@ func configFromFileOrFail(t *testing.T, filename string) *Config {
 }
 
 func TestEnvoyConfigParserBookbuyer(t *testing.T) {
-	cfg := configFromFileOrFail(t, "../../tests/sample-enovy-config-dump-bookbuyer.json")
+	cfg := configFromFileOrFail(t, "../../tests/sample-envoy-config-dump-bookbuyer.json")
 
 	assert := tassert.New(t)
 	// Bootstrap
@@ -62,7 +62,7 @@ func TestEnvoyConfigParserBookbuyer(t *testing.T) {
 }
 
 func TestEnvoyConfigParserBookstore(t *testing.T) {
-	cfg := configFromFileOrFail(t, "../../tests/sample-enovy-config-dump-bookstore.json")
+	cfg := configFromFileOrFail(t, "../../tests/sample-envoy-config-dump-bookstore.json")
 
 	assert := tassert.New(t)
 	// Bootstrap
