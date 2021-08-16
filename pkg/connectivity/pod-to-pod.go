@@ -54,23 +54,27 @@ func PodToPod(fromPod *corev1.Pod, toPod *corev1.Pod, osmControlPlaneNamespace s
 		// Check that pod namespaces are in the same mesh
 		namespace.AreNamespacesInSameMesh(client, fromPod.Namespace, toPod.Namespace),
 
-		// Check source Pod's namespace
+		// Check both pods for osm init and envoy container validity
 		namespace.IsInjectEnabled(client, fromPod.Namespace),
-		namespace.IsMonitoredBy(client, fromPod.Namespace, meshName),
-		podhelper.HasMinExpectedContainers(fromPod, 2),
-		podhelper.HasExpectedOsmInitImage(configurator, fromPod),
-		podhelper.HasExpectedEnvoyImage(configurator, fromPod),
-		podhelper.HasProxyUUIDLabel(fromPod),
-		podhelper.DoesNotHaveBadEvents(client, fromPod),
-
-		// Check destination Pod's namespace
 		namespace.IsInjectEnabled(client, toPod.Namespace),
+		namespace.IsMonitoredBy(client, fromPod.Namespace, meshName),
 		namespace.IsMonitoredBy(client, toPod.Namespace, meshName),
+		podhelper.HasMinExpectedContainers(fromPod, 2),
 		podhelper.HasMinExpectedContainers(toPod, 2),
+		podhelper.HasExpectedOsmInitImage(configurator, fromPod),
 		podhelper.HasExpectedOsmInitImage(configurator, toPod),
+		podhelper.HasExpectedEnvoyImage(configurator, fromPod),
 		podhelper.HasExpectedEnvoyImage(configurator, toPod),
+		podhelper.HasProxyUUIDLabel(fromPod),
 		podhelper.HasProxyUUIDLabel(toPod),
+
+		// Check pods for bad events
+		podhelper.DoesNotHaveBadEvents(client, fromPod),
 		podhelper.DoesNotHaveBadEvents(client, toPod),
+
+		// Check envoy logs
+		envoy.HasNoBadEnvoyLogsCheck(client, fromPod),
+		envoy.HasNoBadEnvoyLogsCheck(client, toPod),
 
 		// The source Envoy must have at least one endpoint for the destination Envoy.
 		envoy.HasDestinationEndpoints(srcConfigGetter),
@@ -83,10 +87,6 @@ func PodToPod(fromPod *corev1.Pod, toPod *corev1.Pod, osmControlPlaneNamespace s
 
 		// Check whether the destination Pod has an inbound dynamic route config domain that matches the source Pod.
 		envoy.HasInboundDynamicRouteConfigDomainCheck(dstConfigGetter, fromPod),
-
-		// Check envoy logs
-		envoy.HasNoBadEnvoyLogsCheck(client, fromPod),
-		envoy.HasNoBadEnvoyLogsCheck(client, toPod),
 
 		// Source Envoy must have Outbound listener
 		envoy.HasOutboundListener(srcConfigGetter, osmVersion),
