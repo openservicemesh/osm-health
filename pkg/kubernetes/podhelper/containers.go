@@ -3,7 +3,7 @@ package podhelper
 import (
 	"fmt"
 
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm/pkg/configurator"
@@ -15,11 +15,11 @@ var _ common.Runnable = (*EnvoySidecarImageCheck)(nil)
 // EnvoySidecarImageCheck implements common.Runnable
 type EnvoySidecarImageCheck struct {
 	cfg configurator.Configurator
-	pod *v1.Pod
+	pod *corev1.Pod
 }
 
 // HasExpectedEnvoyImage checks whether a pod has a sidecar with the envoy image specified in the meshconfig
-func HasExpectedEnvoyImage(osmConfigurator configurator.Configurator, pod *v1.Pod) EnvoySidecarImageCheck {
+func HasExpectedEnvoyImage(osmConfigurator configurator.Configurator, pod *corev1.Pod) EnvoySidecarImageCheck {
 	return EnvoySidecarImageCheck{
 		cfg: osmConfigurator,
 		pod: pod,
@@ -57,11 +57,11 @@ var _ common.Runnable = (*OsmInitContainerImageCheck)(nil)
 // OsmInitContainerImageCheck implements common.Runnable
 type OsmInitContainerImageCheck struct {
 	cfg configurator.Configurator
-	pod *v1.Pod
+	pod *corev1.Pod
 }
 
 // HasExpectedOsmInitImage checks whether a pod has a sidecar with the osm init container image specified in the meshconfig
-func HasExpectedOsmInitImage(osmConfigurator configurator.Configurator, pod *v1.Pod) OsmInitContainerImageCheck {
+func HasExpectedOsmInitImage(osmConfigurator configurator.Configurator, pod *corev1.Pod) OsmInitContainerImageCheck {
 	return OsmInitContainerImageCheck{
 		cfg: osmConfigurator,
 		pod: pod,
@@ -98,13 +98,13 @@ var _ common.Runnable = (*MinNumContainersCheck)(nil)
 
 // MinNumContainersCheck implements common.Runnable
 type MinNumContainersCheck struct {
-	pod    *v1.Pod
+	pod    *corev1.Pod
 	minNum int
 }
 
 // HasMinExpectedContainers checks whether a pod has at least the min number of containers expected
 // This currently corresponds to an app container, osm init container and envoy proxy sidecar
-func HasMinExpectedContainers(pod *v1.Pod, num int) MinNumContainersCheck {
+func HasMinExpectedContainers(pod *corev1.Pod, num int) MinNumContainersCheck {
 	return MinNumContainersCheck{
 		pod:    pod,
 		minNum: num,

@@ -3,9 +3,8 @@ package envoy
 import (
 	"fmt"
 
-	v1 "k8s.io/api/core/v1"
-
 	envoy_config_endpoint_v3 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
 )
@@ -15,7 +14,7 @@ var _ common.Runnable = (*DestinationEndpointChecker)(nil)
 
 // DestinationEndpointChecker implements common.Runnable
 type DestinationEndpointChecker struct {
-	*v1.Pod
+	*corev1.Pod
 	ConfigGetter
 }
 
@@ -104,7 +103,7 @@ func HasDestinationEndpoints(configGetter ConfigGetter) DestinationEndpointCheck
 // HasSpecificEndpoint creates a new common.Runnable, which checks whether the
 // given Pod has an Envoy with an endpoint configured mapping to a specific
 // destination Pod.
-func HasSpecificEndpoint(configGetter ConfigGetter, pod *v1.Pod) DestinationEndpointChecker {
+func HasSpecificEndpoint(configGetter ConfigGetter, pod *corev1.Pod) DestinationEndpointChecker {
 	return DestinationEndpointChecker{
 		ConfigGetter: configGetter,
 		Pod:          pod,

@@ -3,7 +3,7 @@ package envoy
 import (
 	"fmt"
 
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
@@ -16,11 +16,11 @@ var _ common.Runnable = (*NoBadEnvoyLogsCheck)(nil)
 // NoBadEnvoyLogsCheck implements common.Runnable
 type NoBadEnvoyLogsCheck struct {
 	client kubernetes.Interface
-	pod    *v1.Pod
+	pod    *corev1.Pod
 }
 
 // HasNoBadEnvoyLogsCheck checks whether the envoy container of the pod has bad (fatal/error/warning/fail) log messages
-func HasNoBadEnvoyLogsCheck(client kubernetes.Interface, pod *v1.Pod) NoBadEnvoyLogsCheck {
+func HasNoBadEnvoyLogsCheck(client kubernetes.Interface, pod *corev1.Pod) NoBadEnvoyLogsCheck {
 	return NoBadEnvoyLogsCheck{
 		client: client,
 		pod:    pod,

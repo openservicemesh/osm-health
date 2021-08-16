@@ -3,7 +3,7 @@ package envoy
 import (
 	"fmt"
 
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 	"github.com/openservicemesh/osm-health/pkg/osm"
@@ -12,7 +12,7 @@ import (
 
 // ConfigGetterStruct implements ConfigGetter interface.
 type ConfigGetterStruct struct {
-	*v1.Pod
+	*corev1.Pod
 	osm.ControllerVersion
 }
 
@@ -47,7 +47,7 @@ func (mcg ConfigGetterStruct) GetObjectName() string {
 }
 
 // GetEnvoyConfigGetterForPod returns a ConfigGetter struct, which can fetch the Envoy config for the given pod.
-func GetEnvoyConfigGetterForPod(pod *v1.Pod, osmVersion osm.ControllerVersion) (ConfigGetter, error) {
+func GetEnvoyConfigGetterForPod(pod *corev1.Pod, osmVersion osm.ControllerVersion) (ConfigGetter, error) {
 	return ConfigGetterStruct{
 		Pod:               pod,
 		ControllerVersion: osmVersion,
