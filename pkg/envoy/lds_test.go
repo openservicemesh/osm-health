@@ -12,11 +12,7 @@ func TestEnvoyListenerChecker(t *testing.T) {
 	assert := tassert.New(t)
 	osmVersion := osm.ControllerVersion("v0.9")
 	configGetter := mockConfigGetter{
-<<<<<<< HEAD
 		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookstore.json"),
-=======
-		getter: createConfigGetterFuncFromConfigFile("../../tests/sample-envoy-config-dump-bookstore.json"),
->>>>>>> feat(connectivity): Check rds cfg domains
 	}
 	listenerChecker := HasInboundListener(configGetter, osmVersion)
 	checkError := listenerChecker.Run()
@@ -41,11 +37,7 @@ func TestEnvoyListenerCheckerInvalidOSMVersion(t *testing.T) {
 	assert := tassert.New(t)
 	osmVersion := osm.ControllerVersion("no-such-version")
 	configGetter := mockConfigGetter{
-<<<<<<< HEAD
 		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookbuyer.json"),
-=======
-		getter: createConfigGetterFuncFromConfigFile("../../tests/sample-envoy-config-dump-bookbuyer.json"),
->>>>>>> feat(connectivity): Check rds cfg domains
 	}
 	listenerChecker := HasOutboundListener(configGetter, osmVersion)
 	checkError := listenerChecker.Run()

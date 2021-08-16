@@ -8,7 +8,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func TestEnvoyOutboundRouteDomainChecker(t *testing.T) {
+var (
+	bookstoreDestinationHost = "bookstore.bookstore"
+)
+
+func TestEnvoyOutboundRouteDomainPodChecker(t *testing.T) {
 	assert := tassert.New(t)
 	configGetter := mockConfigGetter{
 		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookbuyer.json"),
@@ -19,12 +23,12 @@ func TestEnvoyOutboundRouteDomainChecker(t *testing.T) {
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := HasOutboundDynamicRouteConfigDomainCheck(configGetter, pod)
+	routeDomainChecker := HasOutboundDynamicRouteConfigDomainPodCheck(configGetter, pod)
 	checkError := routeDomainChecker.Run()
 	assert.Nil(checkError)
 }
 
-func TestEnvoyOutboundRouteDomainCheckerEmptyConfig(t *testing.T) {
+func TestEnvoyOutboundRouteDomainPodCheckerEmptyConfig(t *testing.T) {
 	assert := tassert.New(t)
 	configGetter := mockConfigGetter{
 		getter: func() (*Config, error) {
@@ -37,13 +41,13 @@ func TestEnvoyOutboundRouteDomainCheckerEmptyConfig(t *testing.T) {
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := HasOutboundDynamicRouteConfigDomainCheck(configGetter, pod)
+	routeDomainChecker := HasOutboundDynamicRouteConfigDomainPodCheck(configGetter, pod)
 	checkError := routeDomainChecker.Run()
 	assert.NotNil(checkError)
 	assert.Equal("envoy config is empty", checkError.Error())
 }
 
-func TestEnvoyOutboundRouteDomainCheckerNoDomains(t *testing.T) {
+func TestEnvoyOutboundRouteDomainPodCheckerNoDomains(t *testing.T) {
 	assert := tassert.New(t)
 	configGetter := mockConfigGetter{
 		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookbuyer-no-rds-dynamic-route-virtual-host-domains.json"),
@@ -54,13 +58,13 @@ func TestEnvoyOutboundRouteDomainCheckerNoDomains(t *testing.T) {
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := HasOutboundDynamicRouteConfigDomainCheck(configGetter, pod)
+	routeDomainChecker := HasOutboundDynamicRouteConfigDomainPodCheck(configGetter, pod)
 	checkError := routeDomainChecker.Run()
 	assert.NotNil(checkError)
 	assert.Equal("no dynamic route config domains", checkError.Error())
 }
 
-func TestEnvoyOutboundRouteDomainCheckerDomainNotFound(t *testing.T) {
+func TestEnvoyOutboundRouteDomainPodCheckerDomainNotFound(t *testing.T) {
 	assert := tassert.New(t)
 	configGetter := mockConfigGetter{
 		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookbuyer-not-found-rds-dynamic-route-virtual-host-domain.json"),
@@ -71,13 +75,13 @@ func TestEnvoyOutboundRouteDomainCheckerDomainNotFound(t *testing.T) {
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := HasOutboundDynamicRouteConfigDomainCheck(configGetter, pod)
+	routeDomainChecker := HasOutboundDynamicRouteConfigDomainPodCheck(configGetter, pod)
 	checkError := routeDomainChecker.Run()
 	assert.NotNil(checkError)
 	assert.Equal("dynamic route config domain not found", checkError.Error())
 }
 
-func TestEnvoyInboundRouteDomainChecker(t *testing.T) {
+func TestEnvoyInboundRouteDomainPodChecker(t *testing.T) {
 	assert := tassert.New(t)
 	configGetter := mockConfigGetter{
 		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookstore.json"),
@@ -88,12 +92,12 @@ func TestEnvoyInboundRouteDomainChecker(t *testing.T) {
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := HasInboundDynamicRouteConfigDomainCheck(configGetter, pod)
+	routeDomainChecker := HasInboundDynamicRouteConfigDomainPodCheck(configGetter, pod)
 	checkError := routeDomainChecker.Run()
 	assert.Nil(checkError)
 }
 
-func TestEnvoyInboundRouteDomainCheckerEmptyConfig(t *testing.T) {
+func TestEnvoyInboundRouteDomainPodCheckerEmptyConfig(t *testing.T) {
 	assert := tassert.New(t)
 	configGetter := mockConfigGetter{
 		getter: func() (*Config, error) {
@@ -106,13 +110,13 @@ func TestEnvoyInboundRouteDomainCheckerEmptyConfig(t *testing.T) {
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := HasInboundDynamicRouteConfigDomainCheck(configGetter, pod)
+	routeDomainChecker := HasInboundDynamicRouteConfigDomainPodCheck(configGetter, pod)
 	checkError := routeDomainChecker.Run()
 	assert.NotNil(checkError)
 	assert.Equal("envoy config is empty", checkError.Error())
 }
 
-func TestEnvoyInboundRouteDomainCheckerNoDomains(t *testing.T) {
+func TestEnvoyInboundRouteDomainPodCheckerNoDomains(t *testing.T) {
 	assert := tassert.New(t)
 	configGetter := mockConfigGetter{
 		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookstore-no-rds-dynamic-route-virtual-host-domains.json"),
@@ -123,13 +127,13 @@ func TestEnvoyInboundRouteDomainCheckerNoDomains(t *testing.T) {
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := HasInboundDynamicRouteConfigDomainCheck(configGetter, pod)
+	routeDomainChecker := HasInboundDynamicRouteConfigDomainPodCheck(configGetter, pod)
 	checkError := routeDomainChecker.Run()
 	assert.NotNil(checkError)
 	assert.Equal("no dynamic route config domains", checkError.Error())
 }
 
-func TestEnvoyInboundRouteDomainCheckerDomainNotFound(t *testing.T) {
+func TestEnvoyInboundRouteDomainPodCheckerDomainNotFound(t *testing.T) {
 	assert := tassert.New(t)
 	configGetter := mockConfigGetter{
 		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookstore-not-found-rds-dynamic-route-virtual-host-domain.json"),
@@ -140,7 +144,52 @@ func TestEnvoyInboundRouteDomainCheckerDomainNotFound(t *testing.T) {
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := HasInboundDynamicRouteConfigDomainCheck(configGetter, pod)
+	routeDomainChecker := HasInboundDynamicRouteConfigDomainPodCheck(configGetter, pod)
+	checkError := routeDomainChecker.Run()
+	assert.NotNil(checkError)
+	assert.Equal("dynamic route config domain not found", checkError.Error())
+}
+
+func TestEnvoyOutboundRouteDomainHostChecker(t *testing.T) {
+	assert := tassert.New(t)
+	configGetter := mockConfigGetter{
+		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookbuyer.json"),
+	}
+	routeDomainChecker := HasOutboundDynamicRouteConfigDomainHostCheck(configGetter, bookstoreDestinationHost)
+	checkError := routeDomainChecker.Run()
+	assert.Nil(checkError)
+}
+
+func TestEnvoyOutboundRouteDomainHostCheckerEmptyConfig(t *testing.T) {
+	assert := tassert.New(t)
+	configGetter := mockConfigGetter{
+		getter: func() (*Config, error) {
+			return nil, nil
+		},
+	}
+	routeDomainChecker := HasOutboundDynamicRouteConfigDomainHostCheck(configGetter, bookstoreDestinationHost)
+	checkError := routeDomainChecker.Run()
+	assert.NotNil(checkError)
+	assert.Equal("envoy config is empty", checkError.Error())
+}
+
+func TestEnvoyOutboundRouteDomainHostCheckerNoDomains(t *testing.T) {
+	assert := tassert.New(t)
+	configGetter := mockConfigGetter{
+		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookbuyer-no-rds-dynamic-route-virtual-host-domains.json"),
+	}
+	routeDomainChecker := HasOutboundDynamicRouteConfigDomainHostCheck(configGetter, bookstoreDestinationHost)
+	checkError := routeDomainChecker.Run()
+	assert.NotNil(checkError)
+	assert.Equal("no dynamic route config domains", checkError.Error())
+}
+
+func TestEnvoyOutboundRouteDomainHostCheckerDomainNotFound(t *testing.T) {
+	assert := tassert.New(t)
+	configGetter := mockConfigGetter{
+		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookbuyer-not-found-rds-dynamic-route-virtual-host-domain.json"),
+	}
+	routeDomainChecker := HasOutboundDynamicRouteConfigDomainHostCheck(configGetter, bookstoreDestinationHost)
 	checkError := routeDomainChecker.Run()
 	assert.NotNil(checkError)
 	assert.Equal("dynamic route config domain not found", checkError.Error())
