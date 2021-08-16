@@ -1,7 +1,7 @@
 package ingress
 
 import (
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
@@ -9,7 +9,7 @@ import (
 )
 
 // ToPod checks the Ingress to the given pod.
-func ToPod(client kubernetes.Interface, toPod *v1.Pod) {
+func ToPod(client kubernetes.Interface, toPod *corev1.Pod) {
 	log.Info().Msgf("Testing ingress to pod %s/%s", toPod.Namespace, toPod.Name)
 
 	// TODO

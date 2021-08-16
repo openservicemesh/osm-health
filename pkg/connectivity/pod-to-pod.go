@@ -1,7 +1,7 @@
 package connectivity
 
 import (
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/envoy"
@@ -12,7 +12,7 @@ import (
 )
 
 // PodToPod tests the connectivity between a source and destination pods.
-func PodToPod(fromPod *v1.Pod, toPod *v1.Pod, osmControlPlaneNamespace string) {
+func PodToPod(fromPod *corev1.Pod, toPod *corev1.Pod, osmControlPlaneNamespace string) {
 	log.Info().Msgf("Testing connectivity from %s/%s to %s/%s", fromPod.Namespace, fromPod.Name, toPod.Namespace, toPod.Name)
 
 	// TODO

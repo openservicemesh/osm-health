@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -18,11 +17,11 @@ var _ common.Runnable = (*NoBadEventsCheck)(nil)
 // NoBadEventsCheck implements common.Runnable
 type NoBadEventsCheck struct {
 	client kubernetes.Interface
-	pod    *v1.Pod
+	pod    *corev1.Pod
 }
 
 // DoesNotHaveBadEvents checks whether a pod has abnormal (type!=Normal) events
-func DoesNotHaveBadEvents(client kubernetes.Interface, pod *v1.Pod) NoBadEventsCheck {
+func DoesNotHaveBadEvents(client kubernetes.Interface, pod *corev1.Pod) NoBadEventsCheck {
 	return NoBadEventsCheck{
 		client: client,
 		pod:    pod,

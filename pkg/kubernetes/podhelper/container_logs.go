@@ -8,14 +8,14 @@ import (
 
 	"github.com/pkg/errors"
 
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
 // HasNoBadLogs checks whether the logs of the pod container contain bad (fatal/error/warning/fail) logs
-func HasNoBadLogs(client kubernetes.Interface, pod *v1.Pod, containerName string) error {
+func HasNoBadLogs(client kubernetes.Interface, pod *corev1.Pod, containerName string) error {
 	logsTailLines := int64(10)
-	podLogsOpt := v1.PodLogOptions{
+	podLogsOpt := corev1.PodLogOptions{
 		Container: containerName,
 		Follow:    false,
 		Previous:  false,
