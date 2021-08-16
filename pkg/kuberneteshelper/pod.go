@@ -7,6 +7,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -15,6 +16,7 @@ import (
 	"github.com/openservicemesh/osm/pkg/configurator"
 	"github.com/openservicemesh/osm/pkg/constants"
 	"github.com/openservicemesh/osm/pkg/gen/client/config/clientset/versioned"
+	"github.com/openservicemesh/osm/pkg/service"
 	"github.com/openservicemesh/osm/pkg/signals"
 )
 
@@ -79,4 +81,29 @@ func GetOsmConfigurator(osmNamespace common.MeshNamespace) configurator.Configur
 	}
 	cfg := configurator.NewConfigurator(versioned.NewForConfigOrDie(kubeConfig), stop, osmNamespace.String(), constants.OSMMeshConfig)
 	return cfg
+}
+
+// GetMatchingServices returns a list of Kuberentes services in the namespace that match the pod's label
+func GetMatchingServices(kubeClient kubernetes.Interface, podLabels map[string]string, namespace string) ([]service.MeshService, error) {
+	serviceList, err := kubeClient.CoreV1().Services(namespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	var matchingServiceList []service.MeshService
+	for _, svc := range serviceList.Items {
+		svcRawSelector := svc.Spec.Selector
+		selector := labels.Set(svcRawSelector).AsSelector()
+		// service has no selectors, we do not need to match against the pod label
+		if len(svcRawSelector) == 0 {
+			continue
+		}
+		if selector.Matches(labels.Set(podLabels)) {
+			meshSvc := service.MeshService{
+				Namespace: namespace,
+				Name:      svc.Name,
+			}
+			matchingServiceList = append(matchingServiceList, meshSvc)
+		}
+	}
+	return matchingServiceList, nil
 }
