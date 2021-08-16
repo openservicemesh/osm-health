@@ -36,7 +36,7 @@ func (l DestinationEndpointChecker) Run() error {
 
 	foundAnyEndpoints := false
 	// If Pod was defined -- check if this pod IP is in the list of endpoints.
-	foundIt := false
+	foundSpecificEndpoint := false
 
 	for _, dynEpt := range envoyConfig.Endpoints.GetDynamicEndpointConfigs() {
 		var cla envoy_config_endpoint_v3.ClusterLoadAssignment
@@ -51,11 +51,11 @@ func (l DestinationEndpointChecker) Run() error {
 					break
 				}
 				if lbEpt.GetEndpoint().GetAddress().GetSocketAddress().GetAddress() == l.Status.PodIP {
-					foundIt = true
+					foundSpecificEndpoint = true
 					break
 				}
 			}
-			if (l.Pod == nil && foundAnyEndpoints) || foundIt {
+			if (l.Pod == nil && foundAnyEndpoints) || foundSpecificEndpoint {
 				break
 			}
 		}
@@ -66,7 +66,7 @@ func (l DestinationEndpointChecker) Run() error {
 		return ErrNoDestinationEndpoints
 	}
 
-	if l.Pod != nil && !foundIt {
+	if l.Pod != nil && !foundSpecificEndpoint {
 		return ErrEndpointNotFound
 	}
 
