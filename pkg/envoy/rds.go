@@ -17,6 +17,7 @@ type RouteDomainCheck struct {
 	*corev1.Pod
 	ConfigGetter
 	RouteName string
+	Domain    string
 }
 
 // Run implements common.Runnable
@@ -51,15 +52,15 @@ func (l RouteDomainCheck) Run() error {
 		for _, virtualHost := range dynRouteCfg.GetVirtualHosts() {
 			for _, domain := range virtualHost.GetDomains() {
 				foundAnyRouteDomains = true
-				if l.Pod == nil {
+				if l.Domain == "" {
 					break
 				}
-				if domain == fmt.Sprintf("%s.%s", l.Pod.Name, l.Pod.Namespace) {
+				if domain == l.Domain {
 					foundSpecificRouteDomain = true
 					break
 				}
 			}
-			if (l.Pod == nil && foundAnyRouteDomains) || foundSpecificRouteDomain {
+			if (l.Domain == "" && foundAnyRouteDomains) || foundSpecificRouteDomain {
 				break
 			}
 		}
@@ -70,7 +71,7 @@ func (l RouteDomainCheck) Run() error {
 		return ErrNoDynamicRouteConfigDomains
 	}
 
-	if l.Pod != nil && !foundSpecificRouteDomain {
+	if l.Domain != "" && !foundSpecificRouteDomain {
 		return ErrDynamicRouteConfigDomainNotFound
 	}
 
@@ -92,22 +93,32 @@ func (l RouteDomainCheck) Info() string {
 	return fmt.Sprintf("Checking whether %s is configured with correct %s Envoy route", l.ConfigGetter.GetObjectName(), l.RouteName)
 }
 
-// HasOutboundDynamicRouteConfigDomainCheck creates a new common.Runnable, which checks
+// HasOutboundDynamicRouteConfigDomainPodCheck creates a new common.Runnable, which checks
 // whether the Envoy config has an outbound dynamic route domain to the Pod.
-func HasOutboundDynamicRouteConfigDomainCheck(configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
+func HasOutboundDynamicRouteConfigDomainPodCheck(configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
 	return RouteDomainCheck{
 		ConfigGetter: configGetter,
-		Pod:          pod,
 		RouteName:    OutboundDynamicRouteConfigName,
+		Domain:       fmt.Sprintf("%s.%s", pod.Name, pod.Namespace),
 	}
 }
 
-// HasInboundDynamicRouteConfigDomainCheck creates a new common.Runnable, which checks
+// HasInboundDynamicRouteConfigDomainPodCheck creates a new common.Runnable, which checks
 // whether the Envoy config has an inbound dynamic route domain to the Pod.
-func HasInboundDynamicRouteConfigDomainCheck(configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
+func HasInboundDynamicRouteConfigDomainPodCheck(configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
 	return RouteDomainCheck{
 		ConfigGetter: configGetter,
-		Pod:          pod,
 		RouteName:    InboundDynamicRouteConfigName,
+		Domain:       fmt.Sprintf("%s.%s", pod.Name, pod.Namespace),
+	}
+}
+
+// HasOutboundDynamicRouteConfigDomainHostCheck creates a new common.Runnable, which checks
+// whether the Envoy config has an outbound dynamic route domain to the URL.
+func HasOutboundDynamicRouteConfigDomainHostCheck(configGetter ConfigGetter, destinationHost string) RouteDomainCheck {
+	return RouteDomainCheck{
+		ConfigGetter: configGetter,
+		RouteName:    OutboundDynamicRouteConfigName,
+		Domain:       destinationHost,
 	}
 }

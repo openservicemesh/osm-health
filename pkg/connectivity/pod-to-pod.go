@@ -83,10 +83,10 @@ func PodToPod(fromPod *corev1.Pod, toPod *corev1.Pod, osmControlPlaneNamespace s
 		envoy.HasSpecificEndpoint(srcConfigGetter, toPod),
 
 		// Check whether the source Pod has an outbound dynamic route config domain that matches the destination Pod.
-		envoy.HasOutboundDynamicRouteConfigDomainCheck(srcConfigGetter, toPod),
+		envoy.HasOutboundDynamicRouteConfigDomainPodCheck(srcConfigGetter, toPod),
 
 		// Check whether the destination Pod has an inbound dynamic route config domain that matches the source Pod.
-		envoy.HasInboundDynamicRouteConfigDomainCheck(dstConfigGetter, fromPod),
+		envoy.HasInboundDynamicRouteConfigDomainPodCheck(dstConfigGetter, fromPod),
 
 		// Source Envoy must have Outbound listener
 		envoy.HasOutboundListener(srcConfigGetter, osmVersion),
