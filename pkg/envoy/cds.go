@@ -1,17 +1,15 @@
 package envoy
 
 import (
-	"context"
 	"fmt"
 
 	clusterv3 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 	"github.com/openservicemesh/osm/pkg/utils"
 )
 
@@ -41,7 +39,7 @@ func (c HasClusterCheck) Run() error {
 	// The destination Pod might back multiple services, so check that at least
 	// one of those services is listed as a cluster in the source Envoy config.
 	possibleClusterNames := map[string]struct{}{}
-	svcs, err := c.listServicesForPod()
+	svcs, err := kuberneteshelper.GetMatchingServices(c.k8s, c.dstPod.Labels, c.dstPod.Namespace)
 	if err != nil {
 		return errors.Wrapf(err, "failed to map Pod %s/%s to Kubernetes Services", c.dstPod.Namespace, c.dstPod.Name)
 	}
@@ -79,32 +77,6 @@ func (c HasClusterCheck) Run() error {
 		return fmt.Errorf("Expected a cluster named one of %v, but only found %v", expectedClusterNames, foundClusterNames)
 	}
 	return nil
-}
-
-func (c HasClusterCheck) listServicesForPod() ([]*corev1.Service, error) {
-	var serviceList []*corev1.Service
-	svcList, err := c.k8s.CoreV1().Services(c.dstPod.Namespace).List(context.Background(), metav1.ListOptions{})
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to list services in namespace %s", c.dstPod.Namespace)
-	}
-
-	for _, svc := range svcList.Items {
-		svc := svc
-		if svc.Namespace != c.dstPod.Namespace {
-			continue
-		}
-		svcRawSelector := svc.Spec.Selector
-		// service has no selectors, we do not need to match against the pod label
-		if len(svcRawSelector) == 0 {
-			continue
-		}
-		selector := labels.SelectorFromSet(svcRawSelector)
-		if selector.Matches(labels.Set(c.dstPod.Labels)) {
-			serviceList = append(serviceList, &svc)
-		}
-	}
-
-	return serviceList, nil
 }
 
 // Suggestion implements common.Runnable
