@@ -9,9 +9,13 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 	"github.com/openservicemesh/osm/pkg/utils"
 )
+
+// Verify interface compliance
+var _ common.Runnable = (*HasClusterCheck)(nil)
 
 // HasClusterCheck implements common.Runnable
 type HasClusterCheck struct {
@@ -22,18 +26,18 @@ type HasClusterCheck struct {
 }
 
 // Run implements common.Runnable
-func (c HasClusterCheck) Run() error {
+func (c HasClusterCheck) Run() outcomes.Outcome {
 	if c.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
-		return ErrIncorrectlyInitializedConfigGetter
+		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
 	}
 	envoyConfig, err := c.ConfigGetter.GetConfig()
 	if err != nil {
-		return err
+		return outcomes.FailedOutcome{Error: err}
 	}
 
 	if envoyConfig == nil {
-		return ErrEnvoyConfigEmpty
+		return outcomes.FailedOutcome{Error: ErrEnvoyConfigEmpty}
 	}
 
 	// The destination Pod might back multiple services, so check that at least
@@ -41,7 +45,7 @@ func (c HasClusterCheck) Run() error {
 	possibleClusterNames := map[string]struct{}{}
 	svcs, err := kuberneteshelper.GetMatchingServices(c.k8s, c.dstPod.Labels, c.dstPod.Namespace)
 	if err != nil {
-		return errors.Wrapf(err, "failed to map Pod %s/%s to Kubernetes Services", c.dstPod.Namespace, c.dstPod.Name)
+		return outcomes.FailedOutcome{Error: errors.Wrapf(err, "failed to map Pod %s/%s to Kubernetes Services", c.dstPod.Namespace, c.dstPod.Name)}
 	}
 	for _, svc := range svcs {
 		possibleClusterNames[utils.K8sSvcToMeshSvc(svc).String()] = struct{}{}
@@ -49,7 +53,7 @@ func (c HasClusterCheck) Run() error {
 	if len(possibleClusterNames) == 0 {
 		// This pod isn't backing any services, so we wouldn't expect a cluster
 		// to be listed in the Envoy config.
-		return nil
+		return outcomes.DiagnosticOutcome{LongDiagnostics: "pod is not backing any services - no clusters listed in the Envoy config"}
 	}
 
 	found := false
@@ -74,9 +78,9 @@ func (c HasClusterCheck) Run() error {
 		for name := range possibleClusterNames {
 			expectedClusterNames = append(expectedClusterNames, name)
 		}
-		return fmt.Errorf("Expected a cluster named one of %v, but only found %v", expectedClusterNames, foundClusterNames)
+		return outcomes.FailedOutcome{Error: fmt.Errorf("Expected a cluster named one of %v, but only found %v", expectedClusterNames, foundClusterNames)}
 	}
-	return nil
+	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 }
 
 // Suggestion implements common.Runnable
@@ -89,8 +93,8 @@ func (c HasClusterCheck) FixIt() error {
 	panic("implement me")
 }
 
-// Info implements common.Runnable
-func (c HasClusterCheck) Info() string {
+// Description implements common.Runnable
+func (c HasClusterCheck) Description() string {
 	return fmt.Sprintf("Checking whether %s is configured with an envoy cluster referring to Pod %s/%s", c.ConfigGetter.GetObjectName(), c.dstPod.Namespace, c.dstPod.Name)
 }
 

@@ -82,7 +82,7 @@ func GetOsmConfigurator(osmNamespace common.MeshNamespace) configurator.Configur
 	return cfg
 }
 
-// GetMatchingServices returns a list of Kuberentes services in the namespace that match the pod's label
+// GetMatchingServices returns a list of Kubernetes services in the namespace that match the pod's label
 func GetMatchingServices(kubeClient kubernetes.Interface, podLabels map[string]string, namespace string) ([]*corev1.Service, error) {
 	var serviceList []*corev1.Service
 	svcList, err := kubeClient.CoreV1().Services(namespace).List(context.Background(), metav1.ListOptions{})

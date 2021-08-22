@@ -14,11 +14,12 @@ import (
 
 func TestIsInTrafficSplit(t *testing.T) {
 	type test struct {
-		name             string
-		pod              corev1.Pod
-		serviceList      []*corev1.Service
-		trafficSplitList []*split.TrafficSplit
-		isErrorExpected  bool
+		name                     string
+		pod                      corev1.Pod
+		serviceList              []*corev1.Service
+		trafficSplitList         []*split.TrafficSplit
+		isErrorExpected          bool
+		isDiagnosticInfoExpected bool
 	}
 
 	testCases := []test{
@@ -62,10 +63,11 @@ func TestIsInTrafficSplit(t *testing.T) {
 					},
 				},
 			},
-			isErrorExpected: false,
+			isErrorExpected:          false,
+			isDiagnosticInfoExpected: false,
 		},
 		{
-			name: "No split found referring to the pod's service, error returned",
+			name: "No split found referring to the pod's service, error not returned, diagnostic info expected",
 			pod: corev1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "pod-1",
@@ -104,10 +106,11 @@ func TestIsInTrafficSplit(t *testing.T) {
 					},
 				},
 			},
-			isErrorExpected: true,
+			isErrorExpected:          false,
+			isDiagnosticInfoExpected: true,
 		},
 		{
-			name: "No matching svc found for pod, GetMatchingServices returns error, error returned",
+			name: "No matching svc found for pod, error not returned, diagnostic info expected",
 			pod: corev1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "pod-1",
@@ -146,7 +149,8 @@ func TestIsInTrafficSplit(t *testing.T) {
 					},
 				},
 			},
-			isErrorExpected: true,
+			isErrorExpected:          false,
+			isDiagnosticInfoExpected: true,
 		},
 	}
 
@@ -167,9 +171,12 @@ func TestIsInTrafficSplit(t *testing.T) {
 
 			trafficSplitChecker := IsInTrafficSplit(client, &testCase.pod, smiSplitClient)
 			if testCase.isErrorExpected {
-				assert.Error(trafficSplitChecker.Run())
+				assert.Error(trafficSplitChecker.Run().GetError())
 			} else {
-				assert.NoError(trafficSplitChecker.Run())
+				assert.NoError(trafficSplitChecker.Run().GetError())
+			}
+			if testCase.isDiagnosticInfoExpected {
+				assert.NotEmpty(trafficSplitChecker.Run().GetLongDiagnostics())
 			}
 		})
 	}

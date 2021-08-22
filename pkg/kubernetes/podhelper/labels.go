@@ -6,6 +6,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm/pkg/mesh"
 )
 
@@ -24,17 +25,17 @@ func HasProxyUUIDLabel(pod *corev1.Pod) ProxyUUIDLabelCheck {
 	}
 }
 
-// Info implements common.Runnable
-func (check ProxyUUIDLabelCheck) Info() string {
+// Description implements common.Runnable
+func (check ProxyUUIDLabelCheck) Description() string {
 	return fmt.Sprintf("Checking whether pod %s has a valid proxy UUID label", check.pod.Name)
 }
 
 // Run implements common.Runnable
-func (check ProxyUUIDLabelCheck) Run() error {
+func (check ProxyUUIDLabelCheck) Run() outcomes.Outcome {
 	if !mesh.ProxyLabelExists(*check.pod) {
-		return ErrProxyUUIDLabelMissing
+		return outcomes.FailedOutcome{Error: ErrProxyUUIDLabelMissing}
 	}
-	return nil
+	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 }
 
 // Suggestion implements common.Runnable

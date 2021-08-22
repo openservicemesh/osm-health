@@ -6,6 +6,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm/pkg/configurator"
 )
 
@@ -26,19 +27,19 @@ func HasExpectedEnvoyImage(osmConfigurator configurator.Configurator, pod *corev
 	}
 }
 
-// Info implements common.Runnable
-func (check EnvoySidecarImageCheck) Info() string {
+// Description implements common.Runnable
+func (check EnvoySidecarImageCheck) Description() string {
 	return fmt.Sprintf("Checking whether pod %s has a container with envoy image matching meshconfig envoy image", check.pod.Name)
 }
 
 // Run implements common.Runnable
-func (check EnvoySidecarImageCheck) Run() error {
+func (check EnvoySidecarImageCheck) Run() outcomes.Outcome {
 	for _, container := range check.pod.Spec.Containers {
 		if container.Image == check.cfg.GetEnvoyImage() {
-			return nil
+			return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 		}
 	}
-	return ErrExpectedEnvoyImageMissing
+	return outcomes.FailedOutcome{Error: ErrExpectedEnvoyImageMissing}
 }
 
 // Suggestion implements common.Runnable
@@ -68,19 +69,19 @@ func HasExpectedOsmInitImage(osmConfigurator configurator.Configurator, pod *cor
 	}
 }
 
-// Info implements common.Runnable
-func (check OsmInitContainerImageCheck) Info() string {
+// Description implements common.Runnable
+func (check OsmInitContainerImageCheck) Description() string {
 	return fmt.Sprintf("Checking whether pod %s has a container with osm init image matching meshconfig init container image", check.pod.Name)
 }
 
 // Run implements common.Runnable
-func (check OsmInitContainerImageCheck) Run() error {
+func (check OsmInitContainerImageCheck) Run() outcomes.Outcome {
 	for _, container := range check.pod.Spec.InitContainers {
 		if container.Image == check.cfg.GetInitContainerImage() {
-			return nil
+			return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 		}
 	}
-	return ErrExpectedOsmInitImageMissing
+	return outcomes.FailedOutcome{Error: ErrExpectedOsmInitImageMissing}
 }
 
 // Suggestion implements common.Runnable
@@ -111,17 +112,17 @@ func HasMinExpectedContainers(pod *corev1.Pod, num int) MinNumContainersCheck {
 	}
 }
 
-// Info implements common.Runnable
-func (check MinNumContainersCheck) Info() string {
+// Description implements common.Runnable
+func (check MinNumContainersCheck) Description() string {
 	return fmt.Sprintf("Checking whether pod %s has at least %d containers", check.pod.Name, check.minNum)
 }
 
 // Run implements common.Runnable
-func (check MinNumContainersCheck) Run() error {
+func (check MinNumContainersCheck) Run() outcomes.Outcome {
 	if len(check.pod.Spec.Containers) < check.minNum {
-		return ErrExpectedMinNumContainers
+		return outcomes.FailedOutcome{Error: ErrExpectedMinNumContainers}
 	}
-	return nil
+	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 }
 
 // Suggestion implements common.Runnable

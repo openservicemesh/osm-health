@@ -6,6 +6,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm/pkg/constants"
 )
 
@@ -28,26 +29,26 @@ func IsMonitoredBy(client kubernetes.Interface, namespace string, meshName commo
 	}
 }
 
-// Info implements common.Runnable
-func (check MonitoredCheck) Info() string {
+// Description implements common.Runnable
+func (check MonitoredCheck) Description() string {
 	return fmt.Sprintf("Checking whether namespace %s is monitored by OSM %s", check.namespace, check.meshName)
 }
 
 // Run implements common.Runnable
-func (check MonitoredCheck) Run() error {
+func (check MonitoredCheck) Run() outcomes.Outcome {
 	labels, err := getLabels(check.client, check.namespace)
 	if err != nil {
-		return err
+		return outcomes.FailedOutcome{Error: err}
 	}
 
 	labelValue, ok := labels[constants.OSMKubeResourceMonitorAnnotation]
 	isMonitoredByController := ok && labelValue == check.meshName.String()
 
 	if !isMonitoredByController {
-		return ErrNotMonitoredByOSMController
+		return outcomes.FailedOutcome{Error: ErrNotMonitoredByOSMController}
 	}
 
-	return nil
+	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 }
 
 // Suggestion implements common.Runnable
@@ -79,32 +80,33 @@ func AreNamespacesInSameMesh(client kubernetes.Interface, namespaceA string, nam
 	}
 }
 
-// Info implements common.Runnable
-func (check NamespacesInSameMeshCheck) Info() string {
+// Description implements common.Runnable
+func (check NamespacesInSameMeshCheck) Description() string {
 	return fmt.Sprintf("Checking whether namespace %s and namespace %s are monitored by the same mesh", check.namespaceA, check.namespaceB)
 }
 
 // Run implements common.Runnable
-func (check NamespacesInSameMeshCheck) Run() error {
+func (check NamespacesInSameMeshCheck) Run() outcomes.Outcome {
 	labelsA, err := getLabels(check.client, check.namespaceA)
 	if err != nil {
-		return err
+		return outcomes.FailedOutcome{Error: err}
 	}
 	meshNameA, labelExistsA := labelsA[constants.OSMKubeResourceMonitorAnnotation]
 
 	labelsB, err := getLabels(check.client, check.namespaceB)
 	if err != nil {
-		return err
+		return outcomes.FailedOutcome{Error: err}
 	}
 
 	meshNameB, labelExistsB := labelsB[constants.OSMKubeResourceMonitorAnnotation]
 	if !labelExistsA || !labelExistsB {
-		return ErrNotMonitoredByOSMController
+		return outcomes.FailedOutcome{Error: ErrNotMonitoredByOSMController}
 	}
 	if meshNameA != meshNameB {
-		return ErrNamespacesNotInSameMesh
+		return outcomes.FailedOutcome{Error: ErrNamespacesNotInSameMesh}
 	}
-	return nil
+
+	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 }
 
 // Suggestion implements common.Runnable

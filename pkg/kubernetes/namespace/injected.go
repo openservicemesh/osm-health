@@ -6,6 +6,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm/pkg/constants"
 )
 
@@ -38,25 +39,25 @@ func IsInjectEnabled(client kubernetes.Interface, namespace string) SidecarInjec
 	}
 }
 
-// Info implements common.Runnable
-func (check SidecarInjectionCheck) Info() string {
+// Description implements common.Runnable
+func (check SidecarInjectionCheck) Description() string {
 	return fmt.Sprintf("Checking whether namespace %s is annotated for automatic sidecar injection", check.namespace)
 }
 
 // Run implements common.Runnable
-func (check SidecarInjectionCheck) Run() error {
+func (check SidecarInjectionCheck) Run() outcomes.Outcome {
 	annotations, err := getAnnotations(check.client, check.namespace)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
-		return err
+		return outcomes.FailedOutcome{Error: err}
 	}
 
 	annotationValue, ok := annotations[constants.SidecarInjectionAnnotation]
 	isAnnotatedForInjection := ok && annotationValue == enabled
 
 	if !isAnnotatedForInjection {
-		return ErrNotAnnotatedForSidecarInjection
+		return outcomes.FailedOutcome{Error: ErrNotAnnotatedForSidecarInjection}
 	}
 
-	return nil
+	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 }
