@@ -134,3 +134,15 @@ func (check MinNumContainersCheck) Suggestion() string {
 func (check MinNumContainersCheck) FixIt() error {
 	panic("implement me")
 }
+
+// PodHasContainer checks whether a pod's spec has a container.
+func PodHasContainer(pod *corev1.Pod, containerName string) bool {
+	allContainers := pod.Spec.Containers
+	allContainers = append(allContainers, pod.Spec.InitContainers...)
+	for _, container := range allContainers {
+		if container.Name == containerName {
+			return true
+		}
+	}
+	return false
+}

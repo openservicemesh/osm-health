@@ -7,6 +7,7 @@ import (
 	"regexp"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -15,6 +16,10 @@ import (
 
 // HasNoBadLogs checks whether the logs of the pod container contain bad (fatal/error/warning/fail) logs
 func HasNoBadLogs(client kubernetes.Interface, pod *corev1.Pod, containerName string) outcomes.Outcome {
+	if !PodHasContainer(pod, containerName) {
+		return outcomes.FailedOutcome{Error: ErrPodDoesNotHaveContainer}
+	}
+
 	logsTailLines := int64(10)
 	podLogsOpt := corev1.PodLogOptions{
 		Container: containerName,
@@ -39,11 +44,18 @@ func HasNoBadLogs(client kubernetes.Interface, pod *corev1.Pod, containerName st
 	re := regexp.MustCompile("(?i)(fatal)|(error)|(warn)|(fail)")
 	scanner := bufio.NewScanner(podLogsReader)
 	var badLogLines string
+	containsLogs := false
 	for scanner.Scan() {
+		containsLogs = true
 		logLine := scanner.Text()
+		log.Warn().Msgf("%s\n", logLine)
 		if re.MatchString(logLine) {
 			badLogLines += logLine + "\n"
 		}
+	}
+
+	if !containsLogs {
+		log.Warn().Msgf("%s container of pod %s does not contain any logs", containerName, pod.Name)
 	}
 
 	if len(badLogLines) != 0 {

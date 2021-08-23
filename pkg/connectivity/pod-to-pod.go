@@ -76,6 +76,10 @@ func PodToPod(fromPod *corev1.Pod, toPod *corev1.Pod, osmControlPlaneNamespace s
 		envoy.HasNoBadEnvoyLogsCheck(client, fromPod),
 		envoy.HasNoBadEnvoyLogsCheck(client, toPod),
 
+		// Check osm-init logs
+		osm.HasNoBadOsmInitLogsCheck(client, fromPod),
+		osm.HasNoBadOsmInitLogsCheck(client, toPod),
+
 		// The source Envoy must have at least one endpoint for the destination Envoy.
 		envoy.HasDestinationEndpoints(srcConfigGetter),
 
