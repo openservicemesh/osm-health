@@ -55,18 +55,18 @@ func (check TrafficTargetCheck) Run() outcomes.Outcome {
 	if check.cfg.IsPermissiveTrafficPolicyMode() {
 		return outcomes.Info{Diagnostics: "OSM is in permissive traffic policy modes -- all meshed pods can communicate and SMI access policies are not applicable"}
 	}
-	switch check.osmVersion {
-	case "v0.5", "v0.6":
-		return check.runForV1alpha2()
-	case "v0.7", "v0.8", "v0.9":
-		return check.runForV1alpha3()
+	switch osm.SupportedTrafficTarget[check.osmVersion] {
+	case osm.V1Alpha2:
+		return check.runForTrafficTargetV1alpha2()
+	case osm.V1Alpha3:
+		return check.runForTrafficTargetV1alpha3()
 	default:
 		return outcomes.Fail{Error: fmt.Errorf(
 			"OSM Controller version could not be mapped to a TrafficTarget version. Supported versions are v0.5 through v0.9")}
 	}
 }
 
-func (check TrafficTargetCheck) runForV1alpha2() outcomes.Outcome {
+func (check TrafficTargetCheck) runForTrafficTargetV1alpha2() outcomes.Outcome {
 	trafficTargets, err := check.accessClient.AccessV1alpha2().TrafficTargets(check.dstPod.Namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Err(err).Msgf("Error getting TrafficTargets for namespace %s", check.dstPod.Namespace)
@@ -96,7 +96,7 @@ func (check TrafficTargetCheck) runForV1alpha2() outcomes.Outcome {
 		check.dstPod.Name)}
 }
 
-func (check TrafficTargetCheck) runForV1alpha3() outcomes.Outcome {
+func (check TrafficTargetCheck) runForTrafficTargetV1alpha3() outcomes.Outcome {
 	trafficTargets, err := check.accessClient.AccessV1alpha3().TrafficTargets(check.dstPod.Namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Err(err).Msgf("Error getting TrafficTargets for namespace %s", check.dstPod.Namespace)
