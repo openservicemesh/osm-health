@@ -10,6 +10,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 )
 
@@ -32,33 +33,42 @@ func IsInTrafficSplit(client kubernetes.Interface, pod *corev1.Pod, smiSplitClie
 	}
 }
 
-// Info implements common.Runnable
-func (check TrafficSplitCheck) Info() string {
+// Description implements common.Runnable
+func (check TrafficSplitCheck) Description() string {
 	return fmt.Sprintf("Checking whether pod %s participates in a traffic split", check.pod.Name)
 }
 
 // Run implements common.Runnable
-func (check TrafficSplitCheck) Run() error {
-	services, err := kuberneteshelper.GetMatchingServices(check.client, check.pod.ObjectMeta.GetLabels(), check.pod.Namespace)
+func (check TrafficSplitCheck) Run() outcomes.Outcome {
+	ns := check.pod.Namespace
+	services, err := kuberneteshelper.GetMatchingServices(check.client, check.pod.ObjectMeta.GetLabels(), ns)
 	if err != nil {
-		return err
+		return outcomes.FailedOutcome{Error: err}
 	}
+	if len(services) == 0 {
+		return outcomes.DiagnosticOutcome{LongDiagnostics: fmt.Sprintf("pod '%s/%s' does not have a corresponding service", ns, check.pod.Name)}
+	}
+
 	//TODO: eventually change to decide which split version to use based on information dynamically obtained from the cluster
-	trafficSplits, err := check.splitClient.SplitV1alpha2().TrafficSplits(check.pod.Namespace).List(context.TODO(), metav1.ListOptions{})
+	trafficSplits, err := check.splitClient.SplitV1alpha2().TrafficSplits(ns).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		return err
+		return outcomes.FailedOutcome{Error: err}
 	}
 	for _, trafficSplit := range trafficSplits.Items {
 		spec := trafficSplit.Spec
 		for _, backend := range spec.Backends {
 			for _, svc := range services {
 				if backend.Service == svc.Name {
-					return nil
+					return outcomes.DiagnosticOutcome{
+						LongDiagnostics: fmt.Sprintf("pod '%s/%s' participates in traffic split for service '%s/%s'", ns, check.pod.Name, ns, spec.Service),
+					}
 				}
 			}
 		}
 	}
-	return ErrNoTrafficSplitForPod
+	return outcomes.DiagnosticOutcome{
+		LongDiagnostics: fmt.Sprintf("pod '%s/%s' does not participate in any traffic split", check.pod.Namespace, check.pod.Name),
+	}
 }
 
 // Suggestion implements common.Runnable

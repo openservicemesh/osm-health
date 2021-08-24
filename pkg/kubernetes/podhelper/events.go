@@ -9,6 +9,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 )
 
 // Verify interface compliance
@@ -28,13 +29,13 @@ func DoesNotHaveBadEvents(client kubernetes.Interface, pod *corev1.Pod) NoBadEve
 	}
 }
 
-// Info implements common.Runnable
-func (check NoBadEventsCheck) Info() string {
+// Description implements common.Runnable
+func (check NoBadEventsCheck) Description() string {
 	return fmt.Sprintf("Checking whether pod %s has events of type!=Normal", check.pod.Name)
 }
 
 // Run implements common.Runnable
-func (check NoBadEventsCheck) Run() error {
+func (check NoBadEventsCheck) Run() outcomes.Outcome {
 	eventsInterface := check.client.CoreV1().Events(check.pod.Namespace)
 	var events *corev1.EventList
 
@@ -42,14 +43,14 @@ func (check NoBadEventsCheck) Run() error {
 	options := metav1.ListOptions{FieldSelector: selectorString}
 	events, err := eventsInterface.List(context.TODO(), options)
 	if err != nil {
-		return fmt.Errorf("unable to search events of pod '%#v': %v", check.pod, err)
+		return outcomes.FailedOutcome{Error: fmt.Errorf("unable to search events of pod '%#v': %v", check.pod, err)}
 	}
 
 	if len(events.Items) == 0 {
-		return nil
+		return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 	}
 
-	return fmt.Errorf("pod '%s' has events that are of 'type!=Normal' - run 'kubectl get events --namespace %s --field-selector %s' to inspect events", check.pod.Name, check.pod.Namespace, selectorString)
+	return outcomes.FailedOutcome{Error: fmt.Errorf("pod '%s' has events that are of 'type!=Normal' - run 'kubectl get events --namespace %s --field-selector %s' to inspect events", check.pod.Name, check.pod.Namespace, selectorString)}
 }
 
 // Suggestion implements common.Runnable.

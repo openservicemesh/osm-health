@@ -7,6 +7,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/podhelper"
 )
 
@@ -27,13 +28,13 @@ func HasNoBadEnvoyLogsCheck(client kubernetes.Interface, pod *corev1.Pod) NoBadE
 	}
 }
 
-// Info implements common.Runnable
-func (check NoBadEnvoyLogsCheck) Info() string {
+// Description implements common.Runnable
+func (check NoBadEnvoyLogsCheck) Description() string {
 	return fmt.Sprintf("Checking whether pod %s has bad (fatal/error/warning/fail) logs in envoy container", check.pod.Name)
 }
 
 // Run implements common.Runnable
-func (check NoBadEnvoyLogsCheck) Run() error {
+func (check NoBadEnvoyLogsCheck) Run() outcomes.Outcome {
 	return podhelper.HasNoBadLogs(check.client, check.pod, "envoy")
 }
 

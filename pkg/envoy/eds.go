@@ -7,6 +7,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 )
 
 // Verify interface compliance
@@ -19,18 +20,18 @@ type DestinationEndpointChecker struct {
 }
 
 // Run implements common.Runnable
-func (l DestinationEndpointChecker) Run() error {
+func (l DestinationEndpointChecker) Run() outcomes.Outcome {
 	if l.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
-		return ErrIncorrectlyInitializedConfigGetter
+		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
 	}
 	envoyConfig, err := l.ConfigGetter.GetConfig()
 	if err != nil {
-		return err
+		return outcomes.FailedOutcome{Error: err}
 	}
 
 	if envoyConfig == nil {
-		return ErrEnvoyConfigEmpty
+		return outcomes.FailedOutcome{Error: ErrEnvoyConfigEmpty}
 	}
 
 	foundAnyEndpoints := false
@@ -40,7 +41,7 @@ func (l DestinationEndpointChecker) Run() error {
 	for _, dynEpt := range envoyConfig.Endpoints.GetDynamicEndpointConfigs() {
 		var cla envoy_config_endpoint_v3.ClusterLoadAssignment
 		if err = dynEpt.GetEndpointConfig().UnmarshalTo(&cla); err != nil {
-			return ErrUnmarshalingClusterLoadAssigment
+			return outcomes.FailedOutcome{Error: ErrUnmarshalingClusterLoadAssigment}
 		}
 
 		for _, ept := range cla.GetEndpoints() {
@@ -62,14 +63,14 @@ func (l DestinationEndpointChecker) Run() error {
 
 	if !foundAnyEndpoints {
 		log.Error().Msgf("must have at least one destination endpoint: %+v", envoyConfig.Endpoints.GetDynamicEndpointConfigs())
-		return ErrNoDestinationEndpoints
+		return outcomes.FailedOutcome{Error: ErrNoDestinationEndpoints}
 	}
 
 	if l.Pod != nil && !foundSpecificEndpoint {
-		return ErrEndpointNotFound
+		return outcomes.FailedOutcome{Error: ErrEndpointNotFound}
 	}
 
-	return nil
+	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 }
 
 // Suggestion implements common.Runnable
@@ -82,8 +83,8 @@ func (l DestinationEndpointChecker) FixIt() error {
 	panic("implement me")
 }
 
-// Info implements common.Runnable
-func (l DestinationEndpointChecker) Info() string {
+// Description implements common.Runnable
+func (l DestinationEndpointChecker) Description() string {
 	txt := "at least one destination"
 	if l.Pod != nil {
 		txt = fmt.Sprintf("%s as a destination", l.Status.PodIP)

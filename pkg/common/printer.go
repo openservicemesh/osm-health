@@ -8,25 +8,28 @@ import (
 	"github.com/fatih/color"
 )
 
-// Print prints the outcomes of the evaluation of a list of Runnables.
-func Print(outcomes ...Outcome) {
-	issuesCount := 0
-	foundIssues := false
+// Print prints the printable outcomes of the evaluation of a list of Runnables.
+func Print(printables ...Printable) {
+	errorsCount := 0
 	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 8, 8, 0, ' ', 0)
+	w.Init(os.Stdout, 4, 4, 0, ' ', 0)
 
 	defer func() { _ = w.Flush() }()
-	for idx, issue := range outcomes {
-		foundIssues = foundIssues && issue.Error != nil
-		errString := color.GreenString("OK")
-		if issue.Error != nil {
-			errString = fmt.Sprintf("%s %s", color.RedString("FAIL:"), color.RedString(issue.Error.Error()))
-			issuesCount = issuesCount + 1
+	for idx, printableOutcome := range printables {
+		fmt.Fprintf(w, "%d\t%s\t\t%s\n", idx+1, printableOutcome.ShortStatus, printableOutcome.CheckDescription)
+		if printableOutcome.Error != nil {
+			fmt.Fprintln(w, color.RedString("↳ Error: "+printableOutcome.Error.Error()))
+			errorsCount = errorsCount + 1
 		}
-		fmt.Fprintf(w, "%d   %s\t%s\t\n", idx+1, issue.RunnableInfo, errString)
+		if printableOutcome.LongDiagnostics != "" {
+			fmt.Fprintln(w, "↳ Additional diagnostic info:", printableOutcome.LongDiagnostics)
+		}
 	}
 
-	if foundIssues {
-		fmt.Printf("Found %d issues: %+v\n", issuesCount, outcomes)
+	var statusIcon = "✅"
+	if errorsCount > 0 {
+		statusIcon = "❌"
 	}
+
+	fmt.Fprintf(w, "\n%s Ran %d checks. %d checks failed.\n", statusIcon, len(printables), errorsCount)
 }

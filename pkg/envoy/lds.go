@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/osm"
 )
 
@@ -23,27 +24,27 @@ type HasListenerCheck struct {
 }
 
 // Run implements common.Runnable
-func (l HasListenerCheck) Run() error {
+func (l HasListenerCheck) Run() outcomes.Outcome {
 	if l.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
-		return ErrIncorrectlyInitializedConfigGetter
+		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
 	}
 	envoyConfig, err := l.ConfigGetter.GetConfig()
 	if err != nil {
-		return err
+		return outcomes.FailedOutcome{Error: err}
 	}
 
 	if envoyConfig == nil {
-		return ErrEnvoyConfigEmpty
+		return outcomes.FailedOutcome{Error: ErrEnvoyConfigEmpty}
 	}
 
 	expectedListenerName, exists := l.expectedListenersPerVersion[l.ControllerVersion]
 	if !exists {
-		return ErrOSMControllerVersionUnrecognized
+		return outcomes.FailedOutcome{Error: ErrOSMControllerVersionUnrecognized}
 	}
 
 	if envoyConfig == nil || envoyConfig.Listeners.DynamicListeners == nil {
-		return ErrEnvoyConfigEmpty
+		return outcomes.FailedOutcome{Error: ErrEnvoyConfigEmpty}
 	}
 
 	found := false
@@ -58,10 +59,10 @@ func (l HasListenerCheck) Run() error {
 
 	if !found {
 		log.Error().Msgf("must have listener with name %s but only found %s", expectedListenerName, actualListeners)
-		return ErrEnvoyListenerMissing
+		return outcomes.FailedOutcome{Error: ErrEnvoyListenerMissing}
 	}
 
-	return nil
+	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 }
 
 // Suggestion implements common.Runnable
@@ -74,8 +75,8 @@ func (l HasListenerCheck) FixIt() error {
 	panic("implement me")
 }
 
-// Info implements common.Runnable
-func (l HasListenerCheck) Info() string {
+// Description implements common.Runnable
+func (l HasListenerCheck) Description() string {
 	return fmt.Sprintf("Checking whether %s is configured with correct %s Envoy listener", l.ConfigGetter.GetObjectName(), l.listenerType)
 }
 

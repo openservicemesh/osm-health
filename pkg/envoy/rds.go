@@ -7,6 +7,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 )
 
 // Verify interface compliance
@@ -21,19 +22,19 @@ type RouteDomainCheck struct {
 }
 
 // Run implements common.Runnable
-func (l RouteDomainCheck) Run() error {
+func (l RouteDomainCheck) Run() outcomes.Outcome {
 	if l.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
-		return ErrIncorrectlyInitializedConfigGetter
+		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
 	}
 
 	envoyConfig, err := l.ConfigGetter.GetConfig()
 	if err != nil {
-		return err
+		return outcomes.FailedOutcome{Error: err}
 	}
 
 	if envoyConfig == nil {
-		return ErrEnvoyConfigEmpty
+		return outcomes.FailedOutcome{Error: ErrEnvoyConfigEmpty}
 	}
 
 	foundAnyRouteDomains := false
@@ -42,7 +43,7 @@ func (l RouteDomainCheck) Run() error {
 	for _, rawDynRouteCfg := range envoyConfig.Routes.GetDynamicRouteConfigs() {
 		var dynRouteCfg envoy_config_route_v3.RouteConfiguration
 		if err = rawDynRouteCfg.GetRouteConfig().UnmarshalTo(&dynRouteCfg); err != nil {
-			return ErrUnmarshalingDynamicRouteConfig
+			return outcomes.FailedOutcome{Error: ErrUnmarshalingDynamicRouteConfig}
 		}
 
 		if dynRouteCfg.Name != l.RouteName {
@@ -68,14 +69,14 @@ func (l RouteDomainCheck) Run() error {
 
 	if !foundAnyRouteDomains {
 		log.Error().Msgf("must have at least one dynamic route config domain: %+v", envoyConfig.Routes.GetDynamicRouteConfigs())
-		return ErrNoDynamicRouteConfigDomains
+		return outcomes.FailedOutcome{Error: ErrNoDynamicRouteConfigDomains}
 	}
 
 	if l.Domain != "" && !foundSpecificRouteDomain {
-		return ErrDynamicRouteConfigDomainNotFound
+		return outcomes.FailedOutcome{Error: ErrDynamicRouteConfigDomainNotFound}
 	}
 
-	return nil
+	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 }
 
 // Suggestion implements common.Runnable
@@ -88,8 +89,8 @@ func (l RouteDomainCheck) FixIt() error {
 	panic("implement me")
 }
 
-// Info implements common.Runnable
-func (l RouteDomainCheck) Info() string {
+// Description implements common.Runnable
+func (l RouteDomainCheck) Description() string {
 	return fmt.Sprintf("Checking whether %s is configured with correct %s Envoy route", l.ConfigGetter.GetObjectName(), l.RouteName)
 }
 

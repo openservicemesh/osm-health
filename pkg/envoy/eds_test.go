@@ -88,11 +88,11 @@ func TestHasDestinationEndpoints(t *testing.T) {
 				},
 			}
 			clusterChecker := HasDestinationEndpoints(configGetter)
-			err := clusterChecker.Run()
+			outcome := clusterChecker.Run()
 			if test.pass {
-				assert.NoError(err)
+				assert.NoError(outcome.GetError())
 			} else {
-				assert.Error(err)
+				assert.Error(outcome.GetError())
 			}
 		})
 	}
@@ -351,11 +351,11 @@ func TestHasSpecificEndpoint(t *testing.T) {
 				},
 			}
 			clusterChecker := HasSpecificEndpoint(configGetter, test.pod)
-			err := clusterChecker.Run()
+			outcome := clusterChecker.Run()
 			if test.pass {
-				assert.NoError(err)
+				assert.NoError(outcome.GetError())
 			} else {
-				assert.Error(err)
+				assert.Error(outcome.GetError())
 			}
 		})
 	}
