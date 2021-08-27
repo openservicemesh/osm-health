@@ -94,9 +94,8 @@ func (l RouteDomainCheck) Description() string {
 	return fmt.Sprintf("Checking whether %s is configured with correct %s Envoy route", l.ConfigGetter.GetObjectName(), l.RouteName)
 }
 
-// HasOutboundDynamicRouteConfigDomainPodCheck creates a new common.Runnable, which checks
-// whether the Envoy config has an outbound dynamic route domain to the Pod.
-func HasOutboundDynamicRouteConfigDomainPodCheck(configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
+// NewOutboundRouteDomainPodCheck creates a DestinationEndpointCheck which checks whether the Envoy config has an outbound dynamic route domain to the Pod
+func NewOutboundRouteDomainPodCheck(configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
 	return RouteDomainCheck{
 		ConfigGetter: configGetter,
 		RouteName:    OutboundDynamicRouteConfigName,
@@ -104,9 +103,8 @@ func HasOutboundDynamicRouteConfigDomainPodCheck(configGetter ConfigGetter, pod 
 	}
 }
 
-// HasInboundDynamicRouteConfigDomainPodCheck creates a new common.Runnable, which checks
-// whether the Envoy config has an inbound dynamic route domain to the Pod.
-func HasInboundDynamicRouteConfigDomainPodCheck(configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
+// NewInboundRouteDomainPodCheck creates a DestinationEndpointCheck which checks whether the Envoy config has an inbound dynamic route domain to the Pod
+func NewInboundRouteDomainPodCheck(configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
 	return RouteDomainCheck{
 		ConfigGetter: configGetter,
 		RouteName:    InboundDynamicRouteConfigName,
@@ -114,9 +112,8 @@ func HasInboundDynamicRouteConfigDomainPodCheck(configGetter ConfigGetter, pod *
 	}
 }
 
-// HasOutboundDynamicRouteConfigDomainHostCheck creates a new common.Runnable, which checks
-// whether the Envoy config has an outbound dynamic route domain to the URL.
-func HasOutboundDynamicRouteConfigDomainHostCheck(configGetter ConfigGetter, destinationHost string) RouteDomainCheck {
+// NewOutboundRouteDomainHostCheck creates a DestinationEndpointCheck which checks whether the Envoy config has an outbound dynamic route domain to the URL
+func NewOutboundRouteDomainHostCheck(configGetter ConfigGetter, destinationHost string) RouteDomainCheck {
 	return RouteDomainCheck{
 		ConfigGetter: configGetter,
 		RouteName:    OutboundDynamicRouteConfigName,

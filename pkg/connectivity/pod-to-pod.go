@@ -59,53 +59,53 @@ func PodToPod(fromPod *corev1.Pod, toPod *corev1.Pod, osmControlPlaneNamespace s
 
 	outcomes := common.Run(
 		// Check that pod namespaces are in the same mesh
-		namespace.AreNamespacesInSameMesh(client, fromPod.Namespace, toPod.Namespace),
+		namespace.NewNamespacesInSameMeshCheck(client, fromPod.Namespace, toPod.Namespace),
 
 		// Check both pods for osm init and envoy container validity
-		namespace.IsInjectEnabled(client, fromPod.Namespace),
-		namespace.IsInjectEnabled(client, toPod.Namespace),
-		namespace.IsMonitoredBy(client, fromPod.Namespace, meshName),
-		namespace.IsMonitoredBy(client, toPod.Namespace, meshName),
-		podhelper.HasMinExpectedContainers(fromPod, 2),
-		podhelper.HasMinExpectedContainers(toPod, 2),
-		podhelper.HasExpectedOsmInitImage(configurator, fromPod),
-		podhelper.HasExpectedOsmInitImage(configurator, toPod),
-		podhelper.HasExpectedEnvoyImage(configurator, fromPod),
-		podhelper.HasExpectedEnvoyImage(configurator, toPod),
-		podhelper.HasProxyUUIDLabel(fromPod),
-		podhelper.HasProxyUUIDLabel(toPod),
+		namespace.NewSidecarInjectionCheck(client, fromPod.Namespace),
+		namespace.NewSidecarInjectionCheck(client, toPod.Namespace),
+		namespace.NewMonitoredCheck(client, fromPod.Namespace, meshName),
+		namespace.NewMonitoredCheck(client, toPod.Namespace, meshName),
+		podhelper.NewMinNumContainersCheck(fromPod, 2),
+		podhelper.NewMinNumContainersCheck(toPod, 2),
+		podhelper.NewOsmContainerImageCheck(configurator, fromPod),
+		podhelper.NewOsmContainerImageCheck(configurator, toPod),
+		podhelper.NewEnvoySidecarImageCheck(configurator, fromPod),
+		podhelper.NewEnvoySidecarImageCheck(configurator, toPod),
+		podhelper.NewProxyUUIDLabelCheck(fromPod),
+		podhelper.NewProxyUUIDLabelCheck(toPod),
 
 		// Check pods for bad events
-		podhelper.DoesNotHaveBadEvents(client, fromPod),
-		podhelper.DoesNotHaveBadEvents(client, toPod),
+		podhelper.NewPodEventsCheck(client, fromPod),
+		podhelper.NewPodEventsCheck(client, toPod),
 
 		// Check envoy logs
-		envoy.HasNoBadEnvoyLogsCheck(client, fromPod),
-		envoy.HasNoBadEnvoyLogsCheck(client, toPod),
+		envoy.NewBadLogsCheck(client, fromPod),
+		envoy.NewBadLogsCheck(client, toPod),
 
 		// The source Envoy must have at least one endpoint for the destination Envoy.
-		envoy.HasDestinationEndpoints(srcConfigGetter),
+		envoy.NewDestinationEndpointCheck(srcConfigGetter),
 
 		// Check whether the source Pod has an endpoint that matches the destination Pod.
-		envoy.HasSpecificEndpoint(srcConfigGetter, toPod),
+		envoy.NewSpecificEndpointCheck(srcConfigGetter, toPod),
 
 		// Check whether the source Pod has an outbound dynamic route config domain that matches the destination Pod.
-		envoy.HasOutboundDynamicRouteConfigDomainPodCheck(srcConfigGetter, toPod),
+		envoy.NewOutboundRouteDomainPodCheck(srcConfigGetter, toPod),
 
 		// Check whether the destination Pod has an inbound dynamic route config domain that matches the source Pod.
-		envoy.HasInboundDynamicRouteConfigDomainPodCheck(dstConfigGetter, fromPod),
+		envoy.NewInboundRouteDomainPodCheck(dstConfigGetter, fromPod),
 
 		// Source Envoy must have Outbound listener
-		envoy.HasOutboundListener(srcConfigGetter, osmVersion),
+		envoy.NewOutboundListenerCheck(srcConfigGetter, osmVersion),
 
 		// Destination Envoy must have Inbound listener
-		envoy.HasInboundListener(dstConfigGetter, osmVersion),
+		envoy.NewInboundListenerCheck(dstConfigGetter, osmVersion),
 
 		// Source Envoy must define a cluster for the destination
-		envoy.HasCluster(client, srcConfigGetter, toPod),
+		envoy.NewClusterCheck(client, srcConfigGetter, toPod),
 
 		// Run SMI checks
-		smi.IsInTrafficSplit(client, toPod, splitClient),
+		smi.NewTrafficSplitCheck(client, toPod, splitClient),
 		access.NewTrafficTargetCheck(osmVersion, configurator, fromPod, toPod, accessClient),
 		access.NewRoutesValidityCheck(osmVersion, configurator, fromPod, toPod, accessClient),
 	)

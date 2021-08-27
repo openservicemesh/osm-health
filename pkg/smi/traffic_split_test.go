@@ -169,7 +169,7 @@ func TestIsInTrafficSplit(t *testing.T) {
 			}
 			smiSplitClient := fakeSmiSplitClient.NewSimpleClientset(splitObjs...)
 
-			trafficSplitChecker := IsInTrafficSplit(client, &testCase.pod, smiSplitClient)
+			trafficSplitChecker := NewTrafficSplitCheck(client, &testCase.pod, smiSplitClient)
 			if testCase.isErrorExpected {
 				assert.Error(trafficSplitChecker.Run().GetError())
 			} else {

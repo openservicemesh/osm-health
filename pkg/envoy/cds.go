@@ -15,10 +15,10 @@ import (
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*HasClusterCheck)(nil)
+var _ common.Runnable = (*ClusterCheck)(nil)
 
-// HasClusterCheck implements common.Runnable
-type HasClusterCheck struct {
+// ClusterCheck implements common.Runnable
+type ClusterCheck struct {
 	ConfigGetter
 
 	dstPod *corev1.Pod
@@ -26,7 +26,7 @@ type HasClusterCheck struct {
 }
 
 // Run implements common.Runnable
-func (c HasClusterCheck) Run() outcomes.Outcome {
+func (c ClusterCheck) Run() outcomes.Outcome {
 	if c.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
 		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
@@ -84,24 +84,23 @@ func (c HasClusterCheck) Run() outcomes.Outcome {
 }
 
 // Suggestion implements common.Runnable
-func (c HasClusterCheck) Suggestion() string {
+func (c ClusterCheck) Suggestion() string {
 	panic("implement me")
 }
 
 // FixIt implements common.Runnable
-func (c HasClusterCheck) FixIt() error {
+func (c ClusterCheck) FixIt() error {
 	panic("implement me")
 }
 
 // Description implements common.Runnable
-func (c HasClusterCheck) Description() string {
+func (c ClusterCheck) Description() string {
 	return fmt.Sprintf("Checking whether %s is configured with an envoy cluster referring to Pod %s/%s", c.ConfigGetter.GetObjectName(), c.dstPod.Namespace, c.dstPod.Name)
 }
 
-// HasCluster creates a new common.Runnable, which checks whether the given Pod
-// has an Envoy with properly configured cluster.
-func HasCluster(client kubernetes.Interface, configGetter ConfigGetter, dstPod *corev1.Pod) common.Runnable {
-	return HasClusterCheck{
+// NewClusterCheck creates a ClusterCheck which checks whether the given Pod has an Envoy with properly configured cluster.
+func NewClusterCheck(client kubernetes.Interface, configGetter ConfigGetter, dstPod *corev1.Pod) ClusterCheck {
+	return ClusterCheck{
 		ConfigGetter: configGetter,
 		dstPod:       dstPod,
 		k8s:          client,

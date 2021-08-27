@@ -24,7 +24,7 @@ func PodToURL(fromPod *corev1.Pod, destinationURL *url.URL) {
 
 	outcomes := common.Run(
 		// Check whether the source Pod has an outbound dynamic route config domain that matches the destination URL.
-		envoy.HasOutboundDynamicRouteConfigDomainHostCheck(srcConfigGetter, destinationURL.Host),
+		envoy.NewOutboundRouteDomainHostCheck(srcConfigGetter, destinationURL.Host),
 	)
 
 	common.Print(outcomes...)

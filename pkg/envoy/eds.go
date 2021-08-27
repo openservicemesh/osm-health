@@ -11,16 +11,16 @@ import (
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*DestinationEndpointChecker)(nil)
+var _ common.Runnable = (*DestinationEndpointCheck)(nil)
 
-// DestinationEndpointChecker implements common.Runnable
-type DestinationEndpointChecker struct {
+// DestinationEndpointCheck implements common.Runnable
+type DestinationEndpointCheck struct {
 	*corev1.Pod
 	ConfigGetter
 }
 
 // Run implements common.Runnable
-func (l DestinationEndpointChecker) Run() outcomes.Outcome {
+func (l DestinationEndpointCheck) Run() outcomes.Outcome {
 	if l.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
 		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
@@ -74,17 +74,17 @@ func (l DestinationEndpointChecker) Run() outcomes.Outcome {
 }
 
 // Suggestion implements common.Runnable
-func (l DestinationEndpointChecker) Suggestion() string {
+func (l DestinationEndpointCheck) Suggestion() string {
 	panic("implement me")
 }
 
 // FixIt implements common.Runnable
-func (l DestinationEndpointChecker) FixIt() error {
+func (l DestinationEndpointCheck) FixIt() error {
 	panic("implement me")
 }
 
 // Description implements common.Runnable
-func (l DestinationEndpointChecker) Description() string {
+func (l DestinationEndpointCheck) Description() string {
 	txt := "at least one destination"
 	if l.Pod != nil {
 		txt = fmt.Sprintf("%s as a destination", l.Status.PodIP)
@@ -93,19 +93,16 @@ func (l DestinationEndpointChecker) Description() string {
 	return fmt.Sprintf("Checking whether %s is configured with %s endpoint", l.ConfigGetter.GetObjectName(), txt)
 }
 
-// HasDestinationEndpoints creates a new common.Runnable, which checks whether
-// the given Pod has an Envoy with any endpoints configured.
-func HasDestinationEndpoints(configGetter ConfigGetter) DestinationEndpointChecker {
-	return DestinationEndpointChecker{
+// NewDestinationEndpointCheck creates a DestinationEndpointCheck which checks whether the given Pod has an Envoy with any endpoints configured.
+func NewDestinationEndpointCheck(configGetter ConfigGetter) DestinationEndpointCheck {
+	return DestinationEndpointCheck{
 		ConfigGetter: configGetter,
 	}
 }
 
-// HasSpecificEndpoint creates a new common.Runnable, which checks whether the
-// given Pod has an Envoy with an endpoint configured mapping to a specific
-// destination Pod.
-func HasSpecificEndpoint(configGetter ConfigGetter, pod *corev1.Pod) DestinationEndpointChecker {
-	return DestinationEndpointChecker{
+// NewSpecificEndpointCheck creates a DestinationEndpointCheck which checks whether the given Pod has an Envoy with an endpoint configured mapping to a specific destination Pod.
+func NewSpecificEndpointCheck(configGetter ConfigGetter, pod *corev1.Pod) DestinationEndpointCheck {
+	return DestinationEndpointCheck{
 		ConfigGetter: configGetter,
 		Pod:          pod,
 	}

@@ -24,8 +24,8 @@ type TrafficSplitCheck struct {
 	splitClient smiSplitClient.Interface
 }
 
-// IsInTrafficSplit checks whether a pod is affected by an SMI traffic split
-func IsInTrafficSplit(client kubernetes.Interface, pod *corev1.Pod, smiSplitClient smiSplitClient.Interface) TrafficSplitCheck {
+// NewTrafficSplitCheck creates a TrafficSplitCheck which checks whether a pod is affected by an SMI traffic split
+func NewTrafficSplitCheck(client kubernetes.Interface, pod *corev1.Pod, smiSplitClient smiSplitClient.Interface) TrafficSplitCheck {
 	return TrafficSplitCheck{
 		client:      client,
 		pod:         pod,

@@ -31,8 +31,8 @@ func (check SidecarInjectionCheck) FixIt() error {
 	panic("implement me")
 }
 
-// IsInjectEnabled checks whether a namespace is enabled for sidecar injection.
-func IsInjectEnabled(client kubernetes.Interface, namespace string) SidecarInjectionCheck {
+// NewSidecarInjectionCheck creates a SidecarInjectionCheck which checks whether a namespace is enabled for sidecar injection.
+func NewSidecarInjectionCheck(client kubernetes.Interface, namespace string) SidecarInjectionCheck {
 	return SidecarInjectionCheck{
 		client:    client,
 		namespace: namespace,
