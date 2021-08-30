@@ -78,7 +78,7 @@ func TestHasExpectedNumContainers(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		numContainersChecker := HasMinExpectedContainers(&tc.pod, 2)
+		numContainersChecker := NewMinNumContainersCheck(&tc.pod, 2)
 
 		assert.Equal(tc.expectedError, numContainersChecker.Run().GetError())
 	}

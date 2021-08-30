@@ -20,8 +20,8 @@ type MonitoredCheck struct {
 	meshName  common.MeshName
 }
 
-// IsMonitoredBy checks whether a namespace is monitored by certain OSM Controller.
-func IsMonitoredBy(client kubernetes.Interface, namespace string, meshName common.MeshName) MonitoredCheck {
+// NewMonitoredCheck creates a MonitoredCheck which checks whether a namespace is monitored by certain OSM Controller.
+func NewMonitoredCheck(client kubernetes.Interface, namespace string, meshName common.MeshName) MonitoredCheck {
 	return MonitoredCheck{
 		client:    client,
 		namespace: namespace,
@@ -71,8 +71,8 @@ type NamespacesInSameMeshCheck struct {
 	namespaceB string
 }
 
-// AreNamespacesInSameMesh checks whether two pods are in the same mesh
-func AreNamespacesInSameMesh(client kubernetes.Interface, namespaceA string, namespaceB string) NamespacesInSameMeshCheck {
+// NewNamespacesInSameMeshCheck creates a SidecarInjectionCheck which checks whether two pods are in the same mesh
+func NewNamespacesInSameMeshCheck(client kubernetes.Interface, namespaceA string, namespaceB string) NamespacesInSameMeshCheck {
 	return NamespacesInSameMeshCheck{
 		client:     client,
 		namespaceA: namespaceA,

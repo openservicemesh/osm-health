@@ -87,7 +87,7 @@ func TestHasDestinationEndpoints(t *testing.T) {
 					return test.config, nil
 				},
 			}
-			clusterChecker := HasDestinationEndpoints(configGetter)
+			clusterChecker := NewDestinationEndpointCheck(configGetter)
 			outcome := clusterChecker.Run()
 			if test.pass {
 				assert.NoError(outcome.GetError())
@@ -350,7 +350,7 @@ func TestHasSpecificEndpoint(t *testing.T) {
 					return test.config, nil
 				},
 			}
-			clusterChecker := HasSpecificEndpoint(configGetter, test.pod)
+			clusterChecker := NewSpecificEndpointCheck(configGetter, test.pod)
 			outcome := clusterChecker.Run()
 			if test.pass {
 				assert.NoError(outcome.GetError())

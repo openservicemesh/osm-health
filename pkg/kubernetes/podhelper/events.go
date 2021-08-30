@@ -13,29 +13,29 @@ import (
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*NoBadEventsCheck)(nil)
+var _ common.Runnable = (*PodEventsCheck)(nil)
 
-// NoBadEventsCheck implements common.Runnable
-type NoBadEventsCheck struct {
+// PodEventsCheck implements common.Runnable
+type PodEventsCheck struct {
 	client kubernetes.Interface
 	pod    *corev1.Pod
 }
 
-// DoesNotHaveBadEvents checks whether a pod has abnormal (type!=Normal) events
-func DoesNotHaveBadEvents(client kubernetes.Interface, pod *corev1.Pod) NoBadEventsCheck {
-	return NoBadEventsCheck{
+// NewPodEventsCheck creates a PodEventsCheck which checks whether a pod has abnormal (type!=Normal) events
+func NewPodEventsCheck(client kubernetes.Interface, pod *corev1.Pod) PodEventsCheck {
+	return PodEventsCheck{
 		client: client,
 		pod:    pod,
 	}
 }
 
 // Description implements common.Runnable
-func (check NoBadEventsCheck) Description() string {
+func (check PodEventsCheck) Description() string {
 	return fmt.Sprintf("Checking whether pod %s has events of type!=Normal", check.pod.Name)
 }
 
 // Run implements common.Runnable
-func (check NoBadEventsCheck) Run() outcomes.Outcome {
+func (check PodEventsCheck) Run() outcomes.Outcome {
 	eventsInterface := check.client.CoreV1().Events(check.pod.Namespace)
 	var events *corev1.EventList
 
@@ -54,11 +54,11 @@ func (check NoBadEventsCheck) Run() outcomes.Outcome {
 }
 
 // Suggestion implements common.Runnable.
-func (check NoBadEventsCheck) Suggestion() string {
+func (check PodEventsCheck) Suggestion() string {
 	return fmt.Sprintf("To inspect for unexpected events, try \"kubectl get events --namespace %s --field-selector type!=Normal\"", check.pod.Namespace)
 }
 
 // FixIt implements common.Runnable.
-func (check NoBadEventsCheck) FixIt() error {
+func (check PodEventsCheck) FixIt() error {
 	panic("implement me")
 }

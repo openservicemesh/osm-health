@@ -17,8 +17,8 @@ func ToPod(client kubernetes.Interface, toPod *corev1.Pod) {
 
 	outcomes := common.Run(
 		// Check destination Pod's namespace
-		namespace.IsInjectEnabled(client, toPod.Namespace),
-		namespace.IsMonitoredBy(client, toPod.Namespace, meshName),
+		namespace.NewSidecarInjectionCheck(client, toPod.Namespace),
+		namespace.NewMonitoredCheck(client, toPod.Namespace, meshName),
 	)
 
 	common.Print(outcomes...)

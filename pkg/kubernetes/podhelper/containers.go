@@ -19,8 +19,8 @@ type EnvoySidecarImageCheck struct {
 	pod *corev1.Pod
 }
 
-// HasExpectedEnvoyImage checks whether a pod has a sidecar with the envoy image specified in the meshconfig
-func HasExpectedEnvoyImage(osmConfigurator configurator.Configurator, pod *corev1.Pod) EnvoySidecarImageCheck {
+// NewEnvoySidecarImageCheck creates an EnvoySidecarImageCheck which checks whether a pod has a sidecar with the envoy image specified in the meshconfig
+func NewEnvoySidecarImageCheck(osmConfigurator configurator.Configurator, pod *corev1.Pod) EnvoySidecarImageCheck {
 	return EnvoySidecarImageCheck{
 		cfg: osmConfigurator,
 		pod: pod,
@@ -61,8 +61,8 @@ type OsmInitContainerImageCheck struct {
 	pod *corev1.Pod
 }
 
-// HasExpectedOsmInitImage checks whether a pod has a sidecar with the osm init container image specified in the meshconfig
-func HasExpectedOsmInitImage(osmConfigurator configurator.Configurator, pod *corev1.Pod) OsmInitContainerImageCheck {
+// NewOsmContainerImageCheck creates an OsmInitContainerImageCheck which checks whether a pod has a sidecar with the osm init container image specified in the meshconfig
+func NewOsmContainerImageCheck(osmConfigurator configurator.Configurator, pod *corev1.Pod) OsmInitContainerImageCheck {
 	return OsmInitContainerImageCheck{
 		cfg: osmConfigurator,
 		pod: pod,
@@ -103,9 +103,9 @@ type MinNumContainersCheck struct {
 	minNum int
 }
 
-// HasMinExpectedContainers checks whether a pod has at least the min number of containers expected
-// This currently corresponds to an app container, osm init container and envoy proxy sidecar
-func HasMinExpectedContainers(pod *corev1.Pod, num int) MinNumContainersCheck {
+// NewMinNumContainersCheck creates a MinNumContainersCheck which checks whether a pod has at least the min number of containers expected
+// This currently corresponds to an app container and an envoy proxy sidecar
+func NewMinNumContainersCheck(pod *corev1.Pod, num int) MinNumContainersCheck {
 	return MinNumContainersCheck{
 		pod:    pod,
 		minNum: num,
