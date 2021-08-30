@@ -6,6 +6,7 @@ import (
 	tassert "github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/fake"
 )
 
 var (
@@ -19,11 +20,26 @@ func TestEnvoyOutboundRouteDomainPodChecker(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
+			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
+			Namespace: "bookstore",
+			Labels: map[string]string{
+				"bookstore": "yes",
+			},
+		},
+	}
+	svc := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
 			Name:      "bookstore",
 			Namespace: "bookstore",
 		},
+		Spec: corev1.ServiceSpec{
+			Selector: map[string]string{
+				"bookstore": "yes",
+			},
+		},
 	}
-	routeDomainChecker := NewOutboundRouteDomainPodCheck(configGetter, pod)
+	client := fake.NewSimpleClientset(svc)
+	routeDomainChecker := NewOutboundRouteDomainPodCheck(client, configGetter, pod)
 	outcome := routeDomainChecker.Run()
 	assert.Nil(outcome.GetError())
 }
@@ -37,11 +53,11 @@ func TestEnvoyOutboundRouteDomainPodCheckerEmptyConfig(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore",
+			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := NewOutboundRouteDomainPodCheck(configGetter, pod)
+	routeDomainChecker := NewOutboundRouteDomainPodCheck(nil, configGetter, pod)
 	outcome := routeDomainChecker.Run()
 	assert.NotNil(outcome.GetError())
 	assert.Equal("envoy config is empty", outcome.GetError().Error())
@@ -54,11 +70,11 @@ func TestEnvoyOutboundRouteDomainPodCheckerNoDomains(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore",
+			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := NewOutboundRouteDomainPodCheck(configGetter, pod)
+	routeDomainChecker := NewOutboundRouteDomainPodCheck(nil, configGetter, pod)
 	outcome := routeDomainChecker.Run()
 	assert.NotNil(outcome.GetError())
 	assert.Equal("no dynamic route config domains", outcome.GetError().Error())
@@ -71,11 +87,26 @@ func TestEnvoyOutboundRouteDomainPodCheckerDomainNotFound(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
+			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
+			Namespace: "bookstore",
+			Labels: map[string]string{
+				"bookstore": "yes",
+			},
+		},
+	}
+	svc := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
 			Name:      "bookstore",
 			Namespace: "bookstore",
 		},
+		Spec: corev1.ServiceSpec{
+			Selector: map[string]string{
+				"bookstore": "yes",
+			},
+		},
 	}
-	routeDomainChecker := NewOutboundRouteDomainPodCheck(configGetter, pod)
+	client := fake.NewSimpleClientset(svc)
+	routeDomainChecker := NewOutboundRouteDomainPodCheck(client, configGetter, pod)
 	outcome := routeDomainChecker.Run()
 	assert.NotNil(outcome.GetError())
 	assert.Equal("dynamic route config domain not found", outcome.GetError().Error())
@@ -88,11 +119,26 @@ func TestEnvoyInboundRouteDomainPodChecker(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1",
+			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
+			Labels: map[string]string{
+				"bookstore": "yes",
+			},
 		},
 	}
-	routeDomainChecker := NewInboundRouteDomainPodCheck(configGetter, pod)
+	svc := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "bookstore",
+			Namespace: "bookstore",
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: map[string]string{
+				"bookstore": "yes",
+			},
+		},
+	}
+	client := fake.NewSimpleClientset(svc)
+	routeDomainChecker := NewInboundRouteDomainPodCheck(client, configGetter, pod)
 	outcome := routeDomainChecker.Run()
 	assert.Nil(outcome.GetError())
 }
@@ -106,11 +152,11 @@ func TestEnvoyInboundRouteDomainPodCheckerEmptyConfig(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1",
+			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := NewInboundRouteDomainPodCheck(configGetter, pod)
+	routeDomainChecker := NewInboundRouteDomainPodCheck(nil, configGetter, pod)
 	outcome := routeDomainChecker.Run()
 	assert.NotNil(outcome.GetError())
 	assert.Equal("envoy config is empty", outcome.GetError().Error())
@@ -123,11 +169,11 @@ func TestEnvoyInboundRouteDomainPodCheckerNoDomains(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1",
+			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 		},
 	}
-	routeDomainChecker := NewInboundRouteDomainPodCheck(configGetter, pod)
+	routeDomainChecker := NewInboundRouteDomainPodCheck(nil, configGetter, pod)
 	outcome := routeDomainChecker.Run()
 	assert.NotNil(outcome.GetError())
 	assert.Equal("no dynamic route config domains", outcome.GetError().Error())
@@ -140,11 +186,26 @@ func TestEnvoyInboundRouteDomainPodCheckerDomainNotFound(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1",
+			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
+			Labels: map[string]string{
+				"bookstore": "yes",
+			},
 		},
 	}
-	routeDomainChecker := NewInboundRouteDomainPodCheck(configGetter, pod)
+	svc := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "bookstore",
+			Namespace: "bookstore",
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: map[string]string{
+				"bookstore": "yes",
+			},
+		},
+	}
+	client := fake.NewSimpleClientset(svc)
+	routeDomainChecker := NewInboundRouteDomainPodCheck(client, configGetter, pod)
 	outcome := routeDomainChecker.Run()
 	assert.NotNil(outcome.GetError())
 	assert.Equal("dynamic route config domain not found", outcome.GetError().Error())
