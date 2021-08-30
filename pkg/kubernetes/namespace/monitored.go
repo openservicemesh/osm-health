@@ -38,17 +38,17 @@ func (check MonitoredCheck) Description() string {
 func (check MonitoredCheck) Run() outcomes.Outcome {
 	labels, err := getLabels(check.client, check.namespace)
 	if err != nil {
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 
 	labelValue, ok := labels[constants.OSMKubeResourceMonitorAnnotation]
 	isMonitoredByController := ok && labelValue == check.meshName.String()
 
 	if !isMonitoredByController {
-		return outcomes.FailedOutcome{Error: ErrNotMonitoredByOSMController}
+		return outcomes.Fail{Error: ErrNotMonitoredByOSMController}
 	}
 
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }
 
 // Suggestion implements common.Runnable
@@ -89,24 +89,24 @@ func (check NamespacesInSameMeshCheck) Description() string {
 func (check NamespacesInSameMeshCheck) Run() outcomes.Outcome {
 	labelsA, err := getLabels(check.client, check.namespaceA)
 	if err != nil {
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 	meshNameA, labelExistsA := labelsA[constants.OSMKubeResourceMonitorAnnotation]
 
 	labelsB, err := getLabels(check.client, check.namespaceB)
 	if err != nil {
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 
 	meshNameB, labelExistsB := labelsB[constants.OSMKubeResourceMonitorAnnotation]
 	if !labelExistsA || !labelExistsB {
-		return outcomes.FailedOutcome{Error: ErrNotMonitoredByOSMController}
+		return outcomes.Fail{Error: ErrNotMonitoredByOSMController}
 	}
 	if meshNameA != meshNameB {
-		return outcomes.FailedOutcome{Error: ErrNamespacesNotInSameMesh}
+		return outcomes.Fail{Error: ErrNamespacesNotInSameMesh}
 	}
 
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }
 
 // Suggestion implements common.Runnable

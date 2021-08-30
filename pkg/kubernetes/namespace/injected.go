@@ -49,15 +49,15 @@ func (check SidecarInjectionCheck) Run() outcomes.Outcome {
 	annotations, err := getAnnotations(check.client, check.namespace)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 
 	annotationValue, ok := annotations[constants.SidecarInjectionAnnotation]
 	isAnnotatedForInjection := ok && annotationValue == enabled
 
 	if !isAnnotatedForInjection {
-		return outcomes.FailedOutcome{Error: ErrNotAnnotatedForSidecarInjection}
+		return outcomes.Fail{Error: ErrNotAnnotatedForSidecarInjection}
 	}
 
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }

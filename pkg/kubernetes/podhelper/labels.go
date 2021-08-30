@@ -33,9 +33,9 @@ func (check ProxyUUIDLabelCheck) Description() string {
 // Run implements common.Runnable
 func (check ProxyUUIDLabelCheck) Run() outcomes.Outcome {
 	if !mesh.ProxyLabelExists(*check.pod) {
-		return outcomes.FailedOutcome{Error: ErrProxyUUIDLabelMissing}
+		return outcomes.Fail{Error: ErrProxyUUIDLabelMissing}
 	}
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }
 
 // Suggestion implements common.Runnable

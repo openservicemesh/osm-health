@@ -46,7 +46,7 @@ func (check NoBadOsmControllerLogsCheck) Run() outcomes.Outcome {
 	}
 	pods, err := check.client.CoreV1().Pods(check.osmControlPlaneNamespace).List(context.TODO(), listOptions)
 	if err != nil {
-		return outcomes.FailedOutcome{Error: fmt.Errorf("unable to list %s pods in namespace %s", constants.OSMControllerName, check.osmControlPlaneNamespace)}
+		return outcomes.Fail{Error: fmt.Errorf("unable to list %s pods in namespace %s", constants.OSMControllerName, check.osmControlPlaneNamespace)}
 	}
 
 	osmControllerErrCount := 0
@@ -58,10 +58,10 @@ func (check NoBadOsmControllerLogsCheck) Run() outcomes.Outcome {
 	}
 
 	if osmControllerErrCount != 0 {
-		return outcomes.FailedOutcome{Error: errors.Errorf("%s pods in namespace %s have %d errors", constants.OSMControllerName, check.osmControlPlaneNamespace, osmControllerErrCount)}
+		return outcomes.Fail{Error: errors.Errorf("%s pods in namespace %s have %d errors", constants.OSMControllerName, check.osmControlPlaneNamespace, osmControllerErrCount)}
 	}
 
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }
 
 // Suggestion implements common.Runnable.

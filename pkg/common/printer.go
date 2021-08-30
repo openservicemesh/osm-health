@@ -16,13 +16,13 @@ func Print(printables ...Printable) {
 
 	defer func() { _ = w.Flush() }()
 	for idx, printableOutcome := range printables {
-		fmt.Fprintf(w, "%d\t%s\t\t%s\n", idx+1, printableOutcome.ShortStatus, printableOutcome.CheckDescription)
+		fmt.Fprintf(w, "%d\t%s\t\t%s\n", idx+1, printableOutcome.Type, printableOutcome.CheckDescription)
 		if printableOutcome.Error != nil {
-			fmt.Fprintln(w, color.RedString("↳ Error: "+printableOutcome.Error.Error()))
+			fmt.Fprintln(w, color.RedString("---> Error: "+printableOutcome.Error.Error()))
 			errorsCount = errorsCount + 1
 		}
-		if printableOutcome.LongDiagnostics != "" {
-			fmt.Fprintln(w, "↳ Additional diagnostic info:", printableOutcome.LongDiagnostics)
+		if printableOutcome.Diagnostics != "" {
+			fmt.Fprintln(w, "---> Diagnostic info:", printableOutcome.Diagnostics)
 		}
 	}
 
