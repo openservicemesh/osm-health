@@ -22,4 +22,7 @@ var (
 
 	// ErrPodNotInEndpoints is used when a pod is expected to be referenced by any Kubernetes Endpoints resources but is not
 	ErrPodNotInEndpoints = errors.New("pod not referenced by any Kubernetes Endpoints resources")
+
+	// ErrNoService is used when there is no service associated with the pod
+	ErrNoService = errors.New("no service associated")
 )

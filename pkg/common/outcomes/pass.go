@@ -7,7 +7,9 @@ import (
 var _ Outcome = (*Pass)(nil)
 
 // Pass is for check outcomes that are successful and do not have diagnostic information to show.
-type Pass struct{}
+type Pass struct {
+	Msg string
+}
 
 // GetOutcomeType implements outcomes.Outcome.
 func (Pass) GetOutcomeType() string {
@@ -16,7 +18,7 @@ func (Pass) GetOutcomeType() string {
 
 // GetDiagnostics implements outcomes.Outcome.
 func (o Pass) GetDiagnostics() string {
-	return NoDiagnosticInfo
+	return o.Msg
 }
 
 // GetError implements outcomes.Outcome.
