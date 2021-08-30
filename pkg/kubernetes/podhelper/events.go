@@ -39,7 +39,7 @@ func (check PodEventsCheck) Run() outcomes.Outcome {
 	eventsInterface := check.client.CoreV1().Events(check.pod.Namespace)
 	var events *corev1.EventList
 
-	selectorString := "type!=Normal"
+	selectorString := "type!=Normal,involvedObject.apiVersion=v1,involvedObject.kind=Pod,involvedObject.name=" + check.pod.Name
 	options := metav1.ListOptions{FieldSelector: selectorString}
 	events, err := eventsInterface.List(context.TODO(), options)
 	if err != nil {
