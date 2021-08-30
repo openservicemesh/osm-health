@@ -87,6 +87,7 @@ func (check NamespacesInSameMeshCheck) Description() string {
 
 // Run implements common.Runnable
 func (check NamespacesInSameMeshCheck) Run() outcomes.Outcome {
+	outcomes.AddCheckToMap("NamespacesInSameMeshCheck")
 	labelsA, err := getLabels(check.client, check.namespaceA)
 	if err != nil {
 		return outcomes.FailedOutcome{Error: err}
@@ -105,7 +106,7 @@ func (check NamespacesInSameMeshCheck) Run() outcomes.Outcome {
 	if meshNameA != meshNameB {
 		return outcomes.FailedOutcome{Error: ErrNamespacesNotInSameMesh}
 	}
-
+	outcomes.SetCheckPass("NamespacesInSameMeshCheck")
 	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
 }
 

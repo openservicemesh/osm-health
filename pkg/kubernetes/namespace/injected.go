@@ -46,6 +46,9 @@ func (check SidecarInjectionCheck) Description() string {
 
 // Run implements common.Runnable
 func (check SidecarInjectionCheck) Run() outcomes.Outcome {
+	if !outcomes.GetCheckOutcome("NamespacesInSameMeshCheck") {
+		return outcomes.SkipOutcome{LongDiagnostics: "skipped because namespace is not in the mesh"}
+	}
 	annotations, err := getAnnotations(check.client, check.namespace)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
