@@ -75,6 +75,8 @@ func PodToPod(fromPod *corev1.Pod, toPod *corev1.Pod, osmControlPlaneNamespace s
 		podhelper.NewProxyUUIDLabelCheck(fromPod),
 		podhelper.NewProxyUUIDLabelCheck(toPod),
 
+		podhelper.NewEndpointsCheck(client, toPod),
+
 		// Check pods for bad events
 		podhelper.NewPodEventsCheck(client, fromPod),
 		podhelper.NewPodEventsCheck(client, toPod),
