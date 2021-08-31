@@ -20,7 +20,6 @@ func TestEnvoyOutboundRouteDomainPodChecker(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 			Labels: map[string]string{
 				"bookstore": "yes",
@@ -53,7 +52,6 @@ func TestEnvoyOutboundRouteDomainPodCheckerEmptyConfig(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 		},
 	}
@@ -70,7 +68,6 @@ func TestEnvoyOutboundRouteDomainPodCheckerNoDomains(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 		},
 	}
@@ -87,7 +84,6 @@ func TestEnvoyOutboundRouteDomainPodCheckerDomainNotFound(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 			Labels: map[string]string{
 				"bookstore": "yes",
@@ -119,7 +115,6 @@ func TestEnvoyInboundRouteDomainPodChecker(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 			Labels: map[string]string{
 				"bookstore": "yes",
@@ -152,7 +147,6 @@ func TestEnvoyInboundRouteDomainPodCheckerEmptyConfig(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 		},
 	}
@@ -169,7 +163,6 @@ func TestEnvoyInboundRouteDomainPodCheckerNoDomains(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 		},
 	}
@@ -186,7 +179,6 @@ func TestEnvoyInboundRouteDomainPodCheckerDomainNotFound(t *testing.T) {
 	}
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "bookstore-v1-74d9cbd7c8-dlmlj",
 			Namespace: "bookstore",
 			Labels: map[string]string{
 				"bookstore": "yes",
