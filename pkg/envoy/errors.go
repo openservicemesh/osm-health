@@ -32,4 +32,7 @@ var (
 
 	// ErrDynamicRouteConfigDomainNotFound is an error returned when a specific dynamic route config domain is not found.
 	ErrDynamicRouteConfigDomainNotFound = errors.New("dynamic route config domain not found")
+
+	// ErrNoAssociatedDomains is an error returned when a destination is not associated with any domains and therefore is unroutable.
+	ErrNoAssociatedDomains = errors.New("no associated domains that can be routed to the destination")
 )

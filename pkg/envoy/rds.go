@@ -57,6 +57,10 @@ func (l RouteDomainCheck) Run() outcomes.Outcome {
 		}
 	}
 
+	if len(possibleDomains) == 0 {
+		return outcomes.FailedOutcome{Error: ErrNoAssociatedDomains}
+	}
+
 	for _, rawDynRouteCfg := range envoyConfig.Routes.GetDynamicRouteConfigs() {
 		var dynRouteCfg envoy_config_route_v3.RouteConfiguration
 		if err = rawDynRouteCfg.GetRouteConfig().UnmarshalTo(&dynRouteCfg); err != nil {
