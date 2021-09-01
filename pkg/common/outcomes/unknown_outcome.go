@@ -7,7 +7,7 @@ type UnknownOutcome struct{}
 
 // GetShortStatus implements outcomes.Outcome.
 func (UnknownOutcome) GetShortStatus() string {
-	return "❓ Unknown"
+	return "Unknown"
 }
 
 // GetLongDiagnostics implements outcomes.Outcome.

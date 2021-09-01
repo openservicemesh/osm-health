@@ -11,7 +11,7 @@ type DiagnosticOutcome struct {
 
 // GetShortStatus implements outcomes.Outcome.
 func (DiagnosticOutcome) GetShortStatus() string {
-	return "💬 Diagnostic"
+	return "Diagnostic"
 }
 
 // GetLongDiagnostics implements outcomes.Outcome.
