@@ -9,7 +9,7 @@ type FailedOutcome struct {
 
 // GetShortStatus implements outcomes.Outcome.
 func (FailedOutcome) GetShortStatus() string {
-	return "❌ Fail"
+	return "Fail"
 }
 
 // GetLongDiagnostics implements outcomes.Outcome.
