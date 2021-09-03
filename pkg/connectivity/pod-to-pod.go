@@ -111,10 +111,10 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		envoy.NewClusterCheck(client, srcConfigGetter, dstPod),
 
 		// Check Envoy certificates for both pods
-		envoy.HasOutboundRootCertificate(client, srcConfigGetter, toPod),
-		envoy.HasInboundRootCertificate(client, dstConfigGetter, toPod),
-		envoy.HasServiceCertificate(client, srcConfigGetter, fromPod),
-		envoy.HasServiceCertificate(client, dstConfigGetter, toPod),
+		envoy.HasOutboundRootCertificate(client, srcConfigGetter, dstPod),
+		envoy.HasInboundRootCertificate(client, dstConfigGetter, dstPod),
+		envoy.HasServiceCertificate(client, srcConfigGetter, srcPod),
+		envoy.HasServiceCertificate(client, dstConfigGetter, dstPod),
 
 		// Run SMI checks
 		smi.NewTrafficSplitCheck(client, dstPod, splitClient),
