@@ -51,15 +51,15 @@ func (ct SDSCertType) String() string {
 func (c HasValidEnvoyCertificateCheck) Run() outcomes.Outcome {
 	if c.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
-		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
+		return outcomes.Fail{Error: ErrIncorrectlyInitializedConfigGetter}
 	}
 	envoyConfig, err := c.ConfigGetter.GetConfig()
 	if err != nil {
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 
 	if envoyConfig == nil {
-		return outcomes.FailedOutcome{Error: ErrEnvoyConfigEmpty}
+		return outcomes.Fail{Error: ErrEnvoyConfigEmpty}
 	}
 
 	// Checks if a secret of the specified certificate type exists in the
@@ -76,7 +76,7 @@ func (c HasValidEnvoyCertificateCheck) Run() outcomes.Outcome {
 	if c.certificateType == RootCertTypeForMTLSOutbound {
 		svcs, err := kuberneteshelper.GetMatchingServices(c.k8s, c.pod.Labels, c.pod.Namespace)
 		if err != nil {
-			return outcomes.FailedOutcome{Error: errors.Wrapf(err, "failed to map Pod %s/%s to Kubernetes Services", c.pod.Namespace, c.pod.Name)}
+			return outcomes.Fail{Error: errors.Wrapf(err, "failed to map Pod %s/%s to Kubernetes Services", c.pod.Namespace, c.pod.Name)}
 		}
 		for _, svc := range svcs {
 			possibleSecretNames[fmt.Sprintf("%s:%s", c.certificateType.String(), utils.K8sSvcToMeshSvc(svc).String())] = struct{}{}
@@ -86,7 +86,7 @@ func (c HasValidEnvoyCertificateCheck) Run() outcomes.Outcome {
 	}
 
 	if len(possibleSecretNames) == 0 {
-		return outcomes.FailedOutcome{Error: fmt.Errorf("no secrets listed in the Envoy config")}
+		return outcomes.Fail{Error: fmt.Errorf("no secrets listed in the Envoy config")}
 	}
 
 	// Check that at least one of the possible secret names is in the
@@ -102,10 +102,10 @@ func (c HasValidEnvoyCertificateCheck) Run() outcomes.Outcome {
 	}
 
 	if !found {
-		return outcomes.FailedOutcome{Error: fmt.Errorf("expected a secret named one of %v, but only found %v", possibleSecretNames, foundSecretNames)}
+		return outcomes.Fail{Error: fmt.Errorf("expected a secret named one of %v, but only found %v", possibleSecretNames, foundSecretNames)}
 	}
 
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }
 
 // Suggestion implements common.Runnable

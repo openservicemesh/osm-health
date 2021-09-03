@@ -35,15 +35,15 @@ func (mns MeshNamespace) String() string {
 
 // Printable is the printable context around a check (common.Runnable).
 type Printable struct {
-	// CheckDescription holds the description of a check, such as describing what the check does (common.Runnable).
+	// CheckDescription holds the description of a check, such as describing what the check does (common.Runnable)
 	CheckDescription string
 
-	// ShortStatus holds the short status of the check outcome, such as success, fail, or diagnostic.
-	ShortStatus string
+	// Type holds the type of the check outcome, such as success, fail, info or unknown
+	Type string
 
-	// LongDiagnostics holds detailed diagnostics that were dynamically-generated during the check.
-	LongDiagnostics string
+	// Diagnostics holds detailed diagnostics that were dynamically-generated during the check
+	Diagnostics string
 
-	// Error is the error which common.Runnable{}.Run() returned.
+	// Error is the error which common.Runnable{}.Run() may return
 	Error error
 }

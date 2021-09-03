@@ -214,7 +214,7 @@ func TestEndpointsCheck(t *testing.T) {
 			check := NewEndpointsCheck(client, test.pod)
 			out := check.Run()
 			if test.pass {
-				assert.Equal(t, outcomes.SuccessfulOutcomeWithoutDiagnostics{}, out)
+				assert.Equal(t, outcomes.Pass{}, out)
 			} else {
 				assert.Equal(t, ErrPodNotInEndpoints, out.GetError())
 			}

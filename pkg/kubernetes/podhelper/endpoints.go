@@ -35,7 +35,7 @@ func (e EndpointsCheck) Description() string {
 func (e EndpointsCheck) Run() outcomes.Outcome {
 	eps, err := e.client.CoreV1().Endpoints(e.pod.Namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 
 	found := false
@@ -57,9 +57,9 @@ func (e EndpointsCheck) Run() outcomes.Outcome {
 	}
 
 	if !found {
-		return outcomes.FailedOutcome{Error: ErrPodNotInEndpoints}
+		return outcomes.Fail{Error: ErrPodNotInEndpoints}
 	}
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }
 
 // Suggestion implements common.Runnable

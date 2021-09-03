@@ -27,24 +27,24 @@ type ListenerCheck struct {
 func (l ListenerCheck) Run() outcomes.Outcome {
 	if l.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
-		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
+		return outcomes.Fail{Error: ErrIncorrectlyInitializedConfigGetter}
 	}
 	envoyConfig, err := l.ConfigGetter.GetConfig()
 	if err != nil {
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 
 	if envoyConfig == nil {
-		return outcomes.FailedOutcome{Error: ErrEnvoyConfigEmpty}
+		return outcomes.Fail{Error: ErrEnvoyConfigEmpty}
 	}
 
 	expectedListenerName, exists := l.expectedListenersPerVersion[l.ControllerVersion]
 	if !exists {
-		return outcomes.FailedOutcome{Error: ErrOSMControllerVersionUnrecognized}
+		return outcomes.Fail{Error: ErrOSMControllerVersionUnrecognized}
 	}
 
 	if envoyConfig == nil || envoyConfig.Listeners.DynamicListeners == nil {
-		return outcomes.FailedOutcome{Error: ErrEnvoyConfigEmpty}
+		return outcomes.Fail{Error: ErrEnvoyConfigEmpty}
 	}
 
 	found := false
@@ -59,10 +59,10 @@ func (l ListenerCheck) Run() outcomes.Outcome {
 
 	if !found {
 		log.Error().Msgf("must have listener with name %s but only found %s", expectedListenerName, actualListeners)
-		return outcomes.FailedOutcome{Error: ErrEnvoyListenerMissing}
+		return outcomes.Fail{Error: ErrEnvoyListenerMissing}
 	}
 
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }
 
 // Suggestion implements common.Runnable

@@ -17,7 +17,7 @@ import (
 // HasNoBadLogs checks whether the logs of the pod container contain bad (fatal/error/warning/fail) logs
 func HasNoBadLogs(client kubernetes.Interface, pod *corev1.Pod, containerName string) outcomes.Outcome {
 	if !PodHasContainer(pod, containerName) {
-		return outcomes.FailedOutcome{Error: ErrPodDoesNotHaveContainer}
+		return outcomes.Fail{Error: ErrPodDoesNotHaveContainer}
 	}
 
 	logsTailLines := int64(10)
@@ -36,7 +36,7 @@ func HasNoBadLogs(client kubernetes.Interface, pod *corev1.Pod, containerName st
 		request := client.CoreV1().Pods(pod.Namespace).GetLogs(pod.Name, &podLogsOpt)
 		podLogsReader, err = request.Stream(context.TODO())
 		if err != nil {
-			return outcomes.FailedOutcome{Error: fmt.Errorf("could not obtain %s container logs of pod %s: %#v", containerName, pod.Name, err)}
+			return outcomes.Fail{Error: fmt.Errorf("could not obtain %s container logs of pod %s: %#v", containerName, pod.Name, err)}
 		}
 	}
 	defer podLogsReader.Close() //nolint: errcheck,gosec
@@ -59,8 +59,8 @@ func HasNoBadLogs(client kubernetes.Interface, pod *corev1.Pod, containerName st
 	}
 
 	if len(badLogLines) != 0 {
-		return outcomes.FailedOutcome{Error: errors.Errorf("%s container of pod %s contains bad log lines: %s", containerName, pod.Name, badLogLines)}
+		return outcomes.Fail{Error: errors.Errorf("%s container of pod %s contains bad log lines: %s", containerName, pod.Name, badLogLines)}
 	}
 
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }

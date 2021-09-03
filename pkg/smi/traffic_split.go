@@ -43,31 +43,31 @@ func (check TrafficSplitCheck) Run() outcomes.Outcome {
 	ns := check.pod.Namespace
 	services, err := kuberneteshelper.GetMatchingServices(check.client, check.pod.ObjectMeta.GetLabels(), ns)
 	if err != nil {
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 	if len(services) == 0 {
-		return outcomes.DiagnosticOutcome{LongDiagnostics: fmt.Sprintf("pod '%s/%s' does not have a corresponding service", ns, check.pod.Name)}
+		return outcomes.Info{Diagnostics: fmt.Sprintf("pod '%s/%s' does not have a corresponding service", ns, check.pod.Name)}
 	}
 
 	//TODO: eventually change to decide which split version to use based on information dynamically obtained from the cluster
 	trafficSplits, err := check.splitClient.SplitV1alpha2().TrafficSplits(ns).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 	for _, trafficSplit := range trafficSplits.Items {
 		spec := trafficSplit.Spec
 		for _, backend := range spec.Backends {
 			for _, svc := range services {
 				if backend.Service == svc.Name {
-					return outcomes.DiagnosticOutcome{
-						LongDiagnostics: fmt.Sprintf("pod '%s/%s' participates in traffic split for service '%s/%s'", ns, check.pod.Name, ns, spec.Service),
+					return outcomes.Info{
+						Diagnostics: fmt.Sprintf("pod '%s/%s' participates in traffic split for service '%s/%s'", ns, check.pod.Name, ns, spec.Service),
 					}
 				}
 			}
 		}
 	}
-	return outcomes.DiagnosticOutcome{
-		LongDiagnostics: fmt.Sprintf("pod '%s/%s' does not participate in any traffic split", check.pod.Namespace, check.pod.Name),
+	return outcomes.Info{
+		Diagnostics: fmt.Sprintf("pod '%s/%s' does not participate in any traffic split", check.pod.Namespace, check.pod.Name),
 	}
 }
 

@@ -29,15 +29,15 @@ type ClusterCheck struct {
 func (c ClusterCheck) Run() outcomes.Outcome {
 	if c.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
-		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
+		return outcomes.Fail{Error: ErrIncorrectlyInitializedConfigGetter}
 	}
 	envoyConfig, err := c.ConfigGetter.GetConfig()
 	if err != nil {
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 
 	if envoyConfig == nil {
-		return outcomes.FailedOutcome{Error: ErrEnvoyConfigEmpty}
+		return outcomes.Fail{Error: ErrEnvoyConfigEmpty}
 	}
 
 	// The destination Pod might back multiple services, so check that at least
@@ -45,7 +45,7 @@ func (c ClusterCheck) Run() outcomes.Outcome {
 	possibleClusterNames := map[string]struct{}{}
 	svcs, err := kuberneteshelper.GetMatchingServices(c.k8s, c.dstPod.Labels, c.dstPod.Namespace)
 	if err != nil {
-		return outcomes.FailedOutcome{Error: errors.Wrapf(err, "failed to map Pod %s/%s to Kubernetes Services", c.dstPod.Namespace, c.dstPod.Name)}
+		return outcomes.Fail{Error: errors.Wrapf(err, "failed to map Pod %s/%s to Kubernetes Services", c.dstPod.Namespace, c.dstPod.Name)}
 	}
 	for _, svc := range svcs {
 		possibleClusterNames[utils.K8sSvcToMeshSvc(svc).String()] = struct{}{}
@@ -53,7 +53,7 @@ func (c ClusterCheck) Run() outcomes.Outcome {
 	if len(possibleClusterNames) == 0 {
 		// This pod isn't backing any services, so we wouldn't expect a cluster
 		// to be listed in the Envoy config.
-		return outcomes.DiagnosticOutcome{LongDiagnostics: "pod is not backing any services - no clusters listed in the Envoy config"}
+		return outcomes.Info{Diagnostics: "pod is not backing any services - no clusters listed in the Envoy config"}
 	}
 
 	found := false
@@ -78,9 +78,9 @@ func (c ClusterCheck) Run() outcomes.Outcome {
 		for name := range possibleClusterNames {
 			expectedClusterNames = append(expectedClusterNames, name)
 		}
-		return outcomes.FailedOutcome{Error: fmt.Errorf("Expected a cluster named one of %v, but only found %v", expectedClusterNames, foundClusterNames)}
+		return outcomes.Fail{Error: fmt.Errorf("Expected a cluster named one of %v, but only found %v", expectedClusterNames, foundClusterNames)}
 	}
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }
 
 // Suggestion implements common.Runnable
