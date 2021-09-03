@@ -1131,6 +1131,8 @@ github.com/openservicemesh/osm v0.8.2-0.20210730182412-e003a65c2cb5 h1:FeQoI5dkU
 github.com/openservicemesh/osm v0.8.2-0.20210730182412-e003a65c2cb5/go.mod h1:ABKbMdxIUw9FPISOL0ouw7oH9YptNVLD4PpZ6Y/omgI=
 github.com/openservicemesh/osm v0.8.2-0.20210802225558-b607bba099c1 h1:vKk+AWqGjiaD9qSsdN1L9qVP8X3pwrqeGBSdRf0/Umk=
 github.com/openservicemesh/osm v0.8.2-0.20210802225558-b607bba099c1/go.mod h1:ABKbMdxIUw9FPISOL0ouw7oH9YptNVLD4PpZ6Y/omgI=
+github.com/openservicemesh/osm v0.8.2-0.20210823171715-5fba2d3f778b h1:iAbEvDoRQgNZjd0v10xU/PJ5HGEwNff3Ggnwq0Vc5kw=
+github.com/openservicemesh/osm v0.8.2-0.20210823171715-5fba2d3f778b/go.mod h1:ABKbMdxIUw9FPISOL0ouw7oH9YptNVLD4PpZ6Y/omgI=
 github.com/openservicemesh/osm v0.9.1 h1:/u5BF2sW6oPka2GLPOyt/ojA8MfKmRmD/tqKVwkimMY=
 github.com/openservicemesh/osm v0.9.1/go.mod h1:r0cPM8bz8j7RD3ZTcycfaWS0rS45sE3nXtgHgRfBb6k=
 github.com/opentracing-contrib/go-observer v0.0.0-20170622124052-a52f23424492 h1:lM6RxxfUMrYL/f8bWEUqdXrANWtrL7Nndbm9iFN0DlU=

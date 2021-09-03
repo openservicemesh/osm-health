@@ -53,7 +53,7 @@ func TestHasProxyUUIDLabel(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		proxyUUIDLabelChecker := HasProxyUUIDLabel(&tc.pod)
+		proxyUUIDLabelChecker := NewProxyUUIDLabelCheck(&tc.pod)
 
 		assert.Equal(tc.expectedError, proxyUUIDLabelChecker.Run().GetError())
 	}

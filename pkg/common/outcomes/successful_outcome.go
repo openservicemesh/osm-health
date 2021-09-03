@@ -7,7 +7,7 @@ type SuccessfulOutcomeWithoutDiagnostics struct{}
 
 // GetShortStatus implements outcomes.Outcome.
 func (SuccessfulOutcomeWithoutDiagnostics) GetShortStatus() string {
-	return "✅ Pass"
+	return "Pass"
 }
 
 // GetLongDiagnostics implements outcomes.Outcome.

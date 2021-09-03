@@ -12,38 +12,38 @@ import (
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*NoBadEnvoyLogsCheck)(nil)
+var _ common.Runnable = (*BadLogsCheck)(nil)
 
-// NoBadEnvoyLogsCheck implements common.Runnable
-type NoBadEnvoyLogsCheck struct {
+// BadLogsCheck implements common.Runnable
+type BadLogsCheck struct {
 	client kubernetes.Interface
 	pod    *corev1.Pod
 }
 
-// HasNoBadEnvoyLogsCheck checks whether the envoy container of the pod has bad (fatal/error/warning/fail) log messages
-func HasNoBadEnvoyLogsCheck(client kubernetes.Interface, pod *corev1.Pod) NoBadEnvoyLogsCheck {
-	return NoBadEnvoyLogsCheck{
+// NewBadLogsCheck creates an BadLogsCheck which checks whether the envoy container of the pod has bad (fatal/error/warning/fail) log messages
+func NewBadLogsCheck(client kubernetes.Interface, pod *corev1.Pod) BadLogsCheck {
+	return BadLogsCheck{
 		client: client,
 		pod:    pod,
 	}
 }
 
 // Description implements common.Runnable
-func (check NoBadEnvoyLogsCheck) Description() string {
+func (check BadLogsCheck) Description() string {
 	return fmt.Sprintf("Checking whether pod %s has bad (fatal/error/warning/fail) logs in envoy container", check.pod.Name)
 }
 
 // Run implements common.Runnable
-func (check NoBadEnvoyLogsCheck) Run() outcomes.Outcome {
+func (check BadLogsCheck) Run() outcomes.Outcome {
 	return podhelper.HasNoBadLogs(check.client, check.pod, "envoy")
 }
 
 // Suggestion implements common.Runnable.
-func (check NoBadEnvoyLogsCheck) Suggestion() string {
+func (check BadLogsCheck) Suggestion() string {
 	panic("implement me")
 }
 
 // FixIt implements common.Runnable.
-func (check NoBadEnvoyLogsCheck) FixIt() error {
+func (check BadLogsCheck) FixIt() error {
 	panic("implement me")
 }
