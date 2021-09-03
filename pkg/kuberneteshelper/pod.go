@@ -34,13 +34,13 @@ func PodFromString(namespacedPod string) (*corev1.Pod, error) {
 
 	kubeClient, err := GetKubeClient()
 	if err != nil {
-		log.Err(err).Msgf("Error getting Kubernetes client")
+		log.Error().Err(err).Msgf("Error getting Kubernetes client")
 		return nil, err
 	}
 
 	podList, err := kubeClient.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		log.Err(err).Msg("Error getting list of Pods")
+		log.Error().Err(err).Msg("Error getting list of Pods")
 		return nil, errors.New("error getting pods")
 	}
 
@@ -76,7 +76,7 @@ func GetOsmConfigurator(osmNamespace common.MeshNamespace) configurator.Configur
 	stop := signals.RegisterExitHandlers()
 	kubeConfig, err := GetKubeConfig()
 	if err != nil {
-		log.Err(err).Msg("Error getting kubeconfig")
+		log.Error().Err(err).Msg("Error getting kubeconfig")
 	}
 	cfg := configurator.NewConfigurator(versioned.NewForConfigOrDie(kubeConfig), stop, osmNamespace.String(), constants.OSMMeshConfig)
 	return cfg

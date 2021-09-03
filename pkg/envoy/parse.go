@@ -26,7 +26,7 @@ func ParseEnvoyConfig(jsonBytes []byte) (*Config, error) {
 		DiscardUnknown: true,
 	}
 	if err := unmarshal.Unmarshal(jsonBytes, &configDump); err != nil {
-		log.Err(err).Msg("Error parsing JSON bytes")
+		log.Error().Err(err).Msg("Error parsing JSON bytes")
 		return nil, err
 	}
 
@@ -36,42 +36,42 @@ func ParseEnvoyConfig(jsonBytes []byte) (*Config, error) {
 		switch config.TypeUrl {
 		case "type.googleapis.com/envoy.admin.v3.BootstrapConfigDump":
 			if err := configDump.Configs[idx].UnmarshalTo(&cfg.Boostrap); err != nil {
-				log.Err(err).Msg("Error parsing Bootstrap")
+				log.Error().Err(err).Msg("Error parsing Bootstrap")
 				return nil, err
 			}
 
 		case "type.googleapis.com/envoy.admin.v3.ClustersConfigDump":
 			if err := configDump.Configs[idx].UnmarshalTo(&cfg.Clusters); err != nil {
-				log.Err(err).Msg("Error parsing Clusters")
+				log.Error().Err(err).Msg("Error parsing Clusters")
 				return nil, err
 			}
 
 		case "type.googleapis.com/envoy.admin.v3.EndpointsConfigDump":
 			if err := configDump.Configs[idx].UnmarshalTo(&cfg.Endpoints); err != nil {
-				log.Err(err).Msg("Error parsing Endpoints")
+				log.Error().Err(err).Msg("Error parsing Endpoints")
 				return nil, err
 			}
 
 		case "type.googleapis.com/envoy.admin.v3.ListenersConfigDump":
 			if err := configDump.Configs[idx].UnmarshalTo(&cfg.Listeners); err != nil {
-				log.Err(err).Msg("Error parsing Listeners")
+				log.Error().Err(err).Msg("Error parsing Listeners")
 				return nil, err
 			}
 
 		case "type.googleapis.com/envoy.admin.v3.RoutesConfigDump":
 			if err := configDump.Configs[idx].UnmarshalTo(&cfg.Routes); err != nil {
-				log.Err(err).Msg("Error parsing Listeners")
+				log.Error().Err(err).Msg("Error parsing Listeners")
 				return nil, err
 			}
 		case "type.googleapis.com/envoy.admin.v3.ScopedRoutesConfigDump":
 			if err := configDump.Configs[idx].UnmarshalTo(&cfg.ScopedRoutesConfigDump); err != nil {
-				log.Err(err).Msg("Error parsing ScopedRoutesConfigDump")
+				log.Error().Err(err).Msg("Error parsing ScopedRoutesConfigDump")
 				return nil, err
 			}
 
 		case "type.googleapis.com/envoy.admin.v3.SecretsConfigDump":
 			if err := configDump.Configs[idx].UnmarshalTo(&cfg.SecretsConfigDump); err != nil {
-				log.Err(err).Msg("Error parsing SecretsConfigDump")
+				log.Error().Err(err).Msg("Error parsing SecretsConfigDump")
 				return nil, err
 			}
 
