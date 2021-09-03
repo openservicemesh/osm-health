@@ -110,6 +110,12 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		// Source Envoy must define a cluster for the destination
 		envoy.NewClusterCheck(client, srcConfigGetter, dstPod),
 
+		// Check Envoy certificates for both pods
+		envoy.HasOutboundRootCertificate(client, srcConfigGetter, toPod),
+		envoy.HasInboundRootCertificate(client, dstConfigGetter, toPod),
+		envoy.HasServiceCertificate(client, srcConfigGetter, fromPod),
+		envoy.HasServiceCertificate(client, dstConfigGetter, toPod),
+
 		// Run SMI checks
 		smi.NewTrafficSplitCheck(client, dstPod, splitClient),
 		access.NewTrafficTargetCheck(osmVersion, configurator, srcPod, dstPod, accessClient),
