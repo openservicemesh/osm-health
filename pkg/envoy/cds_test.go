@@ -171,7 +171,7 @@ func TestEnvoyClusterChecker(t *testing.T) {
 				objs[i] = test.svcs[i]
 			}
 			k8s := fake.NewSimpleClientset(objs...)
-			clusterChecker := HasCluster(k8s, configGetter, test.dstPod)
+			clusterChecker := NewClusterCheck(k8s, configGetter, test.dstPod)
 			outcome := clusterChecker.Run()
 			if test.pass {
 				assert.NoError(outcome.GetError())

@@ -11,7 +11,7 @@ func ControlPlaneStatus(osmControlPlaneNamespace string) error {
 
 	client, err := kuberneteshelper.GetKubeClient()
 	if err != nil {
-		log.Err(err).Msg("Error creating Kubernetes client")
+		log.Error().Err(err).Msg("Error creating Kubernetes client")
 	}
 
 	outcomes := common.Run(HasNoBadOsmControllerLogsCheck(client, osmControlPlaneNamespace))

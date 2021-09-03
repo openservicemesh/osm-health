@@ -9,10 +9,10 @@ import (
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*HasListenerCheck)(nil)
+var _ common.Runnable = (*ListenerCheck)(nil)
 
-// HasListenerCheck implements common.Runnable
-type HasListenerCheck struct {
+// ListenerCheck implements common.Runnable
+type ListenerCheck struct {
 	ConfigGetter
 	osm.ControllerVersion
 
@@ -24,7 +24,7 @@ type HasListenerCheck struct {
 }
 
 // Run implements common.Runnable
-func (l HasListenerCheck) Run() outcomes.Outcome {
+func (l ListenerCheck) Run() outcomes.Outcome {
 	if l.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
 		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
@@ -66,23 +66,23 @@ func (l HasListenerCheck) Run() outcomes.Outcome {
 }
 
 // Suggestion implements common.Runnable
-func (l HasListenerCheck) Suggestion() string {
+func (l ListenerCheck) Suggestion() string {
 	panic("implement me")
 }
 
 // FixIt implements common.Runnable
-func (l HasListenerCheck) FixIt() error {
+func (l ListenerCheck) FixIt() error {
 	panic("implement me")
 }
 
 // Description implements common.Runnable
-func (l HasListenerCheck) Description() string {
+func (l ListenerCheck) Description() string {
 	return fmt.Sprintf("Checking whether %s is configured with correct %s Envoy listener", l.ConfigGetter.GetObjectName(), l.listenerType)
 }
 
-// HasOutboundListener creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener.
-func HasOutboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVersion) HasListenerCheck {
-	return HasListenerCheck{
+// NewOutboundListenerCheck creates a ListenerCheck which checks whether the given Pod has an Envoy with properly configured listener.
+func NewOutboundListenerCheck(configGetter ConfigGetter, osmVersion osm.ControllerVersion) ListenerCheck {
+	return ListenerCheck{
 		ConfigGetter:      configGetter,
 		ControllerVersion: osmVersion,
 		listenerType:      "outbound",
@@ -91,9 +91,9 @@ func HasOutboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVer
 	}
 }
 
-// HasInboundListener creates a new common.Runnable, which checks whether the given Pod has an Envoy with properly configured listener.
-func HasInboundListener(configGetter ConfigGetter, osmVersion osm.ControllerVersion) HasListenerCheck {
-	return HasListenerCheck{
+// NewInboundListenerCheck creates a ListenerCheck which checks whether the given Pod has an Envoy with properly configured listener.
+func NewInboundListenerCheck(configGetter ConfigGetter, osmVersion osm.ControllerVersion) ListenerCheck {
+	return ListenerCheck{
 		ConfigGetter:      configGetter,
 		ControllerVersion: osmVersion,
 		listenerType:      "inbound",

@@ -18,8 +18,8 @@ type ProxyUUIDLabelCheck struct {
 	pod *corev1.Pod
 }
 
-// HasProxyUUIDLabel checks whether a pod has a valid proxy UUID label which is added when a pod is added to a mesh
-func HasProxyUUIDLabel(pod *corev1.Pod) ProxyUUIDLabelCheck {
+// NewProxyUUIDLabelCheck creates a ProxyUUIDLabelCheck which checks whether a pod has a valid proxy UUID label which is added when a pod is added to a mesh
+func NewProxyUUIDLabelCheck(pod *corev1.Pod) ProxyUUIDLabelCheck {
 	return ProxyUUIDLabelCheck{
 		pod: pod,
 	}

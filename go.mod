@@ -17,7 +17,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/opencontainers/runtime-tools v0.0.0-20181011054405-1d69bd0f9c39 // indirect
-	github.com/openservicemesh/osm v0.8.2-0.20210802225558-b607bba099c1
+	github.com/openservicemesh/osm v0.8.2-0.20210823171715-5fba2d3f778b
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.23.0
 	github.com/servicemeshinterface/smi-sdk-go v0.5.0 // indirect

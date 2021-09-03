@@ -19,12 +19,12 @@ func PodToURL(fromPod *corev1.Pod, destinationURL *url.URL) {
 
 	srcConfigGetter, err := envoy.GetEnvoyConfigGetterForPod(fromPod, osmVersion)
 	if err != nil {
-		log.Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", fromPod.Namespace, fromPod.Name)
+		log.Error().Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", fromPod.Namespace, fromPod.Name)
 	}
 
 	outcomes := common.Run(
 		// Check whether the source Pod has an outbound dynamic route config domain that matches the destination URL.
-		envoy.HasOutboundDynamicRouteConfigDomainHostCheck(srcConfigGetter, destinationURL.Host),
+		envoy.NewOutboundRouteDomainHostCheck(srcConfigGetter, destinationURL.Host),
 	)
 
 	common.Print(outcomes...)
