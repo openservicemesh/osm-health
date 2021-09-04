@@ -1,38 +1,19 @@
 #!make
 
-TARGETS         := darwin/amd64 linux/amd64 windows/amd64
-BINNAME         ?= osm-health
-DIST_DIRS       := find * -type d -exec
-
-GOPATH = $(shell go env GOPATH)
-GOBIN  = $(GOPATH)/bin
-GOX    = go run github.com/mitchellh/gox
-
 VERSION ?= dev
-BUILD_DATE ?=
+BUILD_DATE=$$(date +%F)
 GIT_SHA=$$(git rev-parse HEAD)
-BUILD_DATE_VAR := github.com/openservicemesh/osm/pkg/version.BuildDate
-BUILD_VERSION_VAR := github.com/openservicemesh/osm/pkg/version.Version
-BUILD_GITCOMMIT_VAR := github.com/openservicemesh/osm/pkg/version.GitCommit
+BUILD_DATE_VAR := github.com/openservicemesh/osm-health/pkg/version.BuildDate
+BUILD_VERSION_VAR := github.com/openservicemesh/osm-health/pkg/version.Version
+BUILD_GITCOMMIT_VAR := github.com/openservicemesh/osm-health/pkg/version.GitCommit
 
 LDFLAGS ?= "-X $(BUILD_DATE_VAR)=$(BUILD_DATE) -X $(BUILD_VERSION_VAR)=$(VERSION) -X $(BUILD_GITCOMMIT_VAR)=$(GIT_SHA) -s -w"
 
-# These two values are combined and passed to go test
-E2E_FLAGS ?= -installType=KindCluster
-E2E_FLAGS_DEFAULT := -test.v -ginkgo.v -ginkgo.progress -ctrRegistry $(CTR_REGISTRY) -osmImageTag $(CTR_TAG)
-
-# Installed Go version
-# This is the version of Go going to be used to compile this project.
-# It will be compared with the minimum requirements for OSM.
-GO_VERSION_MAJOR = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1)
-GO_VERSION_MINOR = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f2)
-GO_VERSION_PATCH = $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f3)
-ifeq ($(GO_VERSION_PATCH),)
-GO_VERSION_PATCH := 0
-endif
-
 .PHONY: build-ci
 build-ci: build-osm-health
+
+.PHONY: build
+build: build-osm-health
 
 .PHONY: build-osm-health
 build-osm-health:

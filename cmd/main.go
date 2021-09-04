@@ -10,6 +10,7 @@ import (
 
 	"github.com/openservicemesh/osm-health/pkg/cli"
 	"github.com/openservicemesh/osm-health/pkg/logger"
+	"github.com/openservicemesh/osm-health/pkg/version"
 )
 
 var globalUsage = `The osm-health cli enables you to
@@ -63,7 +64,7 @@ func initCommands() *cobra.Command {
 }
 
 func main() {
-	log.Info().Msg(`👋🏻`)
+	log.Info().Msgf("👋🏻 %s; %s; %s", version.Version, version.GitCommit, version.BuildDate)
 	cmd := initCommands()
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
