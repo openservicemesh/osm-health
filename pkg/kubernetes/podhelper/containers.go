@@ -36,10 +36,10 @@ func (check EnvoySidecarImageCheck) Description() string {
 func (check EnvoySidecarImageCheck) Run() outcomes.Outcome {
 	for _, container := range check.pod.Spec.Containers {
 		if container.Image == check.cfg.GetEnvoyImage() {
-			return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+			return outcomes.Pass{}
 		}
 	}
-	return outcomes.FailedOutcome{Error: ErrExpectedEnvoyImageMissing}
+	return outcomes.Fail{Error: ErrExpectedEnvoyImageMissing}
 }
 
 // Suggestion implements common.Runnable
@@ -78,10 +78,10 @@ func (check OsmInitContainerImageCheck) Description() string {
 func (check OsmInitContainerImageCheck) Run() outcomes.Outcome {
 	for _, container := range check.pod.Spec.InitContainers {
 		if container.Image == check.cfg.GetInitContainerImage() {
-			return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+			return outcomes.Pass{}
 		}
 	}
-	return outcomes.FailedOutcome{Error: ErrExpectedOsmInitImageMissing}
+	return outcomes.Fail{Error: ErrExpectedOsmInitImageMissing}
 }
 
 // Suggestion implements common.Runnable
@@ -120,9 +120,9 @@ func (check MinNumContainersCheck) Description() string {
 // Run implements common.Runnable
 func (check MinNumContainersCheck) Run() outcomes.Outcome {
 	if len(check.pod.Spec.Containers) < check.minNum {
-		return outcomes.FailedOutcome{Error: ErrExpectedMinNumContainers}
+		return outcomes.Fail{Error: ErrExpectedMinNumContainers}
 	}
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }
 
 // Suggestion implements common.Runnable
@@ -133,4 +133,16 @@ func (check MinNumContainersCheck) Suggestion() string {
 // FixIt implements common.Runnable
 func (check MinNumContainersCheck) FixIt() error {
 	panic("implement me")
+}
+
+// PodHasContainer checks whether a pod's spec has a container.
+func PodHasContainer(pod *corev1.Pod, containerName string) bool {
+	allContainers := pod.Spec.Containers
+	allContainers = append(allContainers, pod.Spec.InitContainers...)
+	for _, container := range allContainers {
+		if container.Name == containerName {
+			return true
+		}
+	}
+	return false
 }

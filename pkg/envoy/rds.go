@@ -25,16 +25,16 @@ type RouteDomainCheck struct {
 func (l RouteDomainCheck) Run() outcomes.Outcome {
 	if l.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
-		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
+		return outcomes.Fail{Error: ErrIncorrectlyInitializedConfigGetter}
 	}
 
 	envoyConfig, err := l.ConfigGetter.GetConfig()
 	if err != nil {
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 
 	if envoyConfig == nil {
-		return outcomes.FailedOutcome{Error: ErrEnvoyConfigEmpty}
+		return outcomes.Fail{Error: ErrEnvoyConfigEmpty}
 	}
 
 	foundAnyRouteDomains := false
@@ -43,7 +43,7 @@ func (l RouteDomainCheck) Run() outcomes.Outcome {
 	for _, rawDynRouteCfg := range envoyConfig.Routes.GetDynamicRouteConfigs() {
 		var dynRouteCfg envoy_config_route_v3.RouteConfiguration
 		if err = rawDynRouteCfg.GetRouteConfig().UnmarshalTo(&dynRouteCfg); err != nil {
-			return outcomes.FailedOutcome{Error: ErrUnmarshalingDynamicRouteConfig}
+			return outcomes.Fail{Error: ErrUnmarshalingDynamicRouteConfig}
 		}
 
 		if dynRouteCfg.Name != l.RouteName {
@@ -69,14 +69,14 @@ func (l RouteDomainCheck) Run() outcomes.Outcome {
 
 	if !foundAnyRouteDomains {
 		log.Error().Msgf("must have at least one dynamic route config domain: %+v", envoyConfig.Routes.GetDynamicRouteConfigs())
-		return outcomes.FailedOutcome{Error: ErrNoDynamicRouteConfigDomains}
+		return outcomes.Fail{Error: ErrNoDynamicRouteConfigDomains}
 	}
 
 	if l.Domain != "" && !foundSpecificRouteDomain {
-		return outcomes.FailedOutcome{Error: ErrDynamicRouteConfigDomainNotFound}
+		return outcomes.Fail{Error: ErrDynamicRouteConfigDomainNotFound}
 	}
 
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }
 
 // Suggestion implements common.Runnable

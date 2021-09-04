@@ -26,16 +26,16 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 	osmNamespace := common.MeshNamespace(osmControlPlaneNamespace)
 	client, err := kuberneteshelper.GetKubeClient()
 	if err != nil {
-		log.Err(err).Msg("Error creating Kubernetes client")
+		log.Error().Err(err).Msg("Error creating Kubernetes client")
 	}
 
 	kubeConfig, err := kuberneteshelper.GetKubeConfig()
 	if err != nil {
-		log.Err(err).Msg("Error getting Kubernetes config")
+		log.Error().Err(err).Msg("Error getting Kubernetes config")
 	}
 	splitClient, err := smiSplitClient.NewForConfig(kubeConfig)
 	if err != nil {
-		log.Err(err).Msg("Error initializing SMI split client")
+		log.Error().Err(err).Msg("Error initializing SMI split client")
 	}
 
 	accessClient, err := smiAccessClient.NewForConfig(kubeConfig)
@@ -47,12 +47,12 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 
 	srcConfigGetter, err = envoy.GetEnvoyConfigGetterForPod(srcPod, osmVersion)
 	if err != nil {
-		log.Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", srcPod.Namespace, srcPod.Name)
+		log.Error().Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", srcPod.Namespace, srcPod.Name)
 	}
 
 	dstConfigGetter, err = envoy.GetEnvoyConfigGetterForPod(dstPod, osmVersion)
 	if err != nil {
-		log.Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", dstPod.Namespace, dstPod.Name)
+		log.Error().Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", dstPod.Namespace, dstPod.Name)
 	}
 
 	configurator := kuberneteshelper.GetOsmConfigurator(osmNamespace)
@@ -75,6 +75,8 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		podhelper.NewProxyUUIDLabelCheck(srcPod),
 		podhelper.NewProxyUUIDLabelCheck(dstPod),
 
+		podhelper.NewEndpointsCheck(client, dstPod),
+
 		// Check pods for bad events
 		podhelper.NewPodEventsCheck(client, srcPod),
 		podhelper.NewPodEventsCheck(client, dstPod),
@@ -82,6 +84,10 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		// Check envoy logs
 		envoy.NewBadLogsCheck(client, srcPod),
 		envoy.NewBadLogsCheck(client, dstPod),
+
+		// Check osm-init logs
+		osm.HasNoBadOsmInitLogsCheck(client, srcPod),
+		osm.HasNoBadOsmInitLogsCheck(client, dstPod),
 
 		// The source Envoy must have at least one endpoint for the destination Envoy.
 		envoy.NewDestinationEndpointCheck(srcConfigGetter),
@@ -103,6 +109,12 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 
 		// Source Envoy must define a cluster for the destination
 		envoy.NewClusterCheck(client, srcConfigGetter, dstPod),
+
+		// Check Envoy certificates for both pods
+		envoy.HasOutboundRootCertificate(client, srcConfigGetter, dstPod),
+		envoy.HasInboundRootCertificate(client, dstConfigGetter, dstPod),
+		envoy.HasServiceCertificate(client, srcConfigGetter, srcPod),
+		envoy.HasServiceCertificate(client, dstConfigGetter, dstPod),
 
 		// Run SMI checks
 		smi.NewTrafficSplitCheck(client, dstPod, splitClient),

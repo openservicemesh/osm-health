@@ -23,15 +23,15 @@ type DestinationEndpointCheck struct {
 func (l DestinationEndpointCheck) Run() outcomes.Outcome {
 	if l.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
-		return outcomes.FailedOutcome{Error: ErrIncorrectlyInitializedConfigGetter}
+		return outcomes.Fail{Error: ErrIncorrectlyInitializedConfigGetter}
 	}
 	envoyConfig, err := l.ConfigGetter.GetConfig()
 	if err != nil {
-		return outcomes.FailedOutcome{Error: err}
+		return outcomes.Fail{Error: err}
 	}
 
 	if envoyConfig == nil {
-		return outcomes.FailedOutcome{Error: ErrEnvoyConfigEmpty}
+		return outcomes.Fail{Error: ErrEnvoyConfigEmpty}
 	}
 
 	foundAnyEndpoints := false
@@ -41,7 +41,7 @@ func (l DestinationEndpointCheck) Run() outcomes.Outcome {
 	for _, dynEpt := range envoyConfig.Endpoints.GetDynamicEndpointConfigs() {
 		var cla envoy_config_endpoint_v3.ClusterLoadAssignment
 		if err = dynEpt.GetEndpointConfig().UnmarshalTo(&cla); err != nil {
-			return outcomes.FailedOutcome{Error: ErrUnmarshalingClusterLoadAssigment}
+			return outcomes.Fail{Error: ErrUnmarshalingClusterLoadAssigment}
 		}
 
 		for _, ept := range cla.GetEndpoints() {
@@ -63,14 +63,14 @@ func (l DestinationEndpointCheck) Run() outcomes.Outcome {
 
 	if !foundAnyEndpoints {
 		log.Error().Msgf("must have at least one destination endpoint: %+v", envoyConfig.Endpoints.GetDynamicEndpointConfigs())
-		return outcomes.FailedOutcome{Error: ErrNoDestinationEndpoints}
+		return outcomes.Fail{Error: ErrNoDestinationEndpoints}
 	}
 
 	if l.Pod != nil && !foundSpecificEndpoint {
-		return outcomes.FailedOutcome{Error: ErrEndpointNotFound}
+		return outcomes.Fail{Error: ErrEndpointNotFound}
 	}
 
-	return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+	return outcomes.Pass{}
 }
 
 // Suggestion implements common.Runnable

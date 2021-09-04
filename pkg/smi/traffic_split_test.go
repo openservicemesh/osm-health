@@ -176,7 +176,7 @@ func TestIsInTrafficSplit(t *testing.T) {
 				assert.NoError(trafficSplitChecker.Run().GetError())
 			}
 			if testCase.isDiagnosticInfoExpected {
-				assert.NotEmpty(trafficSplitChecker.Run().GetLongDiagnostics())
+				assert.NotEmpty(trafficSplitChecker.Run().GetDiagnostics())
 			}
 		})
 	}

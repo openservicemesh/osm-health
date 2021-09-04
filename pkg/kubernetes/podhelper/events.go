@@ -43,14 +43,14 @@ func (check PodEventsCheck) Run() outcomes.Outcome {
 	options := metav1.ListOptions{FieldSelector: selectorString}
 	events, err := eventsInterface.List(context.TODO(), options)
 	if err != nil {
-		return outcomes.FailedOutcome{Error: fmt.Errorf("unable to search events of pod '%#v': %v", check.pod, err)}
+		return outcomes.Fail{Error: fmt.Errorf("unable to search events of pod '%#v': %v", check.pod, err)}
 	}
 
 	if len(events.Items) == 0 {
-		return outcomes.SuccessfulOutcomeWithoutDiagnostics{}
+		return outcomes.Pass{}
 	}
 
-	return outcomes.FailedOutcome{Error: fmt.Errorf("pod '%s' has events that are of 'type!=Normal' - run 'kubectl get events --namespace %s --field-selector %s' to inspect events", check.pod.Name, check.pod.Namespace, selectorString)}
+	return outcomes.Fail{Error: fmt.Errorf("pod '%s' has events that are of 'type!=Normal' - run 'kubectl get events --namespace %s --field-selector %s' to inspect events", check.pod.Name, check.pod.Namespace, selectorString)}
 }
 
 // Suggestion implements common.Runnable.

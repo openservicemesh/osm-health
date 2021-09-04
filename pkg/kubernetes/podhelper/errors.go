@@ -16,4 +16,10 @@ var (
 
 	// ErrProxyUUIDLabelMissing is used when a pod is expected to have a valid proxy UUID label but does not
 	ErrProxyUUIDLabelMissing = errors.New("pod does not have expected valid proxy UUID label")
+
+	// ErrPodDoesNotHaveContainer is used when a pod does not have a container in the pod spec container list.
+	ErrPodDoesNotHaveContainer = errors.New("pod does not have container in pod spec container list")
+
+	// ErrPodNotInEndpoints is used when a pod is expected to be referenced by any Kubernetes Endpoints resources but is not
+	ErrPodNotInEndpoints = errors.New("pod not referenced by any Kubernetes Endpoints resources")
 )
