@@ -5,9 +5,11 @@ import (
 
 	envoy_config_route_v3 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
+	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 )
 
 // Verify interface compliance
@@ -15,20 +17,19 @@ var _ common.Runnable = (*RouteDomainCheck)(nil)
 
 // RouteDomainCheck implements common.Runnable
 type RouteDomainCheck struct {
-	*corev1.Pod
 	ConfigGetter
 	RouteName string
-	Domain    string
+	Domains   map[string]bool
 }
 
 // Run implements common.Runnable
-func (l RouteDomainCheck) Run() outcomes.Outcome {
-	if l.ConfigGetter == nil {
+func (check RouteDomainCheck) Run() outcomes.Outcome {
+	if check.ConfigGetter == nil {
 		log.Error().Msg("Incorrectly initialized ConfigGetter")
 		return outcomes.Fail{Error: ErrIncorrectlyInitializedConfigGetter}
 	}
 
-	envoyConfig, err := l.ConfigGetter.GetConfig()
+	envoyConfig, err := check.ConfigGetter.GetConfig()
 	if err != nil {
 		return outcomes.Fail{Error: err}
 	}
@@ -46,33 +47,33 @@ func (l RouteDomainCheck) Run() outcomes.Outcome {
 			return outcomes.Fail{Error: ErrUnmarshalingDynamicRouteConfig}
 		}
 
-		if dynRouteCfg.Name != l.RouteName {
+		if dynRouteCfg.Name != check.RouteName {
 			continue
 		}
 
 		for _, virtualHost := range dynRouteCfg.GetVirtualHosts() {
 			for _, domain := range virtualHost.GetDomains() {
 				foundAnyRouteDomains = true
-				if l.Domain == "" {
+				if len(check.Domains) == 0 {
 					break
 				}
-				if domain == l.Domain {
+				if _, ok := check.Domains[domain]; ok {
 					foundSpecificRouteDomain = true
 					break
 				}
 			}
-			if (l.Domain == "" && foundAnyRouteDomains) || foundSpecificRouteDomain {
+			if (len(check.Domains) == 0 && foundAnyRouteDomains) || foundSpecificRouteDomain {
 				break
 			}
 		}
 	}
 
 	if !foundAnyRouteDomains {
-		log.Error().Msgf("must have at least one dynamic route config domain: %+v", envoyConfig.Routes.GetDynamicRouteConfigs())
+		log.Error().Msgf("must have at least one dynamic route config domain in envoy config")
 		return outcomes.Fail{Error: ErrNoDynamicRouteConfigDomains}
 	}
 
-	if l.Domain != "" && !foundSpecificRouteDomain {
+	if len(check.Domains) > 0 && !foundSpecificRouteDomain {
 		return outcomes.Fail{Error: ErrDynamicRouteConfigDomainNotFound}
 	}
 
@@ -80,35 +81,49 @@ func (l RouteDomainCheck) Run() outcomes.Outcome {
 }
 
 // Suggestion implements common.Runnable
-func (l RouteDomainCheck) Suggestion() string {
+func (check RouteDomainCheck) Suggestion() string {
 	panic("implement me")
 }
 
 // FixIt implements common.Runnable
-func (l RouteDomainCheck) FixIt() error {
+func (check RouteDomainCheck) FixIt() error {
 	panic("implement me")
 }
 
 // Description implements common.Runnable
-func (l RouteDomainCheck) Description() string {
-	return fmt.Sprintf("Checking whether %s is configured with correct %s Envoy route", l.ConfigGetter.GetObjectName(), l.RouteName)
+func (check RouteDomainCheck) Description() string {
+	return fmt.Sprintf("Checking whether %s is configured with correct %s Envoy route", check.ConfigGetter.GetObjectName(), check.RouteName)
 }
 
-// NewOutboundRouteDomainPodCheck creates a DestinationEndpointCheck which checks whether the Envoy config has an outbound dynamic route domain to the Pod
-func NewOutboundRouteDomainPodCheck(configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
-	return RouteDomainCheck{
-		ConfigGetter: configGetter,
-		RouteName:    OutboundDynamicRouteConfigName,
-		Domain:       fmt.Sprintf("%s.%s", pod.Name, pod.Namespace),
+// NewOutboundRouteDomainPodCheck creates a new common.Runnable, which checks
+// whether the Envoy config has outbound dynamic route domains to the Pod's services.
+func NewOutboundRouteDomainPodCheck(client kubernetes.Interface, configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
+	return NewPodServicesRouteDomainCheck(client, configGetter, pod, OutboundDynamicRouteConfigName)
+}
+
+// NewInboundRouteDomainPodCheck creates a new common.Runnable, which checks
+// whether the Envoy config has inbound dynamic route domains from the Pod's services.
+func NewInboundRouteDomainPodCheck(client kubernetes.Interface, configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
+	return NewPodServicesRouteDomainCheck(client, configGetter, pod, InboundDynamicRouteConfigName)
+}
+
+// NewPodServicesRouteDomainCheck checks whether the pod's corresponding service's domains are
+// contained in the envoy dynamic route config domain list.
+func NewPodServicesRouteDomainCheck(client kubernetes.Interface, configGetter ConfigGetter, pod *corev1.Pod, routeName string) RouteDomainCheck {
+	podSvcs, err := kuberneteshelper.GetMatchingServices(client, pod.ObjectMeta.GetLabels(), pod.Namespace)
+	if err != nil {
+		log.Warn().Msgf("unable to obtain the services of pod %s/%s", pod.Namespace, pod.Name)
 	}
-}
 
-// NewInboundRouteDomainPodCheck creates a DestinationEndpointCheck which checks whether the Envoy config has an inbound dynamic route domain to the Pod
-func NewInboundRouteDomainPodCheck(configGetter ConfigGetter, pod *corev1.Pod) RouteDomainCheck {
+	domains := make(map[string]bool)
+	for _, svc := range podSvcs {
+		domains[fmt.Sprintf("%s.%s", svc.Name, svc.Namespace)] = false
+	}
+
 	return RouteDomainCheck{
 		ConfigGetter: configGetter,
-		RouteName:    InboundDynamicRouteConfigName,
-		Domain:       fmt.Sprintf("%s.%s", pod.Name, pod.Namespace),
+		RouteName:    routeName,
+		Domains:      domains,
 	}
 }
 
@@ -117,6 +132,6 @@ func NewOutboundRouteDomainHostCheck(configGetter ConfigGetter, destinationHost 
 	return RouteDomainCheck{
 		ConfigGetter: configGetter,
 		RouteName:    OutboundDynamicRouteConfigName,
-		Domain:       destinationHost,
+		Domains:      map[string]bool{destinationHost: true},
 	}
 }

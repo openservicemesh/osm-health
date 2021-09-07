@@ -57,7 +57,7 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 
 	configurator := kuberneteshelper.GetOsmConfigurator(osmNamespace)
 
-	outcomes := common.Run(
+	checks := []common.Runnable{
 		// Check that pod namespaces are in the same mesh
 		namespace.NewNamespacesInSameMeshCheck(client, srcPod.Namespace, dstPod.Namespace),
 
@@ -96,10 +96,10 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		envoy.NewSpecificEndpointCheck(srcConfigGetter, dstPod),
 
 		// Check whether the source Pod has an outbound dynamic route config domain that matches the destination Pod.
-		envoy.NewOutboundRouteDomainPodCheck(srcConfigGetter, dstPod),
+		envoy.NewOutboundRouteDomainPodCheck(client, srcConfigGetter, dstPod),
 
 		// Check whether the destination Pod has an inbound dynamic route config domain that matches the source Pod.
-		envoy.NewInboundRouteDomainPodCheck(dstConfigGetter, srcPod),
+		envoy.NewInboundRouteDomainPodCheck(client, dstConfigGetter, srcPod),
 
 		// Source Envoy must have Outbound listener
 		envoy.NewOutboundListenerCheck(srcConfigGetter, osmVersion),
@@ -120,7 +120,8 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		smi.NewTrafficSplitCheck(client, dstPod, splitClient),
 		access.NewTrafficTargetCheck(osmVersion, configurator, srcPod, dstPod, accessClient),
 		access.NewRoutesValidityCheck(osmVersion, configurator, srcPod, dstPod, accessClient),
-	)
+	}
 
+	outcomes := common.Run(checks...)
 	common.Print(outcomes...)
 }
