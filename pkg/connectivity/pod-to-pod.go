@@ -19,20 +19,21 @@ import (
 func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace string) {
 	log.Info().Msgf("Testing connectivity from %s/%s to %s/%s", srcPod.Namespace, srcPod.Name, dstPod.Namespace, dstPod.Name)
 
-	// TODO
-	meshName := common.MeshName("osm")
-	osmVersion := osm.ControllerVersion("v0.9")
-
-	osmNamespace := common.MeshNamespace(osmControlPlaneNamespace)
 	client, err := kuberneteshelper.GetKubeClient()
 	if err != nil {
 		log.Error().Err(err).Msg("Error creating Kubernetes client")
+	}
+
+	meshInfo, err := osm.GetMeshInfo(client, osmControlPlaneNamespace)
+	if err != nil {
+		log.Err(err).Msg("Error getting OSM info")
 	}
 
 	kubeConfig, err := kuberneteshelper.GetKubeConfig()
 	if err != nil {
 		log.Error().Err(err).Msg("Error getting Kubernetes config")
 	}
+
 	splitClient, err := smiSplitClient.NewForConfig(kubeConfig)
 	if err != nil {
 		log.Error().Err(err).Msg("Error initializing SMI split client")
@@ -45,17 +46,17 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 
 	var srcConfigGetter, dstConfigGetter envoy.ConfigGetter
 
-	srcConfigGetter, err = envoy.GetEnvoyConfigGetterForPod(srcPod, osmVersion)
+	srcConfigGetter, err = envoy.GetEnvoyConfigGetterForPod(srcPod, meshInfo.OSMVersion)
 	if err != nil {
 		log.Error().Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", srcPod.Namespace, srcPod.Name)
 	}
 
-	dstConfigGetter, err = envoy.GetEnvoyConfigGetterForPod(dstPod, osmVersion)
+	dstConfigGetter, err = envoy.GetEnvoyConfigGetterForPod(dstPod, meshInfo.OSMVersion)
 	if err != nil {
 		log.Error().Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", dstPod.Namespace, dstPod.Name)
 	}
 
-	configurator := kuberneteshelper.GetOsmConfigurator(osmNamespace)
+	configurator := kuberneteshelper.GetOsmConfigurator(meshInfo.Namespace)
 
 	checks := []common.Runnable{
 		// Check that pod namespaces are in the same mesh
@@ -64,8 +65,8 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		// Check both pods for osm init and envoy container validity
 		namespace.NewSidecarInjectionCheck(client, srcPod.Namespace),
 		namespace.NewSidecarInjectionCheck(client, dstPod.Namespace),
-		namespace.NewMonitoredCheck(client, srcPod.Namespace, meshName),
-		namespace.NewMonitoredCheck(client, dstPod.Namespace, meshName),
+		namespace.NewMonitoredCheck(client, srcPod.Namespace, meshInfo.Name),
+		namespace.NewMonitoredCheck(client, dstPod.Namespace, meshInfo.Name),
 		podhelper.NewMinNumContainersCheck(srcPod, 2),
 		podhelper.NewMinNumContainersCheck(dstPod, 2),
 		podhelper.NewOsmContainerImageCheck(configurator, srcPod),
@@ -105,10 +106,10 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		envoy.NewInboundRouteDomainPodCheck(client, dstConfigGetter, srcPod),
 
 		// Source Envoy must have Outbound listener
-		envoy.NewOutboundListenerCheck(srcConfigGetter, osmVersion),
+		envoy.NewOutboundListenerCheck(srcConfigGetter, meshInfo.OSMVersion),
 
 		// Destination Envoy must have Inbound listener
-		envoy.NewInboundListenerCheck(dstConfigGetter, osmVersion),
+		envoy.NewInboundListenerCheck(dstConfigGetter, meshInfo.OSMVersion),
 
 		// Source Envoy must define a cluster for the destination
 		envoy.NewClusterCheck(client, srcConfigGetter, dstPod),
@@ -121,8 +122,8 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 
 		// Run SMI checks
 		smi.NewTrafficSplitCheck(client, dstPod, splitClient),
-		access.NewTrafficTargetCheck(osmVersion, configurator, srcPod, dstPod, accessClient),
-		access.NewRoutesValidityCheck(osmVersion, configurator, srcPod, dstPod, accessClient),
+		access.NewTrafficTargetCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient),
+		access.NewRoutesValidityCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient),
 	}
 
 	outcomes := common.Run(checks...)
