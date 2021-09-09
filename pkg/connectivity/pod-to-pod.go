@@ -2,6 +2,7 @@ package connectivity
 
 import (
 	smiAccessClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/access/clientset/versioned"
+	smiSpecClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/specs/clientset/versioned"
 	smiSplitClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/split/clientset/versioned"
 	corev1 "k8s.io/api/core/v1"
 
@@ -42,6 +43,11 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 	accessClient, err := smiAccessClient.NewForConfig(kubeConfig)
 	if err != nil {
 		log.Err(err).Msg("Error initializing SMI access client")
+	}
+
+	specClient, err := smiSpecClient.NewForConfig(kubeConfig)
+	if err != nil {
+		log.Err(err).Msg("Error initializing SMI spec client")
 	}
 
 	var srcConfigGetter, dstConfigGetter envoy.ConfigGetter
@@ -124,6 +130,7 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		smi.NewTrafficSplitCheck(client, dstPod, splitClient),
 		access.NewTrafficTargetCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient),
 		access.NewRoutesValidityCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient),
+		access.NewRoutesExistenceCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient, specClient),
 	}
 
 	outcomes := common.Run(checks...)
