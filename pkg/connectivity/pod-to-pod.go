@@ -12,8 +12,8 @@ import (
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/podhelper"
 	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 	"github.com/openservicemesh/osm-health/pkg/osm"
-	"github.com/openservicemesh/osm-health/pkg/smi"
 	"github.com/openservicemesh/osm-health/pkg/smi/access"
+	"github.com/openservicemesh/osm-health/pkg/smi/split"
 )
 
 // PodToPod tests the connectivity between a source and destination pods.
@@ -127,7 +127,7 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		envoy.HasServiceCertificate(client, dstConfigGetter, dstPod),
 
 		// Run SMI checks
-		smi.NewTrafficSplitCheck(client, dstPod, splitClient),
+		split.NewTrafficSplitCheck(meshInfo.OSMVersion, client, dstPod, splitClient),
 		access.NewTrafficTargetCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient),
 		access.NewRoutesValidityCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient),
 		access.NewRoutesExistenceCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient, specClient),

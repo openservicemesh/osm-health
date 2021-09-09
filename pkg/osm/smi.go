@@ -19,25 +19,12 @@ var SupportedTrafficTarget = map[ControllerVersion]TrafficTargetVersion{
 }
 
 // SupportedTrafficSplit is the mapping of OSM Controller version to supported SMI TrafficSplit version.
-var SupportedTrafficSplit = map[ControllerVersion][]TrafficSplitVersion{
-	"v0.5": {
-		"v1alpha2",
-	},
-	"v0.6": {
-		"v1alpha2",
-	},
-	"v0.7": {
-
-		"v1alpha2",
-	},
-	"v0.8": {
-
-		"v1alpha2",
-	},
-	"v0.9": {
-
-		"v1alpha2",
-	},
+var SupportedTrafficSplit = map[ControllerVersion]TrafficSplitVersion{
+	"v0.5": "v1alpha2",
+	"v0.6": "v1alpha2",
+	"v0.7": "v1alpha2",
+	"v0.8": "v1alpha2",
+	"v0.9": "v1alpha2",
 }
 
 // SupportedHTTPRouteVersion is a mapping of OSM Controller version to supported HTTP Route Group version.

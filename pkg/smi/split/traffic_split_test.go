@@ -1,4 +1,4 @@
-package smi
+package split
 
 import (
 	"testing"
@@ -10,6 +10,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
+
+	"github.com/openservicemesh/osm-health/pkg/osm"
 )
 
 func TestIsInTrafficSplit(t *testing.T) {
@@ -156,6 +158,7 @@ func TestIsInTrafficSplit(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
+			osmVersion := osm.ControllerVersion("v0.9")
 			assert := tassert.New(t)
 			svcObjs := make([]runtime.Object, len(testCase.serviceList))
 			for i := range testCase.serviceList {
@@ -169,7 +172,7 @@ func TestIsInTrafficSplit(t *testing.T) {
 			}
 			smiSplitClient := fakeSmiSplitClient.NewSimpleClientset(splitObjs...)
 
-			trafficSplitChecker := NewTrafficSplitCheck(client, &testCase.pod, smiSplitClient)
+			trafficSplitChecker := NewTrafficSplitCheck(osmVersion, client, &testCase.pod, smiSplitClient)
 			if testCase.isErrorExpected {
 				assert.Error(trafficSplitChecker.Run().GetError())
 			} else {
