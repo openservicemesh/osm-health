@@ -36,7 +36,7 @@ func GetMeshInfo(client kubernetes.Interface, osmControlPlaneNamespace string) (
 	}
 
 	mesh := &MeshInfo{
-		Name:       common.MeshName(osmControllerDeployment.Labels[constants.OSMAppNameLabelKey]),
+		Name:       common.MeshName(osmControllerDeployment.Labels[constants.OSMAppInstanceLabelKey]),
 		Namespace:  common.MeshNamespace(osmControlPlaneNamespace),
 		OSMVersion: ControllerVersion(osmVersion),
 	}
@@ -66,7 +66,7 @@ func GetOSMControllerDeployment(client kubernetes.Interface, osmControlPlaneName
 func FormatReleaseVersion(version string) (string, error) {
 	splitVersion := strings.Split(version, VersionDelimiter)
 	if len(splitVersion) < 2 {
-		return "", fmt.Errorf(" is not in the expected format. The expected format is vXX.XX.XX or vXX.XX")
+		return "", fmt.Errorf("%s is not in the expected format", version)
 	}
 	majorMinorVersion := splitVersion[0] + VersionDelimiter + splitVersion[1]
 	return majorMinorVersion, nil
