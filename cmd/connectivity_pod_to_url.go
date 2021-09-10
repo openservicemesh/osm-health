@@ -42,7 +42,9 @@ func newConnectivityPodToURLCmd() *cobra.Command {
 				return errors.New("invalid DESTINATION_URL")
 			}
 
-			connectivity.PodToURL(fromPod, toURL)
+			osmControlPlaneNamespace := settings.Namespace()
+
+			connectivity.PodToURL(fromPod, toURL, osmControlPlaneNamespace)
 			return nil
 		},
 	}
