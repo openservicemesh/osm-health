@@ -133,6 +133,9 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace c
 		access.NewTrafficTargetCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient),
 		access.NewRoutesValidityCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient),
 		access.NewRoutesExistenceCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient, specClient),
+
+		// Check whether the source and destination envoys have filter chains that match the destination service.
+		envoy.NewListenerFilterCheck(srcConfigGetter, dstConfigGetter, meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient, client),
 	}
 
 	outcomes := runner.Run(checks...)
