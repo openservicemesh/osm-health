@@ -21,7 +21,7 @@ var settings = cli.New()
 
 var log = logger.New("main")
 
-func newRootCmd(args []string) *cobra.Command {
+func newRootCmd(actionConfig *action.Configuration, args []string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:          "osm-health",
 		Short:        "Check Open Service Mesh health status and debug issues",
@@ -36,7 +36,7 @@ func newRootCmd(args []string) *cobra.Command {
 	// Add subcommands here
 	cmd.AddCommand(
 		newConnectivityCmd(),
-		newControlPlaneCmd(),
+		newControlPlaneCmd(actionConfig),
 		newValidateCmd(),
 		newIngressCmd(),
 	)
@@ -48,7 +48,7 @@ func newRootCmd(args []string) *cobra.Command {
 
 func initCommands() *cobra.Command {
 	actionConfig := new(action.Configuration)
-	cmd := newRootCmd(os.Args[1:])
+	cmd := newRootCmd(actionConfig, os.Args[1:])
 	_ = actionConfig.Init(settings.RESTClientGetter(), settings.Namespace().String(), "secret", debug)
 
 	// run when each command's execute method is called

@@ -11,7 +11,7 @@ import (
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
 	"github.com/openservicemesh/osm-health/pkg/runner"
-	"github.com/openservicemesh/osm/pkg/utils"
+	"github.com/openservicemesh/osm-health/pkg/utils"
 )
 
 // Verify interface compliance
