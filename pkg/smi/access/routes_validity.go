@@ -85,8 +85,8 @@ func (check RoutesValidityCheck) runForTrafficTargetV1alpha2() outcomes.Outcome 
 		foundMatchingTarget = true
 		for _, rule := range spec.Rules {
 			kind := rule.Kind
-			// TODO: update if supported routes change for the OSM controller
-			if !(kind == smi.HTTPRouteGroupKind || kind == smi.TCPRouteKind) {
+			err = isTrafficTargetRouteKindSupported(kind, check.osmVersion)
+			if err != nil {
 				unsupportedRouteTargets[trafficTarget.Name] = kind
 			}
 		}
@@ -119,8 +119,8 @@ func (check RoutesValidityCheck) runForTrafficTargetV1alpha3() outcomes.Outcome 
 		foundMatchingTarget = true
 		for _, rule := range spec.Rules {
 			kind := rule.Kind
-			// TODO: update if supported routes change for the OSM controller
-			if !(kind == smi.HTTPRouteGroupKind || kind == smi.TCPRouteKind) {
+			err = isTrafficTargetRouteKindSupported(kind, check.osmVersion)
+			if err != nil {
 				unsupportedRouteTargets[trafficTarget.Name] = kind
 			}
 		}
