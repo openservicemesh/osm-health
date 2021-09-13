@@ -24,7 +24,7 @@ type MeshInfo struct {
 	OSMVersion ControllerVersion
 }
 
-// GetMeshInfo return the MeshInfo for a service mesh with its control plane in the given namespace
+// GetMeshInfo returns the MeshInfo for a service mesh with its control plane in the given namespace
 func GetMeshInfo(client kubernetes.Interface, osmControlPlaneNamespace string) (*MeshInfo, error) {
 	osmControllerDeployment, err := GetOSMControllerDeployment(client, osmControlPlaneNamespace)
 	if err != nil {
