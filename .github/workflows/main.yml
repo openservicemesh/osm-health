@@ -12,7 +12,6 @@ on:
       - main
     paths-ignore:
       - "docs/**"
-      - "**.md"
       - "scripts/cleanup/**"
 
 jobs:
