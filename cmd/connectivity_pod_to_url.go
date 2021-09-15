@@ -31,19 +31,17 @@ func newConnectivityPodToURLCmd() *cobra.Command {
 				return errors.Errorf("provide both SOURCE_POD and DESTINATION_URL")
 			}
 
-			fromPod, err := pod.FromString(args[0])
+			srcPod, err := pod.FromString(args[0])
 			if err != nil {
 				return errors.New("invalid SOURCE_POD")
 			}
 
-			toURL, err := url.Parse(args[1])
+			dstURL, err := url.Parse(args[1])
 			if err != nil {
 				return errors.New("invalid DESTINATION_URL")
 			}
 
-			osmControlPlaneNamespace := settings.Namespace()
-
-			connectivity.PodToURL(fromPod, toURL, osmControlPlaneNamespace)
+			connectivity.PodToURL(srcPod, dstURL, settings.Namespace())
 			return nil
 		},
 	}

@@ -29,7 +29,7 @@ func newConnectivityPodToPodCmd() *cobra.Command {
 				return errors.Errorf("provide both SOURCE_POD and DESTINATION_POD")
 			}
 
-			sourcePod, err := pod.FromString(args[0])
+			srcPod, err := pod.FromString(args[0])
 			if err != nil {
 				return errors.New("invalid SOURCE_POD")
 			}
@@ -41,7 +41,7 @@ func newConnectivityPodToPodCmd() *cobra.Command {
 
 			osmControlPlaneNamespace := settings.Namespace()
 
-			connectivity.PodToPod(sourcePod, dstPod, osmControlPlaneNamespace)
+			connectivity.PodToPod(srcPod, dstPod, osmControlPlaneNamespace)
 			return nil
 		},
 	}
