@@ -16,7 +16,7 @@ Checks connectivity between a Kubernetes pod and a host name (or URL)
 
 const connectivityPodToURLExample = `
 Example:
-	$ osm-health connectivity pod-to-url namespace-a/pod-x https://contoso.com/store
+	$ osm-health connectivity pod-to-url namespace-a/pod-a https://contoso.com/store
 `
 
 func newConnectivityPodToURLCmd() *cobra.Command {

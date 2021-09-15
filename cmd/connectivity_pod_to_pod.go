@@ -14,7 +14,7 @@ Checks connectivity between two Kubernetes pods
 
 const connectivityPodToPodExample = `
 Example:
-	$ osm-health connectivity pod-to-pod namespace-a/pod-x namespace-b/pod-b
+	$ osm-health connectivity pod-to-pod namespace-a/pod-a namespace-b/pod-b
 `
 
 func newConnectivityPodToPodCmd() *cobra.Command {
