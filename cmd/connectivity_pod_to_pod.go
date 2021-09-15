@@ -34,14 +34,14 @@ func newConnectivityPodToPodCmd() *cobra.Command {
 				return errors.New("invalid SOURCE_POD")
 			}
 
-			destinationPod, err := pod.FromString(args[1])
+			dstPod, err := pod.FromString(args[1])
 			if err != nil {
 				return errors.New("invalid DESTINATION_POD")
 			}
 
 			osmControlPlaneNamespace := settings.Namespace()
 
-			connectivity.PodToPod(sourcePod, destinationPod, osmControlPlaneNamespace)
+			connectivity.PodToPod(sourcePod, dstPod, osmControlPlaneNamespace)
 			return nil
 		},
 	}
