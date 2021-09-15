@@ -39,12 +39,7 @@ func Print(printables ...common.Printable) {
 		}
 	}
 
-	var statusIcon = "✅"
-	if errorsCount > 0 {
-		statusIcon = "❌"
-	}
-
-	_, err := fmt.Fprintf(w, "\n%s Ran %d checks. %d checks failed.\n", statusIcon, len(printables), errorsCount)
+	_, err := fmt.Fprintf(w, "\nRan %d checks. %d checks failed.\n", len(printables), errorsCount)
 	if err != nil {
 		log.Error().Err(err)
 		return
