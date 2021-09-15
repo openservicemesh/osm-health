@@ -25,12 +25,12 @@ func newIngressToPodCmd() *cobra.Command {
 				return err
 			}
 
-			toPod, err := pod.FromString(args[0])
+			dstPod, err := pod.FromString(args[0])
 			if err != nil {
 				return errors.New("invalid DESTINATION_POD")
 			}
 
-			ingress.ToPod(client, toPod)
+			ingress.ToDestinationPod(client, dstPod)
 
 			return nil
 		},
