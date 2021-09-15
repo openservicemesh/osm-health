@@ -5,6 +5,8 @@ import (
 
 	"github.com/spf13/pflag"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+
+	"github.com/openservicemesh/osm-health/pkg/common"
 )
 
 const (
@@ -12,7 +14,7 @@ const (
 	osmNamespaceEnvVar  = "OSM_NAMESPACE"
 )
 
-// EnvSettings describes all of the cli environment settings
+// EnvSettings describes all CLI environment settings
 type EnvSettings struct {
 	namespace string
 	config    *genericclioptions.ConfigFlags
@@ -43,22 +45,15 @@ func (s *EnvSettings) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&s.namespace, "osm-namespace", s.namespace, "namespace for osm control plane")
 }
 
-// EnvVars returns a map of all OSM related environment variables
-func (s *EnvSettings) EnvVars() map[string]string {
-	return map[string]string{
-		osmNamespaceEnvVar: s.Namespace(),
-	}
-}
-
 // RESTClientGetter gets the kubeconfig from EnvSettings
 func (s *EnvSettings) RESTClientGetter() genericclioptions.RESTClientGetter {
 	return s.config
 }
 
 // Namespace gets the namespace from the configuration
-func (s *EnvSettings) Namespace() string {
+func (s *EnvSettings) Namespace() common.MeshNamespace {
 	if ns, _, err := s.config.ToRawKubeConfigLoader().Namespace(); err == nil {
-		return ns
+		return common.MeshNamespace(ns)
 	}
 	return "default"
 }

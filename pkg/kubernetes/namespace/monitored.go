@@ -7,11 +7,12 @@ import (
 
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 	"github.com/openservicemesh/osm/pkg/constants"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*MonitoredCheck)(nil)
+var _ runner.Runnable = (*MonitoredCheck)(nil)
 
 // MonitoredCheck implements common.Runnable
 type MonitoredCheck struct {
@@ -62,7 +63,7 @@ func (check MonitoredCheck) FixIt() error {
 }
 
 // Verify interface compliance
-var _ common.Runnable = (*NamespacesInSameMeshCheck)(nil)
+var _ runner.Runnable = (*NamespacesInSameMeshCheck)(nil)
 
 // NamespacesInSameMeshCheck implements common.Runnable
 type NamespacesInSameMeshCheck struct {
@@ -102,6 +103,7 @@ func (check NamespacesInSameMeshCheck) Run() outcomes.Outcome {
 	if !labelExistsA || !labelExistsB {
 		return outcomes.Fail{Error: ErrNotMonitoredByOSMController}
 	}
+
 	if meshNameA != meshNameB {
 		return outcomes.Fail{Error: ErrNamespacesNotInSameMesh}
 	}

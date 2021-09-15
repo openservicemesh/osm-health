@@ -1,4 +1,4 @@
-package kuberneteshelper
+package pod
 
 import (
 	"testing"

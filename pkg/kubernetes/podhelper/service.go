@@ -3,18 +3,17 @@ package podhelper
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/pkg/errors"
-
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
-	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
+	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*ServiceCheck)(nil)
+var _ runner.Runnable = (*ServiceCheck)(nil)
 
 // ServiceCheck implements common.Runnable
 type ServiceCheck struct {
@@ -38,7 +37,7 @@ func (check ServiceCheck) Description() string {
 // Run implements common.Runnable
 func (check ServiceCheck) Run() outcomes.Outcome {
 	ns := check.pod.Namespace
-	services, err := kuberneteshelper.GetMatchingServices(check.client, check.pod.ObjectMeta.GetLabels(), ns)
+	services, err := pod.GetMatchingServices(check.client, check.pod.ObjectMeta.GetLabels(), ns)
 	if err != nil {
 		return outcomes.Fail{Error: err}
 	}

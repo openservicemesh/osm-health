@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/openservicemesh/osm-health/pkg/ingress"
-	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
+	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
 )
 
 func newIngressToPodCmd() *cobra.Command {
@@ -20,12 +20,12 @@ func newIngressToPodCmd() *cobra.Command {
 			}
 			log.Info().Msgf("Checking Ingress to Pod %s", args[0])
 
-			client, err := kuberneteshelper.GetKubeClient()
+			client, err := pod.GetKubeClient()
 			if err != nil {
 				return err
 			}
 
-			toPod, err := kuberneteshelper.PodFromString(args[0])
+			toPod, err := pod.FromString(args[0])
 			if err != nil {
 				return errors.New("invalid DESTINATION_POD")
 			}

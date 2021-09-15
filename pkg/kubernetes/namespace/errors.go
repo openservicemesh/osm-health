@@ -1,8 +1,6 @@
 package namespace
 
-import (
-	"errors"
-)
+import "errors"
 
 var (
 	// ErrNotAnnotatedForSidecarInjection is used when an object is expected to have sidecar injection annotation but it does not.

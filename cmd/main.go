@@ -2,7 +2,6 @@ package main
 
 import (
 	goflag "flag"
-	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -20,9 +19,9 @@ var globalUsage = `The osm-health cli enables you to
 
 var settings = cli.New()
 
-var log = logger.New("osm-health/main")
+var log = logger.New("main")
 
-func newRootCmd(config *action.Configuration, in io.Reader, out io.Writer, args []string) *cobra.Command {
+func newRootCmd(args []string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:          "osm-health",
 		Short:        "Check Open Service Mesh health status and debug issues",
@@ -36,7 +35,6 @@ func newRootCmd(config *action.Configuration, in io.Reader, out io.Writer, args 
 
 	// Add subcommands here
 	cmd.AddCommand(
-		newCollectCmd(),
 		newConnectivityCmd(),
 		newControlPlaneCmd(),
 		newValidateCmd(),
@@ -50,12 +48,12 @@ func newRootCmd(config *action.Configuration, in io.Reader, out io.Writer, args 
 
 func initCommands() *cobra.Command {
 	actionConfig := new(action.Configuration)
-	cmd := newRootCmd(actionConfig, os.Stdin, os.Stdout, os.Args[1:])
-	_ = actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), "secret", debug)
+	cmd := newRootCmd(os.Args[1:])
+	_ = actionConfig.Init(settings.RESTClientGetter(), settings.Namespace().String(), "secret", debug)
 
 	// run when each command's execute method is called
 	cobra.OnInitialize(func() {
-		if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), "secret", debug); err != nil {
+		if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace().String(), "secret", debug); err != nil {
 			os.Exit(1)
 		}
 	})
@@ -64,7 +62,7 @@ func initCommands() *cobra.Command {
 }
 
 func main() {
-	log.Info().Msgf("👋🏻 %s; %s; %s", version.Version, version.GitCommit, version.BuildDate)
+	log.Info().Msgf("osm-health version: %s; %s; %s", version.Version, version.GitCommit, version.BuildDate)
 	cmd := initCommands()
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)

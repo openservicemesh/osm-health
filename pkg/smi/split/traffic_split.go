@@ -9,14 +9,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
-	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
+	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
 	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*TrafficSplitCheck)(nil)
+var _ runner.Runnable = (*TrafficSplitCheck)(nil)
 
 // TrafficSplitCheck implements common.Runnable
 type TrafficSplitCheck struct {
@@ -54,7 +54,7 @@ func (check TrafficSplitCheck) Run() outcomes.Outcome {
 
 func (check TrafficSplitCheck) runForTrafficSplitV1alpha2() outcomes.Outcome {
 	ns := check.pod.Namespace
-	services, err := kuberneteshelper.GetMatchingServices(check.client, check.pod.ObjectMeta.GetLabels(), ns)
+	services, err := pod.GetMatchingServices(check.client, check.pod.ObjectMeta.GetLabels(), ns)
 	if err != nil {
 		return outcomes.Fail{Error: err}
 	}

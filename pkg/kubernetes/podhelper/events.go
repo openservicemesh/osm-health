@@ -4,16 +4,17 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/openservicemesh/osm-health/pkg/runner"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*PodEventsCheck)(nil)
+var _ runner.Runnable = (*PodEventsCheck)(nil)
 
 // PodEventsCheck implements common.Runnable
 type PodEventsCheck struct {

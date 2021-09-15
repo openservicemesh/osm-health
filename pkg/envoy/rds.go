@@ -7,13 +7,13 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
-	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
+	pod "github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*RouteDomainCheck)(nil)
+var _ runner.Runnable = (*RouteDomainCheck)(nil)
 
 // RouteDomainCheck implements common.Runnable
 type RouteDomainCheck struct {
@@ -109,10 +109,10 @@ func NewInboundRouteDomainPodCheck(client kubernetes.Interface, configGetter Con
 
 // NewPodServicesRouteDomainCheck checks whether the pod's corresponding service's domains are
 // contained in the envoy dynamic route config domain list.
-func NewPodServicesRouteDomainCheck(client kubernetes.Interface, configGetter ConfigGetter, pod *corev1.Pod, routeName string) RouteDomainCheck {
-	podSvcs, err := kuberneteshelper.GetMatchingServices(client, pod.ObjectMeta.GetLabels(), pod.Namespace)
+func NewPodServicesRouteDomainCheck(client kubernetes.Interface, configGetter ConfigGetter, podToCheck *corev1.Pod, routeName string) RouteDomainCheck {
+	podSvcs, err := pod.GetMatchingServices(client, podToCheck.ObjectMeta.GetLabels(), podToCheck.Namespace)
 	if err != nil {
-		log.Warn().Msgf("unable to obtain the services of pod %s/%s", pod.Namespace, pod.Name)
+		log.Warn().Msgf("unable to obtain the services of pod %s/%s", podToCheck.Namespace, podToCheck.Name)
 	}
 
 	domains := make(map[string]bool)

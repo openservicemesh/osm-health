@@ -5,15 +5,15 @@ import (
 
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 	"github.com/openservicemesh/osm/pkg/constants"
 )
 
 const enabled = "enabled"
 
 // Verify interface compliance
-var _ common.Runnable = (*SidecarInjectionCheck)(nil)
+var _ runner.Runnable = (*SidecarInjectionCheck)(nil)
 
 // SidecarInjectionCheck implements common.Runnable
 type SidecarInjectionCheck struct {

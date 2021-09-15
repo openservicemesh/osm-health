@@ -7,14 +7,14 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
-	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
+	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 	"github.com/openservicemesh/osm/pkg/utils"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*HasValidEnvoyCertificateCheck)(nil)
+var _ runner.Runnable = (*HasValidEnvoyCertificateCheck)(nil)
 
 // HasValidEnvoyCertificateCheck implements common.Runnable
 type HasValidEnvoyCertificateCheck struct {
@@ -74,7 +74,7 @@ func (c HasValidEnvoyCertificateCheck) Run() outcomes.Outcome {
 	// so construct the secret name for each possible service.
 	possibleSecretNames := map[string]struct{}{}
 	if c.certificateType == RootCertTypeForMTLSOutbound {
-		svcs, err := kuberneteshelper.GetMatchingServices(c.k8s, c.pod.Labels, c.pod.Namespace)
+		svcs, err := pod.GetMatchingServices(c.k8s, c.pod.Labels, c.pod.Namespace)
 		if err != nil {
 			return outcomes.Fail{Error: errors.Wrapf(err, "failed to map Pod %s/%s to Kubernetes Services", c.pod.Namespace, c.pod.Name)}
 		}
@@ -125,7 +125,7 @@ func (c HasValidEnvoyCertificateCheck) Description() string {
 
 // HasInboundRootCertificate creates a new common.Runnable, which checks whether the given Pod
 // has an Envoy with a properly configured inbound root validation certificate.
-func HasInboundRootCertificate(client kubernetes.Interface, dstConfigGetter ConfigGetter, dst *corev1.Pod) common.Runnable {
+func HasInboundRootCertificate(client kubernetes.Interface, dstConfigGetter ConfigGetter, dst *corev1.Pod) runner.Runnable {
 	return HasValidEnvoyCertificateCheck{
 		ConfigGetter:    dstConfigGetter,
 		k8s:             client,
@@ -137,7 +137,7 @@ func HasInboundRootCertificate(client kubernetes.Interface, dstConfigGetter Conf
 // HasOutboundRootCertificate creates a new common.Runnable, which checks whether the source Pod
 // has an Envoy with a properly configured outbound root validation certificate for the given
 // destination Pod.
-func HasOutboundRootCertificate(client kubernetes.Interface, srcConfigGetter ConfigGetter, dst *corev1.Pod) common.Runnable {
+func HasOutboundRootCertificate(client kubernetes.Interface, srcConfigGetter ConfigGetter, dst *corev1.Pod) runner.Runnable {
 	return HasValidEnvoyCertificateCheck{
 		ConfigGetter:    srcConfigGetter,
 		k8s:             client,
@@ -148,7 +148,7 @@ func HasOutboundRootCertificate(client kubernetes.Interface, srcConfigGetter Con
 
 // HasServiceCertificate creates a new common.Runnable, which checks whether the given Pod
 // has an Envoy with a properly configured service certificate.
-func HasServiceCertificate(client kubernetes.Interface, configGetter ConfigGetter, pod *corev1.Pod) common.Runnable {
+func HasServiceCertificate(client kubernetes.Interface, configGetter ConfigGetter, pod *corev1.Pod) runner.Runnable {
 	return HasValidEnvoyCertificateCheck{
 		ConfigGetter:    configGetter,
 		k8s:             client,

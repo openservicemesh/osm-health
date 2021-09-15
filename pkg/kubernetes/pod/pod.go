@@ -1,4 +1,4 @@
-package kuberneteshelper
+package pod
 
 import (
 	"context"
@@ -19,8 +19,8 @@ import (
 	"github.com/openservicemesh/osm/pkg/signals"
 )
 
-// PodFromString validates the name of the Pod
-func PodFromString(namespacedPod string) (*corev1.Pod, error) {
+// FromString validates the name of the Pod
+func FromString(namespacedPod string) (*corev1.Pod, error) {
 	podChunks := strings.Split(namespacedPod, "/")
 	if len(podChunks) != 2 {
 		log.Fatal().Msgf("Invalid Pod name %s; This is expected to be in the format: namespace/name", namespacedPod)
