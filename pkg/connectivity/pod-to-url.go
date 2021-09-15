@@ -14,8 +14,8 @@ import (
 )
 
 // PodToURL tests the connectivity between a source pod and destination url.
-func PodToURL(fromPod *corev1.Pod, destinationURL *url.URL, osmControlPlaneNamespace common.MeshNamespace) {
-	log.Info().Msgf("Testing connectivity from %s/%s to %s", fromPod.Namespace, fromPod.Name, destinationURL)
+func PodToURL(srcPod *corev1.Pod, destinationURL *url.URL, osmControlPlaneNamespace common.MeshNamespace) {
+	log.Info().Msgf("Testing connectivity from %s/%s to %s", srcPod.Namespace, srcPod.Name, destinationURL)
 
 	client, err := pod.GetKubeClient()
 	if err != nil {
@@ -27,9 +27,9 @@ func PodToURL(fromPod *corev1.Pod, destinationURL *url.URL, osmControlPlaneNames
 		log.Error().Err(err).Msg("Error getting OSM info")
 	}
 
-	srcConfigGetter, err := envoy.GetEnvoyConfigGetterForPod(fromPod, meshInfo.OSMVersion)
+	srcConfigGetter, err := envoy.GetEnvoyConfigGetterForPod(srcPod, meshInfo.OSMVersion)
 	if err != nil {
-		log.Error().Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", fromPod.Namespace, fromPod.Name)
+		log.Error().Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", srcPod.Namespace, srcPod.Name)
 	}
 
 	outcomes := runner.Run(
