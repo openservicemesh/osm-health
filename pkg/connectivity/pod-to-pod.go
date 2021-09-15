@@ -9,18 +9,20 @@ import (
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/envoy"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/namespace"
+	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/podhelper"
-	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
 	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/printer"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 	"github.com/openservicemesh/osm-health/pkg/smi/access"
 	"github.com/openservicemesh/osm-health/pkg/smi/split"
 )
 
 // PodToPod tests the connectivity between a source and destination pods.
-func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace string) {
+func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace common.MeshNamespace) {
 	log.Info().Msgf("Testing connectivity from %s/%s to %s/%s", srcPod.Namespace, srcPod.Name, dstPod.Namespace, dstPod.Name)
 
-	client, err := kuberneteshelper.GetKubeClient()
+	client, err := pod.GetKubeClient()
 	if err != nil {
 		log.Error().Err(err).Msg("Error creating Kubernetes client")
 	}
@@ -30,7 +32,7 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		log.Err(err).Msg("Error getting OSM info")
 	}
 
-	kubeConfig, err := kuberneteshelper.GetKubeConfig()
+	kubeConfig, err := pod.GetKubeConfig()
 	if err != nil {
 		log.Error().Err(err).Msg("Error getting Kubernetes config")
 	}
@@ -62,9 +64,9 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		log.Error().Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", dstPod.Namespace, dstPod.Name)
 	}
 
-	configurator := kuberneteshelper.GetOsmConfigurator(meshInfo.Namespace)
+	configurator := pod.GetOsmConfigurator(meshInfo.Namespace)
 
-	checks := []common.Runnable{
+	checks := []runner.Runnable{
 		// Check that pod namespaces are in the same mesh
 		namespace.NewNamespacesInSameMeshCheck(client, srcPod.Namespace, dstPod.Namespace),
 
@@ -133,6 +135,6 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace s
 		access.NewRoutesExistenceCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient, specClient),
 	}
 
-	outcomes := common.Run(checks...)
-	common.Print(outcomes...)
+	outcomes := runner.Run(checks...)
+	printer.Print(outcomes...)
 }

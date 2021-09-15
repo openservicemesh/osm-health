@@ -12,13 +12,13 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 )
 
 func TestEnvoySecretCheck(t *testing.T) {
 	tests := []struct {
 		name      string
-		checkFunc func(kubernetes.Interface, ConfigGetter, *corev1.Pod) common.Runnable
+		checkFunc func(kubernetes.Interface, ConfigGetter, *corev1.Pod) runner.Runnable
 		config    *Config
 		dstPod    *corev1.Pod
 		svcs      []*corev1.Service

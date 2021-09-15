@@ -5,7 +5,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
+	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
 	"github.com/openservicemesh/osm-health/pkg/osm"
 	osmCLI "github.com/openservicemesh/osm/pkg/cli"
 )
@@ -18,12 +18,12 @@ type ConfigGetterStruct struct {
 
 // GetConfig implements ConfigGetter interface.
 func (mcg ConfigGetterStruct) GetConfig() (*Config, error) {
-	client, err := kuberneteshelper.GetKubeClient()
+	client, err := pod.GetKubeClient()
 	if err != nil {
 		return nil, err
 	}
 
-	config, err := kuberneteshelper.GetKubeConfig()
+	config, err := pod.GetKubeConfig()
 	if err != nil {
 		return nil, err
 	}

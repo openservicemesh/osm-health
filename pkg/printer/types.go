@@ -1,5 +1,5 @@
-package connectivity
+package printer
 
 import "github.com/openservicemesh/osm-health/pkg/logger"
 
-var log = logger.New("connectivity")
+var log = logger.New("printer")

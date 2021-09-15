@@ -6,12 +6,12 @@ import (
 	envoy_config_endpoint_v3 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*DestinationEndpointCheck)(nil)
+var _ runner.Runnable = (*DestinationEndpointCheck)(nil)
 
 // DestinationEndpointCheck implements common.Runnable
 type DestinationEndpointCheck struct {

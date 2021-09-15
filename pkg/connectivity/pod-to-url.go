@@ -7,15 +7,17 @@ import (
 
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/envoy"
-	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
+	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
 	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/printer"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 )
 
 // PodToURL tests the connectivity between a source pod and destination url.
-func PodToURL(fromPod *corev1.Pod, destinationURL *url.URL, osmControlPlaneNamespace string) {
-	log.Info().Msgf("Testing connectivity from %s/%s to %s", fromPod.Namespace, fromPod.Name, destinationURL)
+func PodToURL(srcPod *corev1.Pod, destinationURL *url.URL, osmControlPlaneNamespace common.MeshNamespace) {
+	log.Info().Msgf("Testing connectivity from %s/%s to %s", srcPod.Namespace, srcPod.Name, destinationURL)
 
-	client, err := kuberneteshelper.GetKubeClient()
+	client, err := pod.GetKubeClient()
 	if err != nil {
 		log.Error().Err(err).Msg("Error creating Kubernetes client")
 	}
@@ -25,15 +27,15 @@ func PodToURL(fromPod *corev1.Pod, destinationURL *url.URL, osmControlPlaneNames
 		log.Error().Err(err).Msg("Error getting OSM info")
 	}
 
-	srcConfigGetter, err := envoy.GetEnvoyConfigGetterForPod(fromPod, meshInfo.OSMVersion)
+	srcConfigGetter, err := envoy.GetEnvoyConfigGetterForPod(srcPod, meshInfo.OSMVersion)
 	if err != nil {
-		log.Error().Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", fromPod.Namespace, fromPod.Name)
+		log.Error().Err(err).Msgf("Error creating ConfigGetter for pod %s/%s", srcPod.Namespace, srcPod.Name)
 	}
 
-	outcomes := common.Run(
+	outcomes := runner.Run(
 		// Check whether the source Pod has an outbound dynamic route config domain that matches the destination URL.
 		envoy.NewOutboundRouteDomainHostCheck(srcConfigGetter, destinationURL.Host),
 	)
 
-	common.Print(outcomes...)
+	printer.Print(outcomes...)
 }

@@ -3,15 +3,16 @@ package podhelper
 import (
 	"fmt"
 
+	"github.com/openservicemesh/osm-health/pkg/runner"
+
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm/pkg/mesh"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*ProxyUUIDLabelCheck)(nil)
+var _ runner.Runnable = (*ProxyUUIDLabelCheck)(nil)
 
 // ProxyUUIDLabelCheck implements common.Runnable
 type ProxyUUIDLabelCheck struct {

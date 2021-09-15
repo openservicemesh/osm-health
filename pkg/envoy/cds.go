@@ -8,14 +8,14 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
-	"github.com/openservicemesh/osm-health/pkg/kuberneteshelper"
+	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 	"github.com/openservicemesh/osm/pkg/utils"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*ClusterCheck)(nil)
+var _ runner.Runnable = (*ClusterCheck)(nil)
 
 // ClusterCheck implements common.Runnable
 type ClusterCheck struct {
@@ -43,7 +43,7 @@ func (c ClusterCheck) Run() outcomes.Outcome {
 	// The destination Pod might back multiple services, so check that at least
 	// one of those services is listed as a cluster in the source Envoy config.
 	possibleClusterNames := map[string]struct{}{}
-	svcs, err := kuberneteshelper.GetMatchingServices(c.k8s, c.dstPod.Labels, c.dstPod.Namespace)
+	svcs, err := pod.GetMatchingServices(c.k8s, c.dstPod.Labels, c.dstPod.Namespace)
 	if err != nil {
 		return outcomes.Fail{Error: errors.Wrapf(err, "failed to map Pod %s/%s to Kubernetes Services", c.dstPod.Namespace, c.dstPod.Name)}
 	}

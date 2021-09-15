@@ -3,15 +3,16 @@ package podhelper
 import (
 	"fmt"
 
+	"github.com/openservicemesh/osm-health/pkg/runner"
+
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm/pkg/configurator"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*EnvoySidecarImageCheck)(nil)
+var _ runner.Runnable = (*EnvoySidecarImageCheck)(nil)
 
 // EnvoySidecarImageCheck implements common.Runnable
 type EnvoySidecarImageCheck struct {
@@ -53,7 +54,7 @@ func (check EnvoySidecarImageCheck) FixIt() error {
 }
 
 // Verify interface compliance
-var _ common.Runnable = (*OsmInitContainerImageCheck)(nil)
+var _ runner.Runnable = (*OsmInitContainerImageCheck)(nil)
 
 // OsmInitContainerImageCheck implements common.Runnable
 type OsmInitContainerImageCheck struct {
@@ -95,7 +96,7 @@ func (check OsmInitContainerImageCheck) FixIt() error {
 }
 
 // Verify interface compliance
-var _ common.Runnable = (*MinNumContainersCheck)(nil)
+var _ runner.Runnable = (*MinNumContainersCheck)(nil)
 
 // MinNumContainersCheck implements common.Runnable
 type MinNumContainersCheck struct {

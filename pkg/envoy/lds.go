@@ -3,13 +3,13 @@ package envoy
 import (
 	"fmt"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*ListenerCheck)(nil)
+var _ runner.Runnable = (*ListenerCheck)(nil)
 
 // ListenerCheck implements common.Runnable
 type ListenerCheck struct {

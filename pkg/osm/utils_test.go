@@ -9,6 +9,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 
+	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm/pkg/constants"
 )
 
@@ -16,7 +17,7 @@ func TestGetOSMControllerDeployment(t *testing.T) {
 	tests := []struct {
 		name        string
 		deployments []*v1.Deployment
-		namespace   string
+		namespace   common.MeshNamespace
 		expErr      bool
 	}{
 		{

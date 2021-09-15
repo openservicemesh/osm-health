@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
@@ -13,20 +12,21 @@ import (
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/podhelper"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 	"github.com/openservicemesh/osm/pkg/constants"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*NoBadOsmControllerLogsCheck)(nil)
+var _ runner.Runnable = (*NoBadOsmControllerLogsCheck)(nil)
 
 // NoBadOsmControllerLogsCheck implements common.Runnable
 type NoBadOsmControllerLogsCheck struct {
 	client                   kubernetes.Interface
-	osmControlPlaneNamespace string
+	osmControlPlaneNamespace common.MeshNamespace
 }
 
 // HasNoBadOsmControllerLogsCheck checks whether the osm controller pods in the controller namespace have bad (fatal/error/warning/fail) log messages
-func HasNoBadOsmControllerLogsCheck(client kubernetes.Interface, osmControlPlaneNamespace string) NoBadOsmControllerLogsCheck {
+func HasNoBadOsmControllerLogsCheck(client kubernetes.Interface, osmControlPlaneNamespace common.MeshNamespace) NoBadOsmControllerLogsCheck {
 	return NoBadOsmControllerLogsCheck{
 		client:                   client,
 		osmControlPlaneNamespace: osmControlPlaneNamespace,
@@ -44,7 +44,7 @@ func (check NoBadOsmControllerLogsCheck) Run() outcomes.Outcome {
 	listOptions := metav1.ListOptions{
 		LabelSelector: labels.Set(labelSelector.MatchLabels).String(),
 	}
-	pods, err := check.client.CoreV1().Pods(check.osmControlPlaneNamespace).List(context.TODO(), listOptions)
+	pods, err := check.client.CoreV1().Pods(check.osmControlPlaneNamespace.String()).List(context.TODO(), listOptions)
 	if err != nil {
 		return outcomes.Fail{Error: fmt.Errorf("unable to list %s pods in namespace %s", constants.OSMControllerName, check.osmControlPlaneNamespace)}
 	}

@@ -6,14 +6,14 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/podhelper"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 	"github.com/openservicemesh/osm/pkg/constants"
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*NoBadOsmInitLogsCheck)(nil)
+var _ runner.Runnable = (*NoBadOsmInitLogsCheck)(nil)
 
 // NoBadOsmInitLogsCheck implements common.Runnable
 type NoBadOsmInitLogsCheck struct {

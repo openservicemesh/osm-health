@@ -6,7 +6,7 @@ import (
 	"github.com/openservicemesh/osm-health/pkg/logger"
 )
 
-var log = logger.New("osm-health/envoy")
+var log = logger.New("envoy")
 
 // ConfigGetter is an interface for getting Envoy config from Pods' sidecars.
 type ConfigGetter interface {

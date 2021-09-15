@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/openservicemesh/osm-health/pkg/runner"
+
 	smiAccessClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/access/clientset/versioned"
 	smiSpecClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/specs/clientset/versioned"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/osm"
 	"github.com/openservicemesh/osm-health/pkg/smi"
@@ -20,7 +21,7 @@ import (
 )
 
 // Verify interface compliance
-var _ common.Runnable = (*RoutesExistenceCheck)(nil)
+var _ runner.Runnable = (*RoutesExistenceCheck)(nil)
 
 // RoutesExistenceCheck implements common.Runnable
 type RoutesExistenceCheck struct {

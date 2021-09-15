@@ -1,8 +1,6 @@
 package main
 
-import (
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 const connectivityDesc = `
 Checks connectivity between Kubernetes resources
