@@ -5,6 +5,7 @@ import (
 
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
+	"github.com/openservicemesh/osm-health/pkg/osm/controller"
 	"github.com/openservicemesh/osm-health/pkg/printer"
 	"github.com/openservicemesh/osm-health/pkg/runner"
 )
@@ -20,7 +21,7 @@ func ControlPlaneStatus(osmControlPlaneNamespace common.MeshNamespace, localPort
 
 	outcomes := runner.Run(
 		HasNoBadOsmControllerLogsCheck(client, osmControlPlaneNamespace),
-		HasValidInfoFromControllerHTTPServerEndpointsCheck(client, osmControlPlaneNamespace, localPort, actionConfig),
+		controller.HasValidInfoFromControllerHTTPServerEndpointsCheck(client, osmControlPlaneNamespace, localPort, actionConfig),
 	)
 
 	printer.Print(outcomes...)
