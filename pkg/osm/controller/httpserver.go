@@ -104,7 +104,7 @@ func (check HTTPServerEndpointsCheck) FixIt() error {
 
 func checkControllerHealthReadiness(controllerHTTPServerURL string) error {
 	url := fmt.Sprintf("%s%s", controllerHTTPServerURL, httpserverconstants.HealthReadinessPath)
-	if err := utils.IsHTTPResponseCodeEquals(url, http.StatusOK); err != nil {
+	if err := utils.CheckHTTPResponseCodeEquals(url, http.StatusOK); err != nil {
 		return errors.Errorf("osm-controller health readiness check failed: %s", err)
 	}
 	return nil
@@ -112,7 +112,7 @@ func checkControllerHealthReadiness(controllerHTTPServerURL string) error {
 
 func checkControllerHealthLiveness(controllerHTTPServerURL string) error {
 	url := fmt.Sprintf("%s%s", controllerHTTPServerURL, httpserverconstants.HealthLivenessPath)
-	if err := utils.IsHTTPResponseCodeEquals(url, http.StatusOK); err != nil {
+	if err := utils.CheckHTTPResponseCodeEquals(url, http.StatusOK); err != nil {
 		return errors.Errorf("osm-controller health liveness check failed: %s", err)
 	}
 	return nil

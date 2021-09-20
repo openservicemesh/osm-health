@@ -3,6 +3,8 @@ module github.com/openservicemesh/osm-health
 go 1.16
 
 require (
+	github.com/AlekSi/gocov-xml v0.0.0-20190121064608-3a14fb1c4737 // indirect
+	github.com/axw/gocov v1.0.0 // indirect
 	github.com/deckarep/golang-set v1.7.1
 	github.com/envoyproxy/go-control-plane v0.9.9
 	github.com/fatih/color v1.12.0
@@ -11,6 +13,8 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
+	github.com/jstemmer/go-junit-report v0.9.1 // indirect
+	github.com/matm/gocov-html v0.0.0-20200509184451-71874e2e203b // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/openservicemesh/osm v0.8.2-0.20210921094717-3116404ececa
 	github.com/pkg/errors v0.9.1

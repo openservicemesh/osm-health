@@ -95,8 +95,8 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace c
 		envoy.NewBadLogsCheck(client, dstPod),
 
 		// Check osm-init logs
-		osm.HasNoBadOsmInitLogsCheck(client, srcPod),
-		osm.HasNoBadOsmInitLogsCheck(client, dstPod),
+		podhelper.HasNoBadOsmInitLogsCheck(client, srcPod),
+		podhelper.HasNoBadOsmInitLogsCheck(client, dstPod),
 
 		// The destination pod must have at least one service.
 		podhelper.NewServiceCheck(client, dstPod),

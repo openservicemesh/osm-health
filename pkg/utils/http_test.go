@@ -30,7 +30,7 @@ func TestIsHTTPResponseCodeEquals(t *testing.T) {
 			}))
 			defer ts.Close()
 
-			err := IsHTTPResponseCodeEquals(ts.URL, test.expectedStatusCode)
+			err := CheckHTTPResponseCodeEquals(ts.URL, test.expectedStatusCode)
 			assert.Nil(t, err)
 		})
 	}

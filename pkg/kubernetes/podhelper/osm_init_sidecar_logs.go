@@ -1,4 +1,4 @@
-package osm
+package podhelper
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
-	"github.com/openservicemesh/osm-health/pkg/kubernetes/podhelper"
 	"github.com/openservicemesh/osm-health/pkg/runner"
 	"github.com/openservicemesh/osm/pkg/constants"
 )
@@ -31,12 +30,12 @@ func HasNoBadOsmInitLogsCheck(client kubernetes.Interface, pod *corev1.Pod) NoBa
 
 // Description implements common.Runnable
 func (check NoBadOsmInitLogsCheck) Description() string {
-	return fmt.Sprintf("Checking whether pod %s has bad (fatal/error/warning/fail) logs in osm-init container", check.pod.Name)
+	return fmt.Sprintf("Checking whether pod %s has bad (fatal/error/warning/fail) logs in %s container", check.pod.Name, constants.InitContainerName)
 }
 
 // Run implements common.Runnable
 func (check NoBadOsmInitLogsCheck) Run() outcomes.Outcome {
-	return podhelper.HasNoBadLogs(check.client, check.pod, constants.InitContainerName)
+	return HasNoBadLogs(check.client, check.pod, constants.InitContainerName)
 }
 
 // Suggestion implements common.Runnable.
