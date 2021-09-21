@@ -14,7 +14,6 @@ import (
 
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/osm"
-	"github.com/openservicemesh/osm-health/pkg/smi"
 	"github.com/openservicemesh/osm-health/pkg/smi/access/v1alpha2"
 	"github.com/openservicemesh/osm-health/pkg/smi/access/v1alpha3"
 	"github.com/openservicemesh/osm/pkg/configurator"
@@ -90,7 +89,8 @@ func (check RoutesExistenceCheck) runForTrafficTargetV1alpha2() outcomes.Outcome
 		}
 		foundMatchingTarget = true
 		for _, rule := range spec.Rules {
-			if isValidRoute(rule.Kind) && !(existingRoutes.Contains(rule.Name)) {
+			err = isTrafficTargetRouteKindSupported(rule.Kind, check.osmVersion)
+			if err == nil && !(existingRoutes.Contains(rule.Name)) {
 				missingRoutes = append(missingRoutes, rule.Name)
 			}
 		}
@@ -127,7 +127,8 @@ func (check RoutesExistenceCheck) runForTrafficTargetV1alpha3() outcomes.Outcome
 		}
 		foundMatchingTarget = true
 		for _, rule := range spec.Rules {
-			if isValidRoute(rule.Kind) && !(existingRoutes.Contains(rule.Name)) {
+			err = isTrafficTargetRouteKindSupported(rule.Kind, check.osmVersion)
+			if err == nil && !(existingRoutes.Contains(rule.Name)) {
 				missingRoutes = append(missingRoutes, rule.Name)
 			}
 		}
@@ -139,11 +140,6 @@ func (check RoutesExistenceCheck) runForTrafficTargetV1alpha3() outcomes.Outcome
 		return outcomes.Fail{Error: fmt.Errorf("The following routes could not be found in the cluster: %s", strings.Join(missingRoutes, ", "))}
 	}
 	return outcomes.Pass{}
-}
-
-// TODO: update if supported routes change for the OSM controller
-func isValidRoute(routeKind string) bool {
-	return (routeKind == smi.HTTPRouteGroupKind || routeKind == smi.TCPRouteKind)
 }
 
 // Suggestion implements common.Runnable

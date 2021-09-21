@@ -13,6 +13,9 @@ type IngressVersion string
 // TrafficTargetVersion is a string type alias for the SMI TrafficTarget version supported.
 type TrafficTargetVersion string
 
+// TrafficTargetRouteKind is a string type alias for the SMI TrafficTarget route kind supported.
+type TrafficTargetRouteKind string
+
 // TrafficSplitVersion is a string type alias for the SMI TrafficSplit version supported.
 type TrafficSplitVersion string
 

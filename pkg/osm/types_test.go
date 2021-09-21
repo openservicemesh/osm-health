@@ -30,6 +30,11 @@ func TestEnvoyConfigParser(t *testing.T) {
 		}
 
 		{
+			_, exists := SupportedTrafficTargetRouteKinds[controllerVersion]
+			assert.Truef(exists, "SupportedTrafficTargetRouteKinds does not contain info on OSM release %s", release)
+		}
+
+		{
 			_, exists := SupportedTrafficSplit[controllerVersion]
 			assert.Truef(exists, "SupportedTrafficSplit does not contain info on OSM release %s", release)
 		}
