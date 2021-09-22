@@ -76,10 +76,11 @@ func getReleases() []string {
 	}
 
 	ignore := map[string]interface{}{
-		"v0.1": nil,
-		"v0.2": nil,
-		"v0.3": nil,
-		"v0.4": nil,
+		"v0.1":  nil,
+		"v0.2":  nil,
+		"v0.3":  nil,
+		"v0.4":  nil,
+		"v0.10": nil,
 	}
 	releases := make(map[string]interface{})
 

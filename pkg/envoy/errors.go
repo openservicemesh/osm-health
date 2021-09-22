@@ -6,6 +6,12 @@ var (
 	// ErrEnvoyListenerMissing is an error returned when an Envoy does not have a required listener.
 	ErrEnvoyListenerMissing = errors.New("envoy listener missing")
 
+	// ErrEnvoyFilterChainMissing is an error returned when an Envoy does not have a required filter chain.
+	ErrEnvoyFilterChainMissing = errors.New("envoy listener filter chain missing")
+
+	// ErrEnvoyActiveStateListenerMissing is an error returned when an Envoy does not have a required active state listener.
+	ErrEnvoyActiveStateListenerMissing = errors.New("envoy active state listener missing")
+
 	// ErrEnvoyConfigEmpty is an error returned when an Envoy config is completely missing.
 	ErrEnvoyConfigEmpty = errors.New("envoy config is empty")
 
@@ -20,6 +26,9 @@ var (
 
 	// ErrUnmarshalingClusterLoadAssigment is an error returned when the unmarshaling of the Envoy ClusterLoadAssignment struct fails.
 	ErrUnmarshalingClusterLoadAssigment = errors.New("error unmarshaling envoy cluster load assigment")
+
+	// ErrUnmarshalingListener is an error returned when the unmarshaling of the Envoy Listener struct fails.
+	ErrUnmarshalingListener = errors.New("error unmarshaling envoy listener")
 
 	// ErrEndpointNotFound is an error returned when a specific endpoint is not found in Envoy EDS config.
 	ErrEndpointNotFound = errors.New("endpoint not found")
