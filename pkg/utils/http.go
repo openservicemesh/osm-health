@@ -6,8 +6,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// IsHTTPResponseCodeEquals checks whether the returned response from the url matches the status code.
-func IsHTTPResponseCodeEquals(url string, statusCode int) error {
+// CheckHTTPResponseCodeEquals checks whether the returned response from the url matches the status code.
+func CheckHTTPResponseCodeEquals(url string, statusCode int) error {
 	// #nosec G107: Potential HTTP request made with variable url
 	resp, err := http.Get(url)
 	if err != nil {

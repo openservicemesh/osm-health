@@ -21,6 +21,7 @@ func ControlPlaneStatus(osmControlPlaneNamespace common.MeshNamespace, localPort
 
 	outcomes := runner.Run(
 		HasNoBadOsmControllerLogsCheck(client, osmControlPlaneNamespace),
+		HasNoBadOsmInjectorLogsCheck(client, osmControlPlaneNamespace),
 		controller.HasValidInfoFromControllerHTTPServerEndpointsCheck(client, osmControlPlaneNamespace, localPort, actionConfig),
 	)
 

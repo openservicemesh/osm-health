@@ -13,6 +13,7 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
+	github.com/jstemmer/go-junit-report v0.9.1 // indirect
 	github.com/matm/gocov-html v0.0.0-20200509184451-71874e2e203b // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/openservicemesh/osm v0.8.2-0.20210921094717-3116404ececa
