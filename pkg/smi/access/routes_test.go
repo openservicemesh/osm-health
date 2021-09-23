@@ -5,7 +5,7 @@ import (
 
 	tassert "github.com/stretchr/testify/assert"
 
-	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/osm/version"
 	"github.com/openservicemesh/osm-health/pkg/smi"
 )
 
@@ -45,7 +45,7 @@ func TestIsTrafficTargetRouteKindSupported(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert := tassert.New(t)
-			err := isTrafficTargetRouteKindSupported(test.routeKind, osm.ControllerVersion(test.version))
+			err := isTrafficTargetRouteKindSupported(test.routeKind, version.ControllerVersion(test.version))
 			assert.Equal(test.expErr, err)
 		})
 	}

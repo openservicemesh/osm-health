@@ -1,12 +1,12 @@
 package access
 
 import (
-	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/osm/version"
 )
 
 // isTrafficTargetRouteKindSupported checks whether an SMI TrafficTarget Route Kind is supported.
-func isTrafficTargetRouteKindSupported(routeKind string, osmVersion osm.ControllerVersion) error {
-	supportedRouteKinds, ok := osm.SupportedTrafficTargetRouteKinds[osmVersion]
+func isTrafficTargetRouteKindSupported(routeKind string, osmVersion version.ControllerVersion) error {
+	supportedRouteKinds, ok := version.SupportedTrafficTargetRouteKinds[osmVersion]
 	if !ok {
 		return ErrorUnknownSupportForRouteKindUnknownOsmVersion
 	}

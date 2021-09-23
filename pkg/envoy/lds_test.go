@@ -17,13 +17,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/osm/version"
 	"github.com/openservicemesh/osm-health/pkg/smi"
 )
 
 func TestEnvoyListenerChecker(t *testing.T) {
 	assert := tassert.New(t)
-	osmVersion := osm.ControllerVersion("v0.9")
+	osmVersion := version.ControllerVersion("v0.9")
 	configGetter := mockConfigGetter{
 		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookstore.json"),
 	}
@@ -34,7 +34,7 @@ func TestEnvoyListenerChecker(t *testing.T) {
 
 func TestEnvoyListenerCheckerEmptyConfig(t *testing.T) {
 	assert := tassert.New(t)
-	osmVersion := osm.ControllerVersion("v0.9")
+	osmVersion := version.ControllerVersion("v0.9")
 	configGetter := mockConfigGetter{
 		getter: func() (*Config, error) {
 			return nil, nil
@@ -48,7 +48,7 @@ func TestEnvoyListenerCheckerEmptyConfig(t *testing.T) {
 
 func TestEnvoyListenerCheckerInvalidOSMVersion(t *testing.T) {
 	assert := tassert.New(t)
-	osmVersion := osm.ControllerVersion("no-such-version")
+	osmVersion := version.ControllerVersion("no-such-version")
 	configGetter := mockConfigGetter{
 		getter: createConfigGetterFunc("../../tests/sample-envoy-config-dump-bookbuyer.json"),
 	}

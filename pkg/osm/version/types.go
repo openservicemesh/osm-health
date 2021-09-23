@@ -1,11 +1,12 @@
-package osm
-
-import "github.com/openservicemesh/osm-health/pkg/logger"
-
-var log = logger.New("control-plane")
+package version
 
 // ControllerVersion is a string type alias for the OSM version.
 type ControllerVersion string
+
+// String() implements the stringer for ControllerVersion.
+func (v ControllerVersion) String() string {
+	return string(v)
+}
 
 // IngressVersion is a string type alias for the Ingress version supported.
 type IngressVersion string

@@ -1,4 +1,4 @@
-package osm
+package version
 
 // OutboundListenerNames is the name of the Envoy listener expected to be created by a certain version of the OSM Controller.
 var OutboundListenerNames = map[ControllerVersion]string{

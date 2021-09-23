@@ -11,7 +11,7 @@ import (
 
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
-	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/osm/version"
 	"github.com/openservicemesh/osm-health/pkg/runner"
 )
 
@@ -20,14 +20,14 @@ var _ runner.Runnable = (*TrafficSplitCheck)(nil)
 
 // TrafficSplitCheck implements common.Runnable
 type TrafficSplitCheck struct {
-	osmVersion  osm.ControllerVersion
+	osmVersion  version.ControllerVersion
 	client      kubernetes.Interface
 	pod         *corev1.Pod
 	splitClient smiSplitClient.Interface
 }
 
 // NewTrafficSplitCheck creates a TrafficSplitCheck which checks whether a pod is affected by an SMI traffic split
-func NewTrafficSplitCheck(osmVersion osm.ControllerVersion, client kubernetes.Interface, pod *corev1.Pod, smiSplitClient smiSplitClient.Interface) TrafficSplitCheck {
+func NewTrafficSplitCheck(osmVersion version.ControllerVersion, client kubernetes.Interface, pod *corev1.Pod, smiSplitClient smiSplitClient.Interface) TrafficSplitCheck {
 	return TrafficSplitCheck{
 		osmVersion:  osmVersion,
 		client:      client,
@@ -43,8 +43,8 @@ func (check TrafficSplitCheck) Description() string {
 
 // Run implements common.Runnable
 func (check TrafficSplitCheck) Run() outcomes.Outcome {
-	switch osm.SupportedTrafficSplit[check.osmVersion] {
-	case osm.V1Alpha2:
+	switch version.SupportedTrafficSplit[check.osmVersion] {
+	case version.V1Alpha2:
 		return check.runForTrafficSplitV1alpha2()
 	default:
 		return outcomes.Fail{Error: fmt.Errorf(

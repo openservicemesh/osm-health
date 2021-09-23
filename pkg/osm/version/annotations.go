@@ -1,4 +1,4 @@
-package osm
+package version
 
 // SupportedAnnotations maintains a mapping of OSM version to supported annotations.
 var SupportedAnnotations = map[ControllerVersion][]Annotation{

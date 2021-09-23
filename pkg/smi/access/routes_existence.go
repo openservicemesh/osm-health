@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/openservicemesh/osm-health/pkg/runner"
-
 	smiAccessClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/access/clientset/versioned"
 	smiSpecClient "github.com/servicemeshinterface/smi-sdk-go/pkg/gen/client/specs/clientset/versioned"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
-	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/osm/version"
+	"github.com/openservicemesh/osm-health/pkg/runner"
 	"github.com/openservicemesh/osm-health/pkg/smi/access/v1alpha2"
 	"github.com/openservicemesh/osm-health/pkg/smi/access/v1alpha3"
 	"github.com/openservicemesh/osm/pkg/configurator"
@@ -24,7 +23,7 @@ var _ runner.Runnable = (*RoutesExistenceCheck)(nil)
 
 // RoutesExistenceCheck implements common.Runnable
 type RoutesExistenceCheck struct {
-	osmVersion   osm.ControllerVersion
+	osmVersion   version.ControllerVersion
 	cfg          configurator.Configurator
 	srcPod       *corev1.Pod
 	dstPod       *corev1.Pod
@@ -33,7 +32,7 @@ type RoutesExistenceCheck struct {
 }
 
 // NewRoutesExistenceCheck checks whether routes referenced by TrafficTargets matching the src and dest pods exist in the cluster
-func NewRoutesExistenceCheck(osmVersion osm.ControllerVersion, osmConfigurator configurator.Configurator, srcPod *corev1.Pod, dstPod *corev1.Pod, smiAccessClient smiAccessClient.Interface, smiSpecClient smiSpecClient.Interface) RoutesExistenceCheck {
+func NewRoutesExistenceCheck(osmVersion version.ControllerVersion, osmConfigurator configurator.Configurator, srcPod *corev1.Pod, dstPod *corev1.Pod, smiAccessClient smiAccessClient.Interface, smiSpecClient smiSpecClient.Interface) RoutesExistenceCheck {
 	return RoutesExistenceCheck{
 		osmVersion:   osmVersion,
 		cfg:          osmConfigurator,
@@ -55,10 +54,10 @@ func (check RoutesExistenceCheck) Run() outcomes.Outcome {
 	if check.cfg.IsPermissiveTrafficPolicyMode() {
 		return outcomes.Info{Diagnostics: "OSM is in permissive traffic policy modes -- all meshed pods can communicate and SMI access policies are not applicable"}
 	}
-	switch osm.SupportedTrafficTarget[check.osmVersion] {
-	case osm.V1Alpha2:
+	switch version.SupportedTrafficTarget[check.osmVersion] {
+	case version.V1Alpha2:
 		return check.runForTrafficTargetV1alpha2()
-	case osm.V1Alpha3:
+	case version.V1Alpha3:
 		return check.runForTrafficTargetV1alpha3()
 	default:
 		return outcomes.Fail{Error: fmt.Errorf(

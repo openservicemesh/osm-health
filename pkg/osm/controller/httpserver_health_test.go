@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	tassert "github.com/stretchr/testify/assert"
 )
 
 func TestCheckControllerHealth(t *testing.T) {
@@ -28,15 +28,16 @@ func TestCheckControllerHealth(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			assert := tassert.New(t)
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(test.statusCode)
 			}))
 			defer ts.Close()
 
 			err := checkControllerHealthReadiness(ts.URL)
-			assert.Equal(t, test.shouldError, err != nil)
+			assert.Equal(test.shouldError, err != nil)
 			err = checkControllerHealthLiveness(ts.URL)
-			assert.Equal(t, test.shouldError, err != nil)
+			assert.Equal(test.shouldError, err != nil)
 		})
 	}
 }

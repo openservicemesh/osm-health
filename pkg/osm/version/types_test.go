@@ -1,4 +1,4 @@
-package osm
+package version
 
 import (
 	"encoding/json"
