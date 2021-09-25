@@ -1,6 +1,8 @@
-package osm
+package version
 
-import "github.com/openservicemesh/osm-health/pkg/smi"
+import (
+	"github.com/openservicemesh/osm-health/pkg/smi"
+)
 
 // SupportedTrafficTarget is a map of OSM Controller Version to supported
 var SupportedTrafficTarget = map[ControllerVersion]TrafficTargetVersion{

@@ -1,4 +1,4 @@
-package osm
+package version
 
 // EnvoyAdminPort is the admin port number of Envoys configured by the given version of the OSM Controller.
 var EnvoyAdminPort = map[ControllerVersion]uint16{

@@ -1,4 +1,4 @@
-package osm
+package version
 
 const (
 	// V1Alpha2 is a string constant used to identify SMI resources of version v1alpha2

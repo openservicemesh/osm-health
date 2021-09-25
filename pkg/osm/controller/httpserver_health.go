@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/action"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/openservicemesh/osm-health/pkg/common"
@@ -18,37 +19,37 @@ import (
 )
 
 // Verify interface compliance
-var _ runner.Runnable = (*HTTPServerEndpointsCheck)(nil)
+var _ runner.Runnable = (*HTTPServerHealthEndpointsCheck)(nil)
 
-// HTTPServerEndpointsCheck implements common.Runnable
-type HTTPServerEndpointsCheck struct {
+// HTTPServerHealthEndpointsCheck implements common.Runnable
+type HTTPServerHealthEndpointsCheck struct {
 	client                   kubernetes.Interface
 	osmControlPlaneNamespace common.MeshNamespace
+	controllerPods           *corev1.PodList
 	localPort                uint16
 	actionConfig             *action.Configuration
 }
 
-// HasValidInfoFromControllerHTTPServerEndpointsCheck checks whether the osm-controller's http server endpoints return valid information.
-func HasValidInfoFromControllerHTTPServerEndpointsCheck(client kubernetes.Interface, osmControlPlaneNamespace common.MeshNamespace, localPort uint16, actionConfig *action.Configuration) HTTPServerEndpointsCheck {
-	return HTTPServerEndpointsCheck{
+// NewHTTPServerHealthEndpointsCheck checks whether the osm-controller's http server health endpoints return healthy status.
+func NewHTTPServerHealthEndpointsCheck(client kubernetes.Interface, osmControlPlaneNamespace common.MeshNamespace, controllerPods *corev1.PodList, localPort uint16, actionConfig *action.Configuration) HTTPServerHealthEndpointsCheck {
+	return HTTPServerHealthEndpointsCheck{
 		client:                   client,
 		osmControlPlaneNamespace: osmControlPlaneNamespace,
+		controllerPods:           controllerPods,
 		localPort:                localPort,
 		actionConfig:             actionConfig,
 	}
 }
 
 // Description implements common.Runnable
-func (check HTTPServerEndpointsCheck) Description() string {
-	return "Checking whether osm-controller http server endpoints return valid information"
+func (check HTTPServerHealthEndpointsCheck) Description() string {
+	return "Checking whether the osm-controller's http server health endpoints return healthy status"
 }
 
 // Run implements common.Runnable
-func (check HTTPServerEndpointsCheck) Run() outcomes.Outcome {
-	controllerPods := k8s.GetOSMControllerPods(check.client, check.osmControlPlaneNamespace.String())
-
+func (check HTTPServerHealthEndpointsCheck) Run() outcomes.Outcome {
 	anyControllerPodsExist := false
-	for _, controllerPod := range controllerPods.Items {
+	for _, controllerPod := range check.controllerPods.Items {
 		anyControllerPodsExist = true
 
 		conf, err := check.actionConfig.RESTClientGetter.ToRESTConfig()
@@ -93,12 +94,12 @@ func (check HTTPServerEndpointsCheck) Run() outcomes.Outcome {
 }
 
 // Suggestion implements common.Runnable.
-func (check HTTPServerEndpointsCheck) Suggestion() string {
+func (check HTTPServerHealthEndpointsCheck) Suggestion() string {
 	panic("implement me")
 }
 
 // FixIt implements common.Runnable.
-func (check HTTPServerEndpointsCheck) FixIt() error {
+func (check HTTPServerHealthEndpointsCheck) FixIt() error {
 	panic("implement me")
 }
 

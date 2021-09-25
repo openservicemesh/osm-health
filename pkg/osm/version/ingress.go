@@ -1,4 +1,4 @@
-package osm
+package version
 
 // SupportedIngress maintains a mapping of OSM version to supported Ingress resource versions.
 var SupportedIngress = map[ControllerVersion][]IngressVersion{

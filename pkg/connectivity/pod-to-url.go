@@ -8,7 +8,7 @@ import (
 	"github.com/openservicemesh/osm-health/pkg/common"
 	"github.com/openservicemesh/osm-health/pkg/envoy"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
-	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/osm/utils"
 	"github.com/openservicemesh/osm-health/pkg/printer"
 	"github.com/openservicemesh/osm-health/pkg/runner"
 )
@@ -22,7 +22,7 @@ func PodToURL(srcPod *corev1.Pod, destinationURL *url.URL, osmControlPlaneNamesp
 		log.Error().Err(err).Msg("Error creating Kubernetes client")
 	}
 
-	meshInfo, err := osm.GetMeshInfo(client, osmControlPlaneNamespace)
+	meshInfo, err := utils.GetMeshInfo(client, osmControlPlaneNamespace)
 	if err != nil {
 		log.Error().Err(err).Msg("Error getting OSM info")
 	}

@@ -13,7 +13,7 @@ import (
 
 	"github.com/openservicemesh/osm-health/pkg/common/outcomes"
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
-	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/osm/version"
 	"github.com/openservicemesh/osm-health/pkg/runner"
 	"github.com/openservicemesh/osm-health/pkg/smi"
 	"github.com/openservicemesh/osm-health/pkg/smi/access/v1alpha2"
@@ -28,20 +28,20 @@ var _ runner.Runnable = (*ListenerCheck)(nil)
 // ListenerCheck implements common.Runnable
 type ListenerCheck struct {
 	ConfigGetter
-	osm.ControllerVersion
+	version.ControllerVersion
 
 	// This is used for Info() function from Runnable. Helps the logs identify what kind of a listener we are looking for.
 	listenerType string
 
 	// This map will be used to get the expected NAME of the Envoy listener depending on the OSM version in use.
-	expectedListenersPerVersion map[osm.ControllerVersion]string
+	expectedListenersPerVersion map[version.ControllerVersion]string
 }
 
 // ListenerFilterCheck implements common.Runnable
 type ListenerFilterCheck struct {
 	srcConfigGetter ConfigGetter
 	dstConfigGetter ConfigGetter
-	osmVersion      osm.ControllerVersion
+	osmVersion      version.ControllerVersion
 	cfg             configurator.Configurator
 	srcPod          *corev1.Pod
 	dstPod          *corev1.Pod
@@ -126,24 +126,24 @@ func (l ListenerCheck) Description() string {
 }
 
 // NewOutboundListenerCheck creates a ListenerCheck which checks whether the given Pod has an Envoy with properly configured listener.
-func NewOutboundListenerCheck(configGetter ConfigGetter, osmVersion osm.ControllerVersion) ListenerCheck {
+func NewOutboundListenerCheck(configGetter ConfigGetter, osmVersion version.ControllerVersion) ListenerCheck {
 	return ListenerCheck{
 		ConfigGetter:      configGetter,
 		ControllerVersion: osmVersion,
 		listenerType:      "outbound",
 
-		expectedListenersPerVersion: osm.OutboundListenerNames,
+		expectedListenersPerVersion: version.OutboundListenerNames,
 	}
 }
 
 // NewInboundListenerCheck creates a ListenerCheck which checks whether the given Pod has an Envoy with properly configured listener.
-func NewInboundListenerCheck(configGetter ConfigGetter, osmVersion osm.ControllerVersion) ListenerCheck {
+func NewInboundListenerCheck(configGetter ConfigGetter, osmVersion version.ControllerVersion) ListenerCheck {
 	return ListenerCheck{
 		ConfigGetter:      configGetter,
 		ControllerVersion: osmVersion,
 		listenerType:      "inbound",
 
-		expectedListenersPerVersion: osm.InboundListenerNames,
+		expectedListenersPerVersion: version.InboundListenerNames,
 	}
 }
 
@@ -154,13 +154,13 @@ func (l ListenerFilterCheck) Run() outcomes.Outcome {
 		return outcomes.Info{Diagnostics: "OSM is in permissive traffic policy modes -- all meshed pods can communicate and SMI access policies are not applicable"}
 	}
 
-	// Get rule types from TrafficTarget. The rules will be used to determine what filter chains are expected in the src and dst Envoy configs
+	// Get rule version from TrafficTarget. The rules will be used to determine what filter chains are expected in the src and dst Envoy configs
 	var ruleTypes map[string]struct{}
 	var err error
-	switch osm.SupportedTrafficTarget[l.osmVersion] {
-	case osm.V1Alpha2:
+	switch version.SupportedTrafficTarget[l.osmVersion] {
+	case version.V1Alpha2:
 		ruleTypes, err = getRuleTypesFromMatchingTrafficTargetsV1alpha2(l.srcPod, l.dstPod, l.accessClient)
-	case osm.V1Alpha3:
+	case version.V1Alpha3:
 		ruleTypes, err = getRuleTypesFromMatchingTrafficTargetsV1alpha3(l.srcPod, l.dstPod, l.accessClient)
 	default:
 		return outcomes.Fail{Error: fmt.Errorf(
@@ -233,7 +233,7 @@ func (l ListenerFilterCheck) Run() outcomes.Outcome {
 	}
 
 	// Check inbound listener filter chain names in dst config
-	expectedInboundListenerName, exists := osm.InboundListenerNames[l.osmVersion]
+	expectedInboundListenerName, exists := version.InboundListenerNames[l.osmVersion]
 	if !exists {
 		return outcomes.Fail{Error: ErrOSMControllerVersionUnrecognized}
 	}
@@ -244,7 +244,7 @@ func (l ListenerFilterCheck) Run() outcomes.Outcome {
 	}
 
 	// Check outbound listener filter chain names in src config
-	expectedOutboundListenerName, exists := osm.OutboundListenerNames[l.osmVersion]
+	expectedOutboundListenerName, exists := version.OutboundListenerNames[l.osmVersion]
 	if !exists {
 		return outcomes.Fail{Error: ErrOSMControllerVersionUnrecognized}
 	}
@@ -267,7 +267,7 @@ func getPossibleInboundFilterChainNames(svcs []*corev1.Service, ruleTypes map[st
 			case smi.TCPRouteKind:
 				possibleInboundFilterChainNames[fmt.Sprintf("%s:%s", InboundMeshTCPFilterChainPrefix, utils.K8sSvcToMeshSvc(svc).String())] = false
 			default:
-				log.Error().Msgf("found unsupported rule type for traffic targets. Supported rule types are %s and %s. Found %s", smi.HTTPRouteGroupKind, smi.TCPRouteKind, ruleType)
+				log.Error().Msgf("found unsupported rule type for traffic targets. Supported rule version are %s and %s. Found %s", smi.HTTPRouteGroupKind, smi.TCPRouteKind, ruleType)
 				return nil, smi.ErrInvalidRuleKind
 			}
 		}
@@ -285,7 +285,7 @@ func getPossibleOutboundFilterChainNames(svcs []*corev1.Service, ruleTypes map[s
 			case smi.TCPRouteKind:
 				possibleOutboundFilterChainNames[fmt.Sprintf("%s:%s", OutboundMeshTCPFilterChainPrefix, utils.K8sSvcToMeshSvc(svc).String())] = false
 			default:
-				log.Error().Msgf("found unsupported rule type for traffic targets. Supported rule types are %s and %s. Found %s", smi.HTTPRouteGroupKind, smi.TCPRouteKind, ruleType)
+				log.Error().Msgf("found unsupported rule type for traffic targets. Supported rule version are %s and %s. Found %s", smi.HTTPRouteGroupKind, smi.TCPRouteKind, ruleType)
 				return nil, smi.ErrInvalidRuleKind
 			}
 		}
@@ -401,7 +401,7 @@ func (l ListenerFilterCheck) Description() string {
 func NewListenerFilterCheck(
 	srcConfigGetter ConfigGetter,
 	dstConfigGetter ConfigGetter,
-	osmVersion osm.ControllerVersion,
+	osmVersion version.ControllerVersion,
 	cfg configurator.Configurator,
 	srcPod *corev1.Pod,
 	dstPod *corev1.Pod,

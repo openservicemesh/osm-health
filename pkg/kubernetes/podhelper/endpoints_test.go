@@ -3,7 +3,7 @@ package podhelper
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	tassert "github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -206,6 +206,7 @@ func TestEndpointsCheck(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
+			assert := tassert.New(t)
 			objs := make([]runtime.Object, len(test.endpoints))
 			for i := range test.endpoints {
 				objs[i] = test.endpoints[i]
@@ -214,9 +215,9 @@ func TestEndpointsCheck(t *testing.T) {
 			check := NewEndpointsCheck(client, test.pod)
 			out := check.Run()
 			if test.pass {
-				assert.Equal(t, outcomes.Pass{}, out)
+				assert.Equal(outcomes.Pass{}, out)
 			} else {
-				assert.Equal(t, ErrPodNotInEndpoints, out.GetError())
+				assert.Equal(ErrPodNotInEndpoints, out.GetError())
 			}
 		})
 	}

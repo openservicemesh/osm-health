@@ -11,7 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 
-	"github.com/openservicemesh/osm-health/pkg/osm"
+	"github.com/openservicemesh/osm-health/pkg/osm/version"
 )
 
 func TestIsInTrafficSplit(t *testing.T) {
@@ -158,7 +158,7 @@ func TestIsInTrafficSplit(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			osmVersion := osm.ControllerVersion("v0.9")
+			osmVersion := version.ControllerVersion("v0.9")
 			assert := tassert.New(t)
 			svcObjs := make([]runtime.Object, len(testCase.serviceList))
 			for i := range testCase.serviceList {
