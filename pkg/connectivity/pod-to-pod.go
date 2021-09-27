@@ -128,6 +128,10 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace c
 		envoy.HasServiceCertificate(client, srcConfigGetter, srcPod),
 		envoy.HasServiceCertificate(client, dstConfigGetter, dstPod),
 
+		// Check Envoy for dynamic warming issues
+		envoy.NewDynamicWarmingCheck(srcConfigGetter),
+		envoy.NewDynamicWarmingCheck(dstConfigGetter),
+
 		// Run SMI checks
 		split.NewTrafficSplitCheck(meshInfo.OSMVersion, client, dstPod, splitClient),
 		access.NewTrafficTargetCheck(meshInfo.OSMVersion, configurator, srcPod, dstPod, accessClient),
