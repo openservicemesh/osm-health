@@ -41,4 +41,7 @@ var (
 
 	// ErrDynamicRouteConfigDomainNotFound is an error returned when a specific dynamic route config domain is not found.
 	ErrDynamicRouteConfigDomainNotFound = errors.New("dynamic route config domain not found")
+
+	// ErrDynamicWarmingSecretsConfigDumpNotEmpty is an error returned when the pod's envoy is possibly experiencing dynamic warming issues.
+	ErrDynamicWarmingSecretsConfigDumpNotEmpty = errors.New("possible dynamic warming issue due to non-empty dynamic warming secrets in envoy's secrets config dump")
 )
