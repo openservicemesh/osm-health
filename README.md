@@ -7,13 +7,18 @@ everything is running as expected.
 ## Get started
 
 1. Clone the repo
-1. From root, build the binary
 
+1. Checkout the tag for the [latest release](https://github.com/openservicemesh/osm-health/releases). For example:
+   ```bash
+   git checkout v0.0.1
+   ```
+
+1. From root, build the binary
     ```bash
     make build-osm-health
     ```
 
-1. Add it to `$PATH` to get started
+1. Add it to your `$PATH` to get started. For example:
     ```bash
     sudo cp ./bin/osm-health /usr/local/bin/osm-health
     ```
@@ -24,16 +29,16 @@ osm-health <command>
 ```
 
 ## Commands
-Currently, osm-health checks the connectivity between two pods by running a series of diagnostic checks on the meshed namespaces and pods, 
+To check the status of the OSM control plane, run:
+```bash
+osm-health control-plane status
+```
+
+osm-health can check the connectivity between two pods by running a series of diagnostic checks on the meshed namespaces and pods, 
 Envoy, SMI policies and core OSM control plane components. To run these checks, use:
 
 ```bash
 osm-health connectivity pod-to-pod <SOURCE_POD> <DESTINATION_POD>
-```
-
-For the most up to date list of available commands:
-```bash
-osm-health --help
 ```
 
 ## Outcomes
