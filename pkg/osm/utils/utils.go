@@ -67,10 +67,13 @@ func GetOSMControllerDeployment(client kubernetes.Interface, osmControlPlaneName
 // FormatReleaseVersion returns the major and minor version of the release
 func FormatReleaseVersion(version string) (string, error) {
 	splitVersion := strings.Split(version, versionDelimiter)
-	if len(splitVersion) < 2 {
+	if len(splitVersion) < 2 || len(splitVersion[0]) == 0 {
 		return "", fmt.Errorf("%s is not in the expected format", version)
 	}
 	majorMinorVersion := splitVersion[0] + versionDelimiter + splitVersion[1]
+	if majorMinorVersion[0] != 'v' {
+		majorMinorVersion = "v" + majorMinorVersion
+	}
 	return majorMinorVersion, nil
 }
 

@@ -23,4 +23,14 @@ var SupportedIngress = map[ControllerVersion][]IngressVersion{
 		"networking/v1",
 		"networking/v1beta1",
 	},
+	"v0.10": {
+		// Source: https://github.com/openservicemesh/osm/blob/release-v0.10/pkg/ingress/client.go#L5-L6
+		"networking/v1",
+		"networking/v1beta1",
+	},
+	"v0.11": {
+		// Source: https://github.com/openservicemesh/osm/blob/release-v0.11/pkg/ingress/client.go#L5-L6
+		"networking/v1",
+		"networking/v1beta1",
+	},
 }

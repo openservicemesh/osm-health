@@ -2,6 +2,7 @@ package envoy
 
 import (
 	"fmt"
+	"strings"
 
 	envoy_config_route_v3 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	corev1 "k8s.io/api/core/v1"
@@ -47,7 +48,7 @@ func (check RouteDomainCheck) Run() outcomes.Outcome {
 			return outcomes.Fail{Error: ErrUnmarshalingDynamicRouteConfig}
 		}
 
-		if dynRouteCfg.Name != check.RouteName {
+		if !strings.HasPrefix(dynRouteCfg.Name, check.RouteName) {
 			continue
 		}
 

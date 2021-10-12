@@ -15,7 +15,7 @@ func TestEnvoyConfigParser(t *testing.T) {
 	assert := tassert.New(t)
 	actual := getReleases()
 
-	assert.Equal(actual, []string{"v0.5", "v0.6", "v0.7", "v0.8", "v0.9"})
+	assert.Equal(actual, []string{"v0.10", "v0.11", "v0.5", "v0.6", "v0.7", "v0.8", "v0.9"})
 
 	for _, release := range actual {
 		controllerVersion := ControllerVersion(release)
@@ -48,6 +48,21 @@ func TestEnvoyConfigParser(t *testing.T) {
 			_, exists := SupportedAnnotations[controllerVersion]
 			assert.Truef(exists, "SupportedAnnotations does not contain info on OSM release %s", release)
 		}
+
+		{
+			_, exists := EnvoyAdminPort[controllerVersion]
+			assert.Truef(exists, "EnvoyAdminPort does not contain info on OSM release %s", release)
+		}
+
+		{
+			_, exists := OutboundListenerNames[controllerVersion]
+			assert.Truef(exists, "OutboundListenerNames does not contain info on OSM release %s", release)
+		}
+
+		{
+			_, exists := InboundListenerNames[controllerVersion]
+			assert.Truef(exists, "InboundListenerNames does not contain info on OSM release %s", release)
+		}
 	}
 }
 
@@ -76,11 +91,10 @@ func getReleases() []string {
 	}
 
 	ignore := map[string]interface{}{
-		"v0.1":  nil,
-		"v0.2":  nil,
-		"v0.3":  nil,
-		"v0.4":  nil,
-		"v0.10": nil,
+		"v0.1": nil,
+		"v0.2": nil,
+		"v0.3": nil,
+		"v0.4": nil,
 	}
 	releases := make(map[string]interface{})
 
