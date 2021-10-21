@@ -352,7 +352,6 @@ func findMatchingFilterChainNames(envoyConfig *Config, expectedListenerName stri
 				return ErrUnmarshalingListener
 			}
 			for _, listenerFilter := range listener.FilterChains {
-				log.Error().Msg(listenerFilter.Name)
 				// Check filter chain name
 				actualFilterChainNames = append(actualFilterChainNames, listenerFilter.Name)
 				for expectedFilterChainName := range possibleFilterChainNames {
