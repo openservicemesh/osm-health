@@ -25,16 +25,19 @@ func PodToPod(srcPod *corev1.Pod, dstPod *corev1.Pod, osmControlPlaneNamespace c
 	client, err := pod.GetKubeClient()
 	if err != nil {
 		log.Error().Err(err).Msg("Error creating Kubernetes client")
+		return
 	}
 
 	meshInfo, err := utils.GetMeshInfo(client, osmControlPlaneNamespace)
 	if err != nil {
-		log.Err(err).Msg("Error getting OSM info")
+		log.Err(err).Msg("Error getting OSM info. Try running again with the `--osm-namespace` option to specify the osm control plane namespace")
+		return
 	}
 
 	kubeConfig, err := pod.GetKubeConfig()
 	if err != nil {
 		log.Error().Err(err).Msg("Error getting Kubernetes config")
+		return
 	}
 
 	splitClient, err := smiSplitClient.NewForConfig(kubeConfig)
