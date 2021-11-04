@@ -42,7 +42,7 @@ func (e EndpointsCheck) Run() outcomes.Outcome {
 	for _, ep := range eps.Items {
 		for _, subset := range ep.Subsets {
 			for _, addr := range subset.Addresses {
-				if addr.TargetRef.Name == e.pod.Name {
+				if addr.TargetRef != nil && addr.TargetRef.Name == e.pod.Name {
 					found = true
 					break
 				}
