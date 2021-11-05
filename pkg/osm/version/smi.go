@@ -6,8 +6,6 @@ import (
 
 // SupportedTrafficTarget is a map of OSM Controller Version to supported
 var SupportedTrafficTarget = map[ControllerVersion]TrafficTargetVersion{
-	// Source: https://github.com/openservicemesh/osm/blob/release-v0.5/pkg/smi/client.go#L8
-	"v0.5": "v1alpha2",
 
 	// Source: https://github.com/openservicemesh/osm/blob/release-v0.6/pkg/smi/client.go#L8
 	"v0.6": "v1alpha2",
@@ -30,14 +28,6 @@ var SupportedTrafficTarget = map[ControllerVersion]TrafficTargetVersion{
 
 // SupportedTrafficTargetRouteKinds is a map of OSM Controller Version to supported SMI TrafficTarget Route Kinds.
 var SupportedTrafficTargetRouteKinds = map[ControllerVersion][]TrafficTargetRouteKind{
-	// Source:
-	// https://github.com/openservicemesh/osm/blob/release-v0.5/pkg/smi/client.go#L67
-	// https://github.com/openservicemesh/osm/blob/release-v0.5/pkg/smi/client.go#L68
-	"v0.5": {
-		smi.HTTPRouteGroupKind,
-		smi.TCPRouteKind,
-	},
-
 	// Sources:
 	// https://github.com/openservicemesh/osm/blob/release-v0.6/pkg/smi/client.go#L68
 	// https://github.com/openservicemesh/osm/blob/release-v0.6/pkg/smi/client.go#L69
@@ -89,9 +79,6 @@ var SupportedTrafficTargetRouteKinds = map[ControllerVersion][]TrafficTargetRout
 
 // SupportedTrafficSplit is the mapping of OSM Controller version to supported SMI TrafficSplit version.
 var SupportedTrafficSplit = map[ControllerVersion]TrafficSplitVersion{
-	// Source: https://github.com/openservicemesh/osm/blob/release-v0.5/pkg/smi/client.go#L10
-	"v0.5": "v1alpha2",
-
 	// Source: https://github.com/openservicemesh/osm/blob/release-v0.6/pkg/smi/client.go#L10
 	"v0.6": "v1alpha2",
 
@@ -113,10 +100,6 @@ var SupportedTrafficSplit = map[ControllerVersion]TrafficSplitVersion{
 
 // SupportedHTTPRouteVersion is a mapping of OSM Controller version to supported HTTP Route Group version.
 var SupportedHTTPRouteVersion = map[ControllerVersion][]HTTPRouteVersion{
-	// Source: https://github.com/openservicemesh/osm/blob/release-v0.5/pkg/smi/client.go#L9
-	"v0.5": {
-		"v1alpha3",
-	},
 	// Source: https://github.com/openservicemesh/osm/blob/release-v0.6/pkg/smi/client.go#L9
 	"v0.6": {
 		"v1alpha3",

@@ -165,7 +165,7 @@ func (l ListenerFilterCheck) Run() outcomes.Outcome {
 		ruleTypes, err = getRuleTypesFromMatchingTrafficTargetsV1alpha3(l.srcPod, l.dstPod, l.accessClient)
 	default:
 		return outcomes.Fail{Error: fmt.Errorf(
-			"OSM Controller version could not be mapped to a TrafficTarget version. Supported versions are v0.5 through v0.9")}
+			"OSM Controller version could not be mapped to a TrafficTarget version. Supported versions are v0.6 through v0.11")}
 	}
 	if err != nil {
 		return outcomes.Info{Diagnostics: fmt.Sprintf(
