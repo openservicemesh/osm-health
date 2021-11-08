@@ -2,6 +2,7 @@ package envoy
 
 import (
 	"fmt"
+	"strings"
 
 	clusterv3 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	"github.com/pkg/errors"
@@ -67,7 +68,14 @@ func (c ClusterCheck) Run() outcomes.Outcome {
 		}
 		foundClusterNames = append(foundClusterNames, cluster.Name)
 
-		if _, exists := possibleClusterNames[cluster.Name]; exists {
+		// Beginning in OSM version v0.10 onwards, the Envoy cluster name is appended with the port number of the service.
+		// cluster.Name pre v0.9 would look like "bookstore/bookstore-v1"
+		// cluster.Name v0.10 onwards would look like "bookstore/bookstore-v1|14001"
+		splitEnvoyClusterName := strings.Split(cluster.Name, "|")
+		if len(splitEnvoyClusterName) == 0 || len(splitEnvoyClusterName[0]) == 0 {
+			continue
+		}
+		if _, exists := possibleClusterNames[splitEnvoyClusterName[0]]; exists {
 			found = true
 			break
 		}

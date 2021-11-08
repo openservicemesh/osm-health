@@ -3,6 +3,7 @@ package envoy
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	envoy_config_listener_v3 "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	"github.com/pkg/errors"
@@ -164,7 +165,7 @@ func (l ListenerFilterCheck) Run() outcomes.Outcome {
 		ruleTypes, err = getRuleTypesFromMatchingTrafficTargetsV1alpha3(l.srcPod, l.dstPod, l.accessClient)
 	default:
 		return outcomes.Fail{Error: fmt.Errorf(
-			"OSM Controller version could not be mapped to a TrafficTarget version. Supported versions are v0.5 through v0.9")}
+			"OSM Controller version could not be mapped to a TrafficTarget version. Supported versions are v0.6 through v0.11")}
 	}
 	if err != nil {
 		return outcomes.Info{Diagnostics: fmt.Sprintf(
@@ -353,10 +354,16 @@ func findMatchingFilterChainNames(envoyConfig *Config, expectedListenerName stri
 			for _, listenerFilter := range listener.FilterChains {
 				// Check filter chain name
 				actualFilterChainNames = append(actualFilterChainNames, listenerFilter.Name)
-				listenerFilter.GetFilterChainMatch()
-				if found, exists := possibleFilterChainNames[listenerFilter.Name]; exists && !found {
-					// Found expected filter chain
-					possibleFilterChainNames[listenerFilter.Name] = true
+				for expectedFilterChainName := range possibleFilterChainNames {
+					// For osm pre v0.9, the listenerFilter.Name does not have the port number appended to it.
+					// For osm v0.10 onwards, the listenerFilter.Name has the port number appended to it and may also
+					// have the traffic type appended to it.
+					// Examples for listenerFilter.Name v0.10 onwards:
+					//				inbound-mesh-http-filter-chain:bookstore/bookstore-v1:14001
+					//				outbound-mesh-http-filter-chain:bookstore/bookstore-v1_14001_http
+					if strings.HasPrefix(listenerFilter.Name, expectedFilterChainName) {
+						possibleFilterChainNames[expectedFilterChainName] = true
+					}
 				}
 			}
 		}

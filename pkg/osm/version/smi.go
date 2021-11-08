@@ -6,8 +6,6 @@ import (
 
 // SupportedTrafficTarget is a map of OSM Controller Version to supported
 var SupportedTrafficTarget = map[ControllerVersion]TrafficTargetVersion{
-	// Source: https://github.com/openservicemesh/osm/blob/release-v0.5/pkg/smi/client.go#L8
-	"v0.5": "v1alpha2",
 
 	// Source: https://github.com/openservicemesh/osm/blob/release-v0.6/pkg/smi/client.go#L8
 	"v0.6": "v1alpha2",
@@ -20,18 +18,16 @@ var SupportedTrafficTarget = map[ControllerVersion]TrafficTargetVersion{
 
 	// Source: https://github.com/openservicemesh/osm/blob/release-v0.9/pkg/smi/client.go#L10
 	"v0.9": "v1alpha3",
+
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.10/pkg/smi/client.go#L9
+	"v0.10": "v1alpha3",
+
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.11/pkg/smi/client.go#L9
+	"v0.11": "v1alpha3",
 }
 
 // SupportedTrafficTargetRouteKinds is a map of OSM Controller Version to supported SMI TrafficTarget Route Kinds.
 var SupportedTrafficTargetRouteKinds = map[ControllerVersion][]TrafficTargetRouteKind{
-	// Source:
-	// https://github.com/openservicemesh/osm/blob/release-v0.5/pkg/smi/client.go#L67
-	// https://github.com/openservicemesh/osm/blob/release-v0.5/pkg/smi/client.go#L68
-	"v0.5": {
-		smi.HTTPRouteGroupKind,
-		smi.TCPRouteKind,
-	},
-
 	// Sources:
 	// https://github.com/openservicemesh/osm/blob/release-v0.6/pkg/smi/client.go#L68
 	// https://github.com/openservicemesh/osm/blob/release-v0.6/pkg/smi/client.go#L69
@@ -63,32 +59,69 @@ var SupportedTrafficTargetRouteKinds = map[ControllerVersion][]TrafficTargetRout
 		smi.HTTPRouteGroupKind,
 		smi.TCPRouteKind,
 	},
+
+	// Sources:
+	// https://github.com/openservicemesh/osm/blob/release-v0.10/pkg/smi/client.go#L61
+	// https://github.com/openservicemesh/osm/blob/release-v0.10/pkg/smi/client.go#L62
+	"v0.10": {
+		smi.HTTPRouteGroupKind,
+		smi.TCPRouteKind,
+	},
+
+	// Sources:
+	// https://github.com/openservicemesh/osm/blob/release-v0.11/pkg/smi/client.go#L61
+	// https://github.com/openservicemesh/osm/blob/release-v0.11/pkg/smi/client.go#L62
+	"v0.11": {
+		smi.HTTPRouteGroupKind,
+		smi.TCPRouteKind,
+	},
 }
 
 // SupportedTrafficSplit is the mapping of OSM Controller version to supported SMI TrafficSplit version.
 var SupportedTrafficSplit = map[ControllerVersion]TrafficSplitVersion{
-	"v0.5": "v1alpha2",
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.6/pkg/smi/client.go#L10
 	"v0.6": "v1alpha2",
+
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.7/pkg/smi/client.go#L10
 	"v0.7": "v1alpha2",
+
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.8/pkg/smi/client.go#L10
 	"v0.8": "v1alpha2",
+
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.9/pkg/smi/client.go#L12
 	"v0.9": "v1alpha2",
+
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.10/pkg/smi/client.go#L11
+	"v0.10": "v1alpha2",
+
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.11/pkg/smi/client.go#L11
+	"v0.11": "v1alpha2",
 }
 
 // SupportedHTTPRouteVersion is a mapping of OSM Controller version to supported HTTP Route Group version.
 var SupportedHTTPRouteVersion = map[ControllerVersion][]HTTPRouteVersion{
-	"v0.5": {
-		"v1alpha3",
-	},
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.6/pkg/smi/client.go#L9
 	"v0.6": {
 		"v1alpha3",
 	},
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.7/pkg/smi/client.go#L9
 	"v0.7": {
 		"v1alpha4",
 	},
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.8/pkg/smi/client.go#L9
 	"v0.8": {
 		"v1alpha4",
 	},
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.9/pkg/smi/client.go#L11
 	"v0.9": {
+		"v1alpha4",
+	},
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.10/pkg/smi/client.go#L10
+	"v0.10": {
+		"v1alpha4",
+	},
+	// Source: https://github.com/openservicemesh/osm/blob/release-v0.11/pkg/smi/client.go#L10
+	"v0.11": {
 		"v1alpha4",
 	},
 }

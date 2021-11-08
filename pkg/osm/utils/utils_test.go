@@ -235,8 +235,20 @@ func TestFormatReleaseVersion(t *testing.T) {
 			expErr:                    false,
 		},
 		{
+			name:                      "major, minor and patch version without v prefix",
+			version:                   "0.9.0",
+			expectedMajorMinorVersion: "v0.9",
+			expErr:                    false,
+		},
+		{
 			name:                      "major and minor version",
 			version:                   "v0.8",
+			expectedMajorMinorVersion: "v0.8",
+			expErr:                    false,
+		},
+		{
+			name:                      "major and minor version without v prefix",
+			version:                   "0.8",
 			expectedMajorMinorVersion: "v0.8",
 			expErr:                    false,
 		},
@@ -245,6 +257,12 @@ func TestFormatReleaseVersion(t *testing.T) {
 			version:                   "v0.8.1-rc.1",
 			expectedMajorMinorVersion: "v0.8",
 			expErr:                    false,
+		},
+		{
+			name:                      "incorrectly-formatted version",
+			version:                   ".1.2",
+			expectedMajorMinorVersion: "",
+			expErr:                    true,
 		},
 		{
 			name:                      "major version",

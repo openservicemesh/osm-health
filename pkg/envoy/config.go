@@ -3,6 +3,7 @@ package envoy
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
@@ -30,9 +31,11 @@ func (mcg ConfigGetterStruct) GetConfig() (*Config, error) {
 
 	namespace := mcg.Pod.Namespace
 	podName := mcg.Pod.Name
-	localPort := version.EnvoyAdminPort[mcg.ControllerVersion]
+	localPort, ok := version.EnvoyAdminPort[mcg.ControllerVersion]
+	if !ok {
+		return nil, errors.Errorf("unable to determine envoy admin port due to unrecognized osm-controller version: %s", mcg.ControllerVersion)
+	}
 	query := "config_dump?include_eds"
-	// This function becomes available in github.com/openservicemesh/osm at 9be251135819c360ce2b9cf77087c88ab1e3f54a
 	configBytes, err := osmCLI.GetEnvoyProxyConfig(client, config, namespace, podName, localPort, query)
 	if err != nil {
 		return nil, err
