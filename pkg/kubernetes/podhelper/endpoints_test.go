@@ -202,6 +202,33 @@ func TestEndpointsCheck(t *testing.T) {
 			},
 			pass: true,
 		},
+		{
+			name: "ok when there is no targetRef",
+			pod: &corev1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "a",
+					Namespace: "b",
+				},
+			},
+			endpoints: []*corev1.Endpoints{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "a-unique-name",
+						Namespace: "b",
+					},
+					Subsets: []corev1.EndpointSubset{
+						{
+							Addresses: []corev1.EndpointAddress{
+								{
+									TargetRef: nil,
+								},
+							},
+						},
+					},
+				},
+			},
+			pass: false,
+		},
 	}
 
 	for _, test := range tests {
