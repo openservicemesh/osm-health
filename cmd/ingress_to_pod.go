@@ -8,12 +8,15 @@ import (
 	"github.com/openservicemesh/osm-health/pkg/kubernetes/pod"
 )
 
+const ingressToPodExample = `$ osm-health ingress to-pod namespace-a/pod-a`
+
 func newIngressToPodCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "to-pod DESTINATION_POD",
-		Short: "Checks ingress to a given Kubernetes pod",
-		Long:  `Checks ingress to a given Kubernetes pod`,
-		Args:  cobra.ExactArgs(1),
+		Use:     "to-pod DESTINATION_POD",
+		Short:   "Checks ingress to a given Kubernetes pod",
+		Example: ingressToPodExample,
+		Long:    `Checks ingress to a given Kubernetes pod`,
+		Args:    cobra.ExactArgs(1),
 		RunE: func(_ *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.Errorf("missing DESTINATION_POD parameter")
@@ -30,11 +33,12 @@ func newIngressToPodCmd() *cobra.Command {
 				return errors.New("invalid DESTINATION_POD")
 			}
 
-			ingress.ToDestinationPod(client, dstPod)
+			osmControlPlaneNamespace := settings.Namespace()
+
+			ingress.ToDestinationPod(client, dstPod, osmControlPlaneNamespace)
 
 			return nil
 		},
-		Example: `TODO`,
 	}
 	return cmd
 }
