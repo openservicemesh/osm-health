@@ -8,12 +8,14 @@ import (
 	"github.com/openservicemesh/osm/pkg/constants"
 )
 
+const controlPlaneStatusExample = `$ osm-health ingress to-pod namespace-a/pod-a`
+
 func newControlPlaneStatusCmd(actionConfig *action.Configuration) *cobra.Command {
 	var localPort uint16
 	cmd := &cobra.Command{
 		Use:     "status",
 		Short:   "Checks the status of the osm control plane",
-		Example: `TODO add example`,
+		Example: controlPlaneStatusExample,
 		Long:    `Checks the status of the osm control plane`,
 		Args:    cobra.NoArgs,
 		RunE: func(_ *cobra.Command, args []string) error {

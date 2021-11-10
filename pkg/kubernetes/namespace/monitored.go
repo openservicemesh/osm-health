@@ -32,7 +32,7 @@ func NewMonitoredCheck(client kubernetes.Interface, namespace string, meshName c
 
 // Description implements common.Runnable
 func (check MonitoredCheck) Description() string {
-	return fmt.Sprintf("Checking whether namespace %s is monitored by OSM %s", check.namespace, check.meshName)
+	return fmt.Sprintf("Checking whether namespace %s is monitored by mesh %s", check.namespace, check.meshName)
 }
 
 // Run implements common.Runnable
