@@ -29,6 +29,9 @@ osm-health <command>
 ```
 
 ## Commands
+
+> Note: osm-health defaults to look for OSM resources in the `osm-system` namespace. If OSM is installed in a different namespace, use the `--osm-namespace=<custom namespace>` flag with all commands.
+
 To check the status of the OSM control plane, run:
 ```bash
 osm-health control-plane status
