@@ -16,6 +16,7 @@ require (
 	github.com/jstemmer/go-junit-report v0.9.1 // indirect
 	github.com/matm/gocov-html v0.0.0-20200509184451-71874e2e203b // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
+	github.com/mitchellh/gox v1.0.1 // indirect
 	github.com/openservicemesh/osm v0.8.2-0.20210921094717-3116404ececa
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.23.0

@@ -15,7 +15,7 @@ func TestEnvoyConfigParser(t *testing.T) {
 	assert := tassert.New(t)
 	actual := getReleases()
 
-	assert.Equal([]string{"v0.10", "v0.11", "v0.6", "v0.7", "v0.8", "v0.9"}, actual)
+	assert.Equal([]string{"v0.10", "v0.11", "v0.7", "v0.8", "v0.9"}, actual)
 
 	for _, release := range actual {
 		controllerVersion := ControllerVersion(release)
